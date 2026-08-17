@@ -6,7 +6,15 @@
   }
 {%- endstyle -%}
 
-{%- if section.blocks.size > 0 -%}
+{%- liquid
+  assign ticker_messages = shop.metafields.custom.ticker_messages.value
+  assign use_metafield = false
+  if ticker_messages != blank and ticker_messages.size > 0
+    assign use_metafield = true
+  endif
+-%}
+
+{%- if use_metafield or section.blocks.size > 0 -%}
   <div
     id="PromoTicker-{{ section.id }}"
     class="promo-ticker color-{{ section.settings.color_scheme }} gradient"
@@ -14,39 +22,36 @@
     aria-label="Promotions"
   >
     <div class="promo-ticker__inner{% if section.settings.pause_on_hover %} promo-ticker__inner--pause-hover{% endif %}">
-      <div class="promo-ticker__group">
-        {%- for block in section.blocks -%}
-          <div class="promo-ticker__item" {{ block.shopify_attributes }}>
-            {%- if block.settings.link != blank -%}
-              <a href="{{ block.settings.link }}">
-            {%- endif -%}
-            <span>{{ block.settings.text | escape }}</span>
-            {%- if block.settings.link != blank -%}
-              </a>
-            {%- endif -%}
-            <span class="promo-ticker__sep" aria-hidden="true">{{ section.settings.separator }}</span>
-          </div>
-        {%- endfor -%}
-      </div>
-      <div class="promo-ticker__group" aria-hidden="true">
-        {%- for block in section.blocks -%}
-          <div class="promo-ticker__item">
-            {%- if block.settings.link != blank -%}
-              <a href="{{ block.settings.link }}" tabindex="-1">
-            {%- endif -%}
-            <span>{{ block.settings.text | escape }}</span>
-            {%- if block.settings.link != blank -%}
-              </a>
-            {%- endif -%}
-            <span class="promo-ticker__sep" aria-hidden="true">{{ section.settings.separator }}</span>
-          </div>
-        {%- endfor -%}
-      </div>
+      {%- for copy in (1..2) -%}
+        <div class="promo-ticker__group"{% if copy == 2 %} aria-hidden="true"{% endif %}>
+          {%- if use_metafield -%}
+            {%- for message in ticker_messages -%}
+              <div class="promo-ticker__item">
+                <span>{{ message | escape }}</span>
+                <span class="promo-ticker__sep" aria-hidden="true">{{ section.settings.separator }}</span>
+              </div>
+            {%- endfor -%}
+          {%- else -%}
+            {%- for block in section.blocks -%}
+              <div class="promo-ticker__item"{% if copy == 1 %} {{ block.shopify_attributes }}{% endif %}>
+                {%- if block.settings.link != blank -%}
+                  <a href="{{ block.settings.link }}"{% if copy == 2 %} tabindex="-1"{% endif %}>
+                {%- endif -%}
+                <span>{{ block.settings.text | escape }}</span>
+                {%- if block.settings.link != blank -%}
+                  </a>
+                {%- endif -%}
+                <span class="promo-ticker__sep" aria-hidden="true">{{ section.settings.separator }}</span>
+              </div>
+            {%- endfor -%}
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
     </div>
   </div>
 {%- elsif request.design_mode -%}
   <div id="PromoTicker-{{ section.id }}" class="promo-ticker promo-ticker--empty color-{{ section.settings.color_scheme }} gradient">
-    <p class="promo-ticker__placeholder">Add message blocks below to show offers here</p>
+    <p class="promo-ticker__placeholder">Add offers via Settings → Custom data → Shop → "Promo Ticker Messages", or add Message blocks below</p>
   </div>
 {%- endif -%}
 
@@ -60,6 +65,10 @@
     "groups": ["header"]
   },
   "settings": [
+    {
+      "type": "paragraph",
+      "content": "Day-to-day offer text is edited in Settings → Custom data → Shop → \"Promo Ticker Messages\" — no need to open the theme editor for that. The Message blocks below are a fallback used only if that field is empty, and support optional links."
+    },
     {
       "type": "color_scheme",
       "id": "color_scheme",

@@ -1,6 +1,8 @@
 .promo-ticker {
   overflow: hidden;
   padding: 0.8rem 0;
+  /* Dawn renders color schemes at 0.75 alpha; the ticker needs full-strength text */
+  color: rgb(var(--color-foreground));
 }
 
 .promo-ticker--empty {
@@ -38,7 +40,8 @@
   font-size: 1.3rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  font-weight: 600;
+  font-weight: 700;
+  color: rgb(var(--color-foreground));
 }
 
 .promo-ticker__item a {
@@ -52,7 +55,7 @@
 
 .promo-ticker__sep {
   margin-left: 1.5rem;
-  opacity: 0.6;
+  opacity: 0.55;
 }
 
 @keyframes promo-ticker-scroll {

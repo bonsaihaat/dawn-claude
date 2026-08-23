@@ -19,6 +19,7 @@
   media="print"
   onload="this.media='all'"
 >
+<script src="{{ 'header-search-placeholder.js' | asset_url }}" defer="defer"></script>
 
 {%- if settings.predictive_search_enabled -%}
   <link rel="stylesheet" href="{{ 'component-price.css' | asset_url }}" media="print" onload="this.media='all'">
@@ -249,7 +250,18 @@
       {%- endif -%}
     {%- endif -%}
 
-    {%- render 'header-search-bar', input_id: 'Header-Search-Bar' -%}
+    {%- liquid
+      assign raw_placeholder_phrases = section.settings.search_placeholder_phrases | newline_to_br | split: '<br />'
+      assign search_placeholder_phrases_string = ''
+      for phrase in raw_placeholder_phrases
+        assign clean_phrase = phrase | strip_newlines | strip
+        if clean_phrase != blank
+          assign search_placeholder_phrases_string = search_placeholder_phrases_string | append: clean_phrase | append: '||'
+        endif
+      endfor
+      assign search_placeholder_phrases = search_placeholder_phrases_string | split: '||'
+    -%}
+    {%- render 'header-search-bar', input_id: 'Header-Search-Bar', placeholder_phrases: search_placeholder_phrases -%}
 
     <div class="header__icons{% if section.settings.enable_country_selector or section.settings.enable_language_selector %} header__icons--localization header-localization{% endif %}">
       <div class="desktop-localization-wrapper">
@@ -606,6 +618,17 @@
       "id": "show_line_separator",
       "default": true,
       "label": "t:sections.header.settings.show_line_separator.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.header.settings.header__search.content"
+    },
+    {
+      "type": "textarea",
+      "id": "search_placeholder_phrases",
+      "label": "t:sections.header.settings.search_placeholder_phrases.label",
+      "info": "t:sections.header.settings.search_placeholder_phrases.info",
+      "default": "Search for Bonsai Plants\nSearch for Bonsai Pots\nSearch for Garden Tools"
     },
     {
       "type": "header",

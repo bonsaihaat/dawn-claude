@@ -1112,6 +1112,13 @@
         "show_line_separator": {
           "label": "Separator line"
         },
+        "header__search": {
+          "content": "Search"
+        },
+        "search_placeholder_phrases": {
+          "label": "Search bar placeholder phrases",
+          "info": "One phrase per line. Typed and deleted on a loop in the search bar. Leave blank to show a plain \"Search\" placeholder."
+        },
         "header__1": {
           "content": "Color"
         },

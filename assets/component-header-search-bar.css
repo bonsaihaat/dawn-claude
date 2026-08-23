@@ -99,6 +99,6 @@
   overflow-y: auto;
 }
 
-.header__search-bar predictive-search:not(.loading) .predictive-search:not(.predictive-search--search) {
+.header__search-bar predictive-search:not([loading]) .predictive-search:not(.predictive-search--search) {
   display: none;
 }

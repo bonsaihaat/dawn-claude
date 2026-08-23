@@ -27,46 +27,46 @@
             assign drawer_promo_banner = section.blocks | where: 'type', 'drawer_promo_banner' | first
             assign drawer_category_tiles = section.blocks | where: 'type', 'drawer_category_tile'
           -%}
-          {%- if drawer_promo_banner -%}
-            <a
-              href="{{ drawer_promo_banner.settings.link | default: '#' }}"
-              class="menu-drawer__promo-banner"
-              {%- if drawer_promo_banner.settings.image -%}
-                style="background-image: url({{ drawer_promo_banner.settings.image | image_url: width: 700 }});"
-              {%- endif -%}
-              {{ drawer_promo_banner.shopify_attributes }}
-            >
-              <span class="menu-drawer__promo-banner-heading">{{ drawer_promo_banner.settings.heading }}</span>
-            </a>
-          {%- endif -%}
-
-          {%- if drawer_category_tiles.size > 0 -%}
-            <h2 class="menu-drawer__tiles-heading">{{ 'sections.header.drawer_tiles_heading' | t }}</h2>
-            <ul class="menu-drawer__tiles list-unstyled" role="list">
-              {%- for tile in drawer_category_tiles -%}
-                <li
-                  class="menu-drawer__tile{% if tile.settings.highlighted %} menu-drawer__tile--highlighted{% endif %}"
-                  {{ tile.shopify_attributes }}
-                >
-                  <a href="{{ tile.settings.link | default: '#' }}" class="menu-drawer__tile-link">
-                    {%- if tile.settings.image -%}
-                      {{
-                        tile.settings.image
-                        | image_url: width: 200
-                        | image_tag: class: 'menu-drawer__tile-image', widths: '50, 100, 200', loading: 'lazy'
-                      }}
-                    {%- endif -%}
-                    <span class="menu-drawer__tile-title">{{ tile.settings.title }}</span>
-                    {%- if tile.settings.badge != blank -%}
-                      <span class="menu-drawer__tile-badge">{{ tile.settings.badge }}</span>
-                    {%- endif -%}
-                  </a>
-                </li>
-              {%- endfor -%}
-            </ul>
-          {%- endif -%}
-
           <nav class="menu-drawer__navigation">
+            {%- if drawer_promo_banner -%}
+              <a
+                href="{{ drawer_promo_banner.settings.link | default: '#' }}"
+                class="menu-drawer__promo-banner"
+                {%- if drawer_promo_banner.settings.image -%}
+                  style="background-image: url({{ drawer_promo_banner.settings.image | image_url: width: 700 }});"
+                {%- endif -%}
+                {{ drawer_promo_banner.shopify_attributes }}
+              >
+                <span class="menu-drawer__promo-banner-heading">{{ drawer_promo_banner.settings.heading | escape }}</span>
+              </a>
+            {%- endif -%}
+
+            {%- if drawer_category_tiles.size > 0 -%}
+              <h2 class="menu-drawer__tiles-heading">{{ 'sections.header.drawer_tiles_heading' | t }}</h2>
+              <ul class="menu-drawer__tiles list-unstyled" role="list">
+                {%- for tile in drawer_category_tiles -%}
+                  <li
+                    class="menu-drawer__tile{% if tile.settings.highlighted %} menu-drawer__tile--highlighted{% endif %}"
+                    {{ tile.shopify_attributes }}
+                  >
+                    <a href="{{ tile.settings.link | default: '#' }}" class="menu-drawer__tile-link">
+                      {%- if tile.settings.image -%}
+                        {{
+                          tile.settings.image
+                          | image_url: width: 200
+                          | image_tag: class: 'menu-drawer__tile-image', widths: '50, 100, 200', loading: 'lazy'
+                        }}
+                      {%- endif -%}
+                      <span class="menu-drawer__tile-title">{{ tile.settings.title | escape }}</span>
+                      {%- if tile.settings.badge != blank -%}
+                        <span class="badge menu-drawer__tile-badge color-{{ settings.sale_badge_color_scheme }}">{{ tile.settings.badge | escape }}</span>
+                      {%- endif -%}
+                    </a>
+                  </li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+
             <ul class="menu-drawer__menu has-submenu list-menu" role="list">
               {%- for link in section.settings.menu.links -%}
                 <li>

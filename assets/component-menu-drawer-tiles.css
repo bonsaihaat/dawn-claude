@@ -82,12 +82,5 @@
 
 .menu-drawer__tile-badge {
   flex-shrink: 0;
-  padding: 0.2rem 0.9rem;
-  border-radius: 999px;
-  background-color: #84b815;
-  color: #ffffff;
   font-size: 1.1rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.03rem;
 }

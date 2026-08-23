@@ -251,15 +251,7 @@
     {%- endif -%}
 
     {%- liquid
-      assign raw_placeholder_phrases = section.settings.search_placeholder_phrases | newline_to_br | split: '<br />'
-      assign search_placeholder_phrases_string = ''
-      for phrase in raw_placeholder_phrases
-        assign clean_phrase = phrase | strip_newlines | strip
-        if clean_phrase != blank
-          assign search_placeholder_phrases_string = search_placeholder_phrases_string | append: clean_phrase | append: '||'
-        endif
-      endfor
-      assign search_placeholder_phrases = search_placeholder_phrases_string | split: '||'
+      assign search_placeholder_phrases = section.settings.search_placeholder_phrases | newline_to_br | split: '<br />'
     -%}
     {%- render 'header-search-bar', input_id: 'Header-Search-Bar', placeholder_phrases: search_placeholder_phrases -%}
 
@@ -324,7 +316,7 @@
     </div>
   </header>
 
-  {%- if section.settings.menu != blank -%}
+  {%- if section.settings.menu != blank and section.settings.menu_type_desktop != 'drawer' -%}
     <nav class="header__nav-row" aria-label="{{ 'sections.header.menu' | t }}">
       <div class="page-width">
         {%- if section.settings.menu_type_desktop == 'mega' -%}

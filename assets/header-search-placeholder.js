@@ -1,15 +1,27 @@
 (function () {
   function startTypewriter(input) {
+    if (input.dataset.typewriterInit) return;
+    input.dataset.typewriterInit = 'true';
+
     var raw = input.getAttribute('data-placeholder-phrases');
     if (!raw) return;
 
-    var phrases;
+    var parsed;
     try {
-      phrases = JSON.parse(raw);
+      parsed = JSON.parse(raw);
     } catch (e) {
       return;
     }
-    if (!Array.isArray(phrases) || phrases.length === 0) return;
+    if (!Array.isArray(parsed)) return;
+
+    var phrases = parsed
+      .map(function (phrase) {
+        return String(phrase).trim();
+      })
+      .filter(function (phrase) {
+        return phrase.length > 0;
+      });
+    if (phrases.length === 0) return;
 
     var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -28,6 +40,8 @@
     var deleting = false;
 
     function tick() {
+      if (!input.isConnected) return;
+
       var current = phrases[phraseIndex];
 
       if (!deleting) {
@@ -58,14 +72,21 @@
     window.setTimeout(tick, NEXT_DELAY);
   }
 
-  function init() {
-    var inputs = document.querySelectorAll('input[data-placeholder-phrases]');
+  function init(root) {
+    var scope = root || document;
+    var inputs = scope.querySelectorAll('input[data-placeholder-phrases]');
     inputs.forEach(startTypewriter);
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', function () {
+      init();
+    });
   } else {
     init();
   }
+
+  document.addEventListener('shopify:section:load', function (event) {
+    init(event.target);
+  });
 })();

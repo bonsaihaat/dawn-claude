@@ -1,0 +1,93 @@
+/* Mobile drawer promo banner + category tiles */
+
+.menu-drawer__promo-banner {
+  display: block;
+  position: relative;
+  min-height: 9rem;
+  margin: 0 0 1.6rem;
+  border-radius: 1.2rem;
+  background-color: #202b14;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+  text-decoration: none;
+}
+
+.menu-drawer__promo-banner:before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.15) 70%);
+}
+
+.menu-drawer__promo-banner-heading {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  min-height: 9rem;
+  padding: 1.6rem 2rem;
+  color: #ffffff;
+  font-family: var(--font-heading-family);
+  font-weight: var(--font-heading-weight);
+  font-size: 1.8rem;
+  line-height: 1.25;
+}
+
+.menu-drawer__tiles-heading {
+  margin: 0 0 1rem;
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05rem;
+  color: rgba(var(--color-foreground), 0.7);
+}
+
+.menu-drawer__tiles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin: 0 0 2rem;
+  padding: 0;
+  max-height: 40rem;
+  overflow-y: auto;
+}
+
+.menu-drawer__tile-link {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 0.6rem;
+  border-radius: 999px;
+  background-color: #f4f5f0;
+  text-decoration: none;
+  color: rgb(var(--color-foreground));
+}
+
+.menu-drawer__tile--highlighted .menu-drawer__tile-link {
+  background-color: rgba(132, 184, 21, 0.14);
+}
+
+.menu-drawer__tile-image {
+  flex-shrink: 0;
+  width: 4.8rem;
+  height: 4.8rem;
+  border-radius: 0.8rem;
+  object-fit: cover;
+}
+
+.menu-drawer__tile-title {
+  flex-grow: 1;
+  font-size: 1.5rem;
+}
+
+.menu-drawer__tile-badge {
+  flex-shrink: 0;
+  padding: 0.2rem 0.9rem;
+  border-radius: 999px;
+  background-color: #84b815;
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03rem;
+}

@@ -36,35 +36,45 @@
 
 .menu-drawer__tiles-heading {
   margin: 0 0 1rem;
-  font-size: 1.4rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05rem;
-  color: rgba(var(--color-foreground), 0.7);
+  font-size: 1.6rem;
+  font-weight: var(--font-heading-weight);
+  color: rgb(var(--color-button));
 }
 
-.menu-drawer__tiles {
+.menu-drawer__menu.has-submenu {
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
   margin: 0 0 2rem;
+}
+
+.menu-drawer__menu-item--top {
+  display: block;
   padding: 0;
-  max-height: 40rem;
-  overflow-y: auto;
+}
+
+.menu-drawer__menu-item--top:hover,
+.menu-drawer__menu-item--top:focus {
+  background-color: transparent;
+}
+
+.menu-drawer summary.menu-drawer__menu-item--top {
+  padding-right: 0;
 }
 
 .menu-drawer__tile-link {
   display: flex;
   align-items: center;
   gap: 1.2rem;
-  padding: 0.6rem;
-  border-radius: 999px;
-  background-color: #f4f5f0;
+  padding: 1rem 1.4rem;
+  border-radius: 1.2rem;
+  background-color: rgba(132, 184, 21, 0.12);
   text-decoration: none;
   color: rgb(var(--color-foreground));
 }
 
-.menu-drawer__tile--highlighted .menu-drawer__tile-link {
-  background-color: rgba(132, 184, 21, 0.14);
+.menu-drawer__tile-link.menu-drawer__tile--highlighted {
+  background-color: rgba(132, 184, 21, 0.22);
 }
 
 .menu-drawer__tile-image {
@@ -75,12 +85,22 @@
   object-fit: cover;
 }
 
+.menu-drawer__tile-image--placeholder {
+  background-color: rgba(132, 184, 21, 0.25);
+}
+
 .menu-drawer__tile-title {
   flex-grow: 1;
   font-size: 1.5rem;
+  text-align: left;
 }
 
 .menu-drawer__tile-badge {
   flex-shrink: 0;
   font-size: 1.1rem;
+}
+
+.menu-drawer__tile-link > .svg-wrapper {
+  flex-shrink: 0;
+  width: 15px;
 }

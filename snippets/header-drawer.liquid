@@ -41,47 +41,40 @@
               </a>
             {%- endif -%}
 
-            {%- if drawer_category_tiles.size > 0 -%}
+            {%- if drawer_promo_banner or drawer_category_tiles.size > 0 -%}
               <h2 class="menu-drawer__tiles-heading">{{ 'sections.header.drawer_tiles_heading' | t }}</h2>
-              <ul class="menu-drawer__tiles list-unstyled" role="list">
-                {%- for tile in drawer_category_tiles -%}
-                  <li
-                    class="menu-drawer__tile{% if tile.settings.highlighted %} menu-drawer__tile--highlighted{% endif %}"
-                    {{ tile.shopify_attributes }}
-                  >
-                    <a href="{{ tile.settings.link | default: '#' }}" class="menu-drawer__tile-link">
-                      {%- if tile.settings.image -%}
-                        {{
-                          tile.settings.image
-                          | image_url: width: 200
-                          | image_tag: class: 'menu-drawer__tile-image', widths: '50, 100, 200', loading: 'lazy'
-                        }}
-                      {%- endif -%}
-                      <span class="menu-drawer__tile-title">{{ tile.settings.title | escape }}</span>
-                      {%- if tile.settings.badge != blank -%}
-                        <span class="badge menu-drawer__tile-badge color-{{ settings.sale_badge_color_scheme }}">{{ tile.settings.badge | escape }}</span>
-                      {%- endif -%}
-                    </a>
-                  </li>
-                {%- endfor -%}
-              </ul>
             {%- endif -%}
 
             <ul class="menu-drawer__menu has-submenu list-menu" role="list">
               {%- for link in section.settings.menu.links -%}
+                {%- assign tile_block = drawer_category_tiles | where: 'settings.title', link.title | first -%}
                 <li>
                   {%- if link.links != blank -%}
                     <details id="Details-menu-drawer-menu-item-{{ forloop.index }}">
                       <summary
                         id="HeaderDrawer-{{ link.handle }}"
-                        class="menu-drawer__menu-item list-menu__item link link--text focus-inset{% if link.child_active %} menu-drawer__menu-item--active{% endif %}"
+                        class="menu-drawer__menu-item menu-drawer__menu-item--top list-menu__item link link--text focus-inset{% if link.child_active %} menu-drawer__menu-item--active{% endif %}"
                       >
-                        {{ link.title | escape }}
-                        <span class="svg-wrapper">
-                          {{- 'icon-arrow.svg' | inline_asset_content -}}
-                        </span>
-                        <span class="svg-wrapper">
-                          {{- 'icon-caret.svg' | inline_asset_content -}}
+                        <span class="menu-drawer__tile-link{% if tile_block.settings.highlighted %} menu-drawer__tile--highlighted{% endif %}">
+                          {%- if tile_block.settings.image -%}
+                            {{
+                              tile_block.settings.image
+                              | image_url: width: 200
+                              | image_tag: class: 'menu-drawer__tile-image', widths: '50, 100, 200', loading: 'lazy'
+                            }}
+                          {%- else -%}
+                            <span class="menu-drawer__tile-image menu-drawer__tile-image--placeholder" aria-hidden="true"></span>
+                          {%- endif -%}
+                          <span class="menu-drawer__tile-title">{{ link.title | escape }}</span>
+                          {%- if tile_block.settings.badge != blank -%}
+                            <span class="badge menu-drawer__tile-badge color-{{ settings.sale_badge_color_scheme }}">{{ tile_block.settings.badge | escape }}</span>
+                          {%- endif -%}
+                          <span class="svg-wrapper">
+                            {{- 'icon-arrow.svg' | inline_asset_content -}}
+                          </span>
+                          <span class="svg-wrapper">
+                            {{- 'icon-caret.svg' | inline_asset_content -}}
+                          </span>
                         </span>
                       </summary>
                       <div
@@ -170,12 +163,26 @@
                     <a
                       id="HeaderDrawer-{{ link.handle }}"
                       href="{{ link.url }}"
-                      class="menu-drawer__menu-item list-menu__item link link--text focus-inset{% if link.current %} menu-drawer__menu-item--active{% endif %}"
+                      class="menu-drawer__menu-item menu-drawer__menu-item--top list-menu__item link link--text focus-inset{% if link.current %} menu-drawer__menu-item--active{% endif %}"
                       {% if link.current %}
                         aria-current="page"
                       {% endif %}
                     >
-                      {{ link.title | escape }}
+                      <span class="menu-drawer__tile-link{% if tile_block.settings.highlighted %} menu-drawer__tile--highlighted{% endif %}">
+                        {%- if tile_block.settings.image -%}
+                          {{
+                            tile_block.settings.image
+                            | image_url: width: 200
+                            | image_tag: class: 'menu-drawer__tile-image', widths: '50, 100, 200', loading: 'lazy'
+                          }}
+                        {%- else -%}
+                          <span class="menu-drawer__tile-image menu-drawer__tile-image--placeholder" aria-hidden="true"></span>
+                        {%- endif -%}
+                        <span class="menu-drawer__tile-title">{{ link.title | escape }}</span>
+                        {%- if tile_block.settings.badge != blank -%}
+                          <span class="badge menu-drawer__tile-badge color-{{ settings.sale_badge_color_scheme }}">{{ tile_block.settings.badge | escape }}</span>
+                        {%- endif -%}
+                      </span>
                     </a>
                   {%- endif -%}
                 </li>

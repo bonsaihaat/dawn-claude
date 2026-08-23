@@ -61,8 +61,8 @@
         "header-tile-0": {
           "type": "drawer_category_tile",
           "settings": {
-            "title": "All Plants",
-            "link": "/collections/plants",
+            "title": "Home",
+            "link": "/",
             "badge": "",
             "highlighted": false
           }
@@ -70,17 +70,17 @@
         "header-tile-1": {
           "type": "drawer_category_tile",
           "settings": {
-            "title": "Bonsai Trees",
-            "link": "/collections/bonsai",
-            "badge": "New",
-            "highlighted": true
+            "title": "Bonsai Plants",
+            "link": "/collections/bonsai-plants",
+            "badge": "",
+            "highlighted": false
           }
         },
         "header-tile-2": {
           "type": "drawer_category_tile",
           "settings": {
-            "title": "Succulents",
-            "link": "/collections/succulents",
+            "title": "Pots & Others",
+            "link": "/collections/pots-others",
             "badge": "",
             "highlighted": false
           }
@@ -88,8 +88,8 @@
         "header-tile-3": {
           "type": "drawer_category_tile",
           "settings": {
-            "title": "Pots & Planters",
-            "link": "/collections/pots-planters",
+            "title": "Blogs",
+            "link": "/blogs/news",
             "badge": "",
             "highlighted": false
           }
@@ -97,8 +97,8 @@
         "header-tile-4": {
           "type": "drawer_category_tile",
           "settings": {
-            "title": "Plant Care",
-            "link": "/collections/plant-care",
+            "title": "Gallery",
+            "link": "/pages/gallery",
             "badge": "",
             "highlighted": false
           }

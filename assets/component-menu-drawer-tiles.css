@@ -90,6 +90,7 @@
 .menu-drawer__tile-link > .svg-wrapper {
   flex-shrink: 0;
   width: 15px;
+  color: rgb(var(--color-button));
 }
 
 .menu-drawer__account-links {

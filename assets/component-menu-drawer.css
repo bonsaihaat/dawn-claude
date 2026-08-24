@@ -150,7 +150,7 @@ details[open].menu-opening > .menu-drawer__submenu {
     justify-content: space-between;
     flex-shrink: 0;
     padding: 1.8rem 2rem;
-    border-bottom: 1px solid rgba(var(--color-foreground), 0.06);
+    border-bottom: 1px solid #eee7d8;
   }
 
   .menu-drawer__panel-title {

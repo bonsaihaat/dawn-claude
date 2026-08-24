@@ -95,7 +95,7 @@ details[open].menu-opening > .menu-drawer__submenu {
     position: fixed;
     top: 0;
     left: 0;
-    width: min(88vw, 36rem);
+    width: min(84vw, 32rem);
     height: 100vh;
     height: 100dvh;
     z-index: 9999;
@@ -158,6 +158,16 @@ details[open].menu-opening > .menu-drawer__submenu {
     font-weight: 700;
     font-size: 1.9rem;
     color: rgb(var(--color-foreground));
+  }
+
+  .menu-drawer__panel-logo-link {
+    display: block;
+    line-height: 0;
+  }
+
+  .menu-drawer__panel-logo {
+    height: 2.7rem;
+    width: auto;
   }
 
   .menu-drawer__panel-close {

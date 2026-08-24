@@ -135,6 +135,74 @@
       padding-bottom: {{ section.settings.padding_bottom }}px;
     }
   }
+
+  /* Bonsai Haat header restyle: cream surface, green accent nav, softer chrome. */
+  .header-wrapper {
+    --bh-search-bg: #eef4e0;
+    --bh-border: #eee7d8;
+    --bh-muted: #767d6c;
+    --bh-badge: #871b0f;
+    background-color: #faf7f1;
+  }
+
+  .header-wrapper--border-bottom {
+    border-bottom-color: var(--bh-border);
+  }
+
+  .header .cart-count-bubble {
+    background-color: var(--bh-badge);
+  }
+
+  @media screen and (min-width: 990px) {
+    .header__nav-row {
+      background-color: #faf7f1;
+      border-bottom-color: var(--bh-border);
+    }
+
+    .header__nav-row .list-menu--inline {
+      justify-content: center;
+      gap: clamp(1.6rem, 3vw, 4rem);
+    }
+
+    .header__nav-row .header__menu-item {
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      padding-top: 1.2rem;
+      padding-bottom: 0.9rem;
+      box-shadow: inset 0 -2px 0 transparent;
+      transition: box-shadow var(--duration-short) ease;
+    }
+
+    .header__nav-row .header__menu-item:hover,
+    .header__nav-row .header__menu-item:hover span,
+    .header__nav-row details[open] > .header__menu-item {
+      text-decoration: none;
+    }
+
+    .header__nav-row .header__menu-item:hover {
+      box-shadow: inset 0 -2px 0 rgba(var(--color-button), 0.5);
+    }
+
+    .header__nav-row .header__active-menu-item {
+      text-decoration: none;
+    }
+
+    .header__nav-row summary:has(.header__active-menu-item),
+    .header__nav-row a.header__menu-item[aria-current='page'] {
+      box-shadow: inset 0 -2px 0 rgb(var(--color-button));
+    }
+
+    .header__submenu.global-settings-popup {
+      border-radius: 1.4rem;
+      border: none;
+      box-shadow: 0 1.8rem 4rem -1.4rem rgba(13, 14, 12, 0.28);
+    }
+
+    .header__submenu .header__menu-item {
+      border-radius: 0.8rem;
+      margin: 0 0.4rem;
+    }
+  }
 {%- endstyle -%}
 
 <script src="{{ 'cart-notification.js' | asset_url }}" defer="defer"></script>

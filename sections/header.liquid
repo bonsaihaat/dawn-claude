@@ -158,6 +158,16 @@
     background-color: var(--bh-badge);
   }
 
+  /* base.css comma-groups `.header__icon, .header__icon--cart .icon` into one
+     4.4rem sizing rule, so the cart glyph inherits the 44px touch-target size
+     meant for the outer box instead of the 2rem size every other header icon
+     gets — it renders visibly larger/heavier than the account icon next to
+     it. Restore it to match. */
+  .header__icon--cart .icon {
+    height: 2rem;
+    width: 2rem;
+  }
+
   @media screen and (max-width: 989px) {
     .header {
       padding: 1.4rem 1.8rem 1.4rem;

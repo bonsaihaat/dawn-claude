@@ -51,13 +51,6 @@
     "header": {
       "type": "header",
       "blocks": {
-        "header-promo-0": {
-          "type": "drawer_promo_banner",
-          "settings": {
-            "heading": "Buy any 4 plants for just ₹999",
-            "link": "/collections/all"
-          }
-        },
         "header-tile-0": {
           "type": "drawer_category_tile",
           "settings": {
@@ -105,7 +98,6 @@
         }
       },
       "block_order": [
-        "header-promo-0",
         "header-tile-0",
         "header-tile-1",
         "header-tile-2",
@@ -116,6 +108,7 @@
         "logo_position": "middle-left",
         "mobile_logo_position": "center",
         "menu": "main-menu",
+        "drawer_menu_heading": "Kyari Top Picks",
         "menu_type_desktop": "dropdown",
         "sticky_header_type": "on-scroll-up",
         "show_line_separator": true,

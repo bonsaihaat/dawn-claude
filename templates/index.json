@@ -1,59 +1,68 @@
 {
   "sections": {
-    "image_banner": {
-      "type": "image-banner",
+    "hero_grid": {
+      "type": "hero-grid",
       "blocks": {
-        "badge": {
-          "type": "text",
+        "card_1": {
+          "type": "promo_card",
           "settings": {
-            "text": "India's No. 1 Bonsai Shop",
-            "text_style": "caption-with-letter-spacing"
+            "tone": "dark",
+            "eyebrow": "New to bonsai?",
+            "title": "<p>Shop beginner-friendly trees</p>",
+            "button_label": "Under ₹999",
+            "button_link": "shopify://collections/all"
           }
         },
-        "heading": {
-          "type": "heading",
+        "card_2": {
+          "type": "promo_card",
           "settings": {
-            "heading": "Bring the Art of Bonsai Home",
-            "heading_size": "hxl"
+            "tone": "light",
+            "eyebrow": "Already growing one?",
+            "title": "<p>Explore pots, tools &amp; feed</p>",
+            "button_label": "Shop accessories",
+            "button_link": "shopify://collections/all"
           }
         },
-        "text": {
-          "type": "text",
+        "benefit_1": {
+          "type": "benefit",
           "settings": {
-            "text": "Hand-trained, nursery-grown bonsai trees delivered across India — for beginners and collectors alike.",
-            "text_style": "body"
+            "label": "Hand-trained trees"
           }
         },
-        "button": {
-          "type": "buttons",
+        "benefit_2": {
+          "type": "benefit",
           "settings": {
-            "button_label_1": "Shop Bonsai Trees",
-            "button_link_1": "shopify://collections/all",
-            "button_style_secondary_1": false,
-            "button_label_2": "",
-            "button_link_2": "",
-            "button_style_secondary_2": false
+            "label": "Arrives healthy"
+          }
+        },
+        "benefit_3": {
+          "type": "benefit",
+          "settings": {
+            "label": "Free replacement"
+          }
+        },
+        "benefit_4": {
+          "type": "benefit",
+          "settings": {
+            "label": "Bonsai care support"
           }
         }
       },
       "block_order": [
-        "badge",
-        "heading",
-        "text",
-        "button"
+        "card_1",
+        "card_2",
+        "benefit_1",
+        "benefit_2",
+        "benefit_3",
+        "benefit_4"
       ],
       "settings": {
+        "badge_text": "India's No. 1 Bonsai Shop",
+        "heading": "<p>Bring the Art of Bonsai Home.</p>",
         "image": "shopify:\/\/shop_images\/280071abbec0e2410032d47e6182ea0b.png",
-        "image_overlay_opacity": 30,
-        "image_height": "large",
-        "desktop_content_position": "middle-left",
-        "show_text_box": true,
-        "image_behavior": "none",
-        "desktop_content_alignment": "left",
-        "color_scheme": "scheme-3",
-        "mobile_content_alignment": "center",
-        "stack_images_on_mobile": false,
-        "show_text_below": false
+        "banner_link": "shopify://collections/all",
+        "banner_link_label": "Shop bonsai trees",
+        "color_scheme": "scheme-1"
       }
     },
     "featured_collection": {
@@ -86,7 +95,7 @@
     }
   },
   "order": [
-    "image_banner",
+    "hero_grid",
     "featured_collection"
   ]
 }

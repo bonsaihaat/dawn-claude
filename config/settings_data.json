@@ -198,6 +198,17 @@
           "secondary_button_label": "#ffffff",
           "shadow": "#121212"
         }
+      },
+      "scheme-6": {
+        "settings": {
+          "background": "#0d0e0c",
+          "background_gradient": "linear-gradient(90deg, #0d0e0c 0%, #3a1109 55%, #871b0f 100%)",
+          "text": "#f4f7ea",
+          "button": "#f4f7ea",
+          "button_label": "#0d0e0c",
+          "secondary_button_label": "#f4f7ea",
+          "shadow": "#121212"
+        }
       }
     }
   },
@@ -259,6 +270,17 @@
             "button": "#FFFFFF",
             "button_label": "#84B815",
             "secondary_button_label": "#FFFFFF",
+            "shadow": "#121212"
+          }
+        },
+        "scheme-6": {
+          "settings": {
+            "background": "#0D0E0C",
+            "background_gradient": "linear-gradient(90deg, #0d0e0c 0%, #3a1109 55%, #871b0f 100%)",
+            "text": "#F4F7EA",
+            "button": "#F4F7EA",
+            "button_label": "#0D0E0C",
+            "secondary_button_label": "#F4F7EA",
             "shadow": "#121212"
           }
         }

@@ -26,8 +26,20 @@
         <div class="promo-ticker__group"{% if copy == 2 %} aria-hidden="true"{% endif %}>
           {%- if use_metafield -%}
             {%- for message in ticker_messages -%}
+              {%- assign message_parts = message | split: '|' -%}
+              {%- assign message_text = message_parts[0] | strip -%}
+              {%- assign message_link = '' -%}
+              {%- if message_parts.size > 1 -%}
+                {%- assign message_link = message_parts[1] | strip -%}
+              {%- endif -%}
               <div class="promo-ticker__item">
-                <span>{{ message | escape }}</span>
+                {%- if message_link != blank -%}
+                  <a href="{{ message_link | escape }}"{% if copy == 2 %} tabindex="-1"{% endif %}>
+                {%- endif -%}
+                <span>{{ message_text | escape }}</span>
+                {%- if message_link != blank -%}
+                  </a>
+                {%- endif -%}
                 <span class="promo-ticker__sep" aria-hidden="true">{{ section.settings.separator }}</span>
               </div>
             {%- endfor -%}
@@ -67,7 +79,7 @@
   "settings": [
     {
       "type": "paragraph",
-      "content": "Day-to-day offer text is edited in Settings → Custom data → Shop → \"Promo Ticker Messages\" — no need to open the theme editor for that. The Message blocks below are a fallback used only if that field is empty, and support optional links."
+      "content": "Day-to-day offer text is edited in Settings → Custom data → Shop → \"Promo Ticker Messages\" — no need to open the theme editor for that. To make a message clickable, add \"| \" followed by the URL after the text, e.g. \"Free shipping on orders above ₹1999 | /pages/shipping\". The Message blocks below are a fallback used only if that field is empty, and support optional links via their own Link setting."
     },
     {
       "type": "color_scheme",

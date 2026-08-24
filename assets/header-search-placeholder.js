@@ -35,6 +35,22 @@
     var HOLD_DELAY = 1600;
     var NEXT_DELAY = 400;
 
+    // Phrases usually share a leading phrase like "Search for " (and often
+    // more, e.g. "Search for Bonsai "). Keep that shared part static and
+    // only animate the part that actually differs between phrases, instead
+    // of retyping the whole string every cycle. Degrades gracefully to the
+    // old whole-phrase behavior if the phrases share no common prefix.
+    var prefix = phrases[0];
+    for (var i = 1; i < phrases.length && prefix; i++) {
+      var other = phrases[i];
+      var j = 0;
+      while (j < prefix.length && j < other.length && prefix[j] === other[j]) j++;
+      prefix = prefix.slice(0, j);
+    }
+    var suffixes = phrases.map(function (phrase) {
+      return phrase.slice(prefix.length);
+    });
+
     var phraseIndex = 0;
     var charIndex = 0;
     var deleting = false;
@@ -42,11 +58,11 @@
     function tick() {
       if (!input.isConnected) return;
 
-      var current = phrases[phraseIndex];
+      var current = suffixes[phraseIndex];
 
       if (!deleting) {
         charIndex += 1;
-        input.setAttribute('placeholder', current.slice(0, charIndex));
+        input.setAttribute('placeholder', prefix + current.slice(0, charIndex));
 
         if (charIndex === current.length) {
           deleting = true;
@@ -58,11 +74,11 @@
       }
 
       charIndex -= 1;
-      input.setAttribute('placeholder', current.slice(0, charIndex));
+      input.setAttribute('placeholder', prefix + current.slice(0, charIndex));
 
       if (charIndex === 0) {
         deleting = false;
-        phraseIndex = (phraseIndex + 1) % phrases.length;
+        phraseIndex = (phraseIndex + 1) % suffixes.length;
         window.setTimeout(tick, NEXT_DELAY);
         return;
       }

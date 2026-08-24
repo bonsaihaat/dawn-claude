@@ -1,6 +1,6 @@
 .promo-ticker {
   overflow: hidden;
-  padding: 0.8rem 0;
+  padding: 0.9rem 0;
   /* Dawn renders color schemes at 0.75 alpha; the ticker needs full-strength text */
   color: rgb(var(--color-foreground));
 }
@@ -36,11 +36,10 @@
   display: inline-flex;
   align-items: center;
   white-space: nowrap;
-  padding: 0 1.5rem;
-  font-size: 1.3rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  font-weight: 700;
+  padding: 0 1.8rem;
+  font-size: 1.2rem;
+  letter-spacing: 0.04em;
+  font-weight: 500;
   color: rgb(var(--color-foreground));
 }
 
@@ -54,8 +53,12 @@
 }
 
 .promo-ticker__sep {
-  margin-left: 1.5rem;
+  margin-left: 1.8rem;
   opacity: 0.55;
+}
+
+.promo-ticker__sep:empty {
+  display: none;
 }
 
 @keyframes promo-ticker-scroll {

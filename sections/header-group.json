@@ -17,21 +17,21 @@
         "promo-ticker-0": {
           "type": "message",
           "settings": {
-            "text": "🌿 Free shipping on orders above ₹1999",
+            "text": "Free shipping on orders above ₹1999",
             "link": ""
           }
         },
         "promo-ticker-1": {
           "type": "message",
           "settings": {
-            "text": "✨ Use code BONSAI10 for 10% off your first order",
+            "text": "Use code BONSAI10 for 10% off your first order",
             "link": ""
           }
         },
         "promo-ticker-2": {
           "type": "message",
           "settings": {
-            "text": "🚚 Pan-India delivery in 3–5 days",
+            "text": "Pan-India delivery in 3–5 days",
             "link": ""
           }
         }
@@ -42,10 +42,10 @@
         "promo-ticker-2"
       ],
       "settings": {
-        "color_scheme": "scheme-5",
-        "scroll_speed": 25,
+        "color_scheme": "scheme-6",
+        "scroll_speed": 20,
         "pause_on_hover": true,
-        "separator": "•"
+        "separator": ""
       }
     },
     "header": {
@@ -119,7 +119,7 @@
         "enable_language_selector": false,
         "margin_bottom": 0,
         "padding_top": 12,
-        "padding_bottom": 12
+        "padding_bottom": 10
       }
     }
   },

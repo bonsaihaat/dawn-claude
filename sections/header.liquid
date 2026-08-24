@@ -142,7 +142,14 @@
     --bh-border: #eee7d8;
     --bh-muted: #767d6c;
     --bh-badge: #871b0f;
-    background-color: #faf7f1;
+  }
+
+  /* .gradient (base.css) sets the `background` shorthand, which includes
+     background-color — a plain .header-wrapper background-color rule loses
+     to it regardless of source order. Match its specificity with a
+     compound selector so the cream surface actually wins. */
+  .header-wrapper.gradient {
+    background: #faf7f1;
   }
 
   .header-wrapper--border-bottom {
@@ -162,7 +169,7 @@
   @media screen and (min-width: 990px) {
     .header__search-bar {
       max-width: 48rem;
-      justify-self: start;
+      justify-self: center;
     }
 
     .header__icons {

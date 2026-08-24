@@ -1,0 +1,189 @@
+{{ 'section-hero-grid.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign full_width = '100vw'
+  assign widths = '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840'
+  assign fetch_priority = 'auto'
+  if section.index == 1
+    assign fetch_priority = 'high'
+  endif
+-%}
+
+<div class="hero-grid color-{{ section.settings.color_scheme }} page-width">
+  {%- if section.settings.badge_text != blank -%}
+    <p class="hero-grid__badge">{{ section.settings.badge_text | escape }}</p>
+  {%- endif -%}
+
+  {%- if section.settings.heading != blank -%}
+    <h2 class="hero-grid__heading">{{ section.settings.heading }}</h2>
+  {%- endif -%}
+
+  <div class="hero-grid__layout">
+    <div class="hero-grid__banner">
+      {%- if section.settings.image != blank -%}
+        {{
+          section.settings.image
+          | image_url: width: 3840
+          | image_tag: sizes: full_width, widths: widths, fetchpriority: fetch_priority, class: 'hero-grid__banner-image'
+        }}
+      {%- else -%}
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg hero-grid__banner-image' }}
+      {%- endif -%}
+      {%- if section.settings.banner_link != blank -%}
+        <a href="{{ section.settings.banner_link }}" class="hero-grid__banner-link" aria-label="{{ section.settings.banner_link_label | escape }}"></a>
+      {%- endif -%}
+    </div>
+
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'promo_card' -%}
+        <div class="hero-grid__card hero-grid__card--{{ block.settings.tone }}" {{ block.shopify_attributes }}>
+          {%- if block.settings.eyebrow != blank -%}
+            <p class="hero-grid__card-eyebrow">{{ block.settings.eyebrow | escape }}</p>
+          {%- endif -%}
+          {%- if block.settings.title != blank -%}
+            <p class="hero-grid__card-title">{{ block.settings.title }}</p>
+          {%- endif -%}
+          {%- if block.settings.button_label != blank -%}
+            <a href="{{ block.settings.button_link }}" class="hero-grid__card-link">
+              {{ block.settings.button_label | escape }}
+              <span aria-hidden="true">&rarr;</span>
+            </a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+
+  {%- liquid
+    assign benefit_blocks = section.blocks | where: 'type', 'benefit'
+  -%}
+  {%- if benefit_blocks.size > 0 -%}
+    <ul class="hero-grid__benefits list-unstyled" role="list">
+      {%- for block in benefit_blocks -%}
+        <li class="hero-grid__benefit" {{ block.shopify_attributes }}>
+          <span class="hero-grid__benefit-icon">
+            {%- if block.settings.icon != blank -%}
+              {{ block.settings.icon | image_url: width: 80 | image_tag: loading: 'lazy', widths: '40, 80' }}
+            {%- endif -%}
+          </span>
+          <span class="hero-grid__benefit-label">{{ block.settings.label | escape }}</span>
+        </li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Hero grid",
+  "class": "section",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "scheme-1"
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge text",
+      "default": "Rated 4.9 by 10,000+ Bonsai Parents"
+    },
+    {
+      "type": "richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "<p>India's No. 1 Bonsai Shop.</p>"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Banner image"
+    },
+    {
+      "type": "url",
+      "id": "banner_link",
+      "label": "Banner link"
+    },
+    {
+      "type": "text",
+      "id": "banner_link_label",
+      "label": "Banner link accessible label",
+      "default": "Shop the banner offer"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "promo_card",
+      "name": "Promo card",
+      "limit": 2,
+      "settings": [
+        {
+          "type": "select",
+          "id": "tone",
+          "label": "Tone",
+          "options": [
+            { "value": "dark", "label": "Dark" },
+            { "value": "light", "label": "Light" }
+          ],
+          "default": "dark"
+        },
+        {
+          "type": "text",
+          "id": "eyebrow",
+          "label": "Eyebrow",
+          "default": "New to bonsai?"
+        },
+        {
+          "type": "richtext",
+          "id": "title",
+          "label": "Title",
+          "default": "<p>Shop beginner-friendly trees</p>"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label",
+          "default": "Under ₹999"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button link"
+        }
+      ]
+    },
+    {
+      "type": "benefit",
+      "name": "Benefit",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "icon",
+          "label": "Icon"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Free replacement"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero grid",
+      "blocks": [
+        { "type": "promo_card" },
+        { "type": "promo_card" },
+        { "type": "benefit" },
+        { "type": "benefit" },
+        { "type": "benefit" },
+        { "type": "benefit" }
+      ]
+    }
+  ]
+}
+{% endschema %}

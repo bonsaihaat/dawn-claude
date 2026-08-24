@@ -153,6 +153,12 @@
     background-color: var(--bh-badge);
   }
 
+  @media screen and (max-width: 989px) {
+    .header {
+      padding: 1.4rem 1.8rem 1.4rem;
+    }
+  }
+
   @media screen and (min-width: 990px) {
     .header__nav-row {
       background-color: #faf7f1;
@@ -160,6 +166,10 @@
     }
 
     .header__nav-row .list-menu--inline {
+      /* list-menu--inline is display:inline-flex (shrink-to-fit), so
+         justify-content alone can't center it — force it to span the row. */
+      display: flex;
+      width: 100%;
       justify-content: center;
       gap: clamp(1.6rem, 3vw, 4rem);
     }

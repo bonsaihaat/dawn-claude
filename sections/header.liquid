@@ -138,9 +138,7 @@
 
   /* Bonsai Haat header restyle: cream surface, green accent nav, softer chrome. */
   .header-wrapper {
-    --bh-search-bg: #eef4e0;
     --bh-border: #eee7d8;
-    --bh-muted: #767d6c;
     --bh-badge: #871b0f;
   }
 
@@ -167,13 +165,17 @@
   }
 
   @media screen and (min-width: 990px) {
+    .header__heading-logo {
+      width: 8rem;
+    }
+
     .header__search-bar {
       max-width: 48rem;
       justify-self: center;
     }
 
     .header__icons {
-      gap: 0.6rem;
+      gap: 0.2rem;
     }
 
     .header__nav-row {
@@ -224,9 +226,26 @@
       box-shadow: 0 1.8rem 4rem -1.4rem rgba(13, 14, 12, 0.28);
     }
 
+    /* .header__nav-row .header__menu-item (above, and base.css's own uppercase
+       rule) targets every .header__menu-item under .header__nav-row — including
+       the dropdown's own links, since they're nested inside it. Reset them back
+       to the mockup's plain dropdown-item look so the nav row's bold/uppercase/
+       underline styling doesn't bleed into the popup. */
     .header__submenu .header__menu-item {
       border-radius: 0.8rem;
       margin: 0 0.4rem;
+      padding-top: 0.8rem;
+      padding-bottom: 0.8rem;
+      text-transform: none;
+      font-weight: 500;
+      letter-spacing: normal;
+      font-size: 1.3rem;
+      color: #20241b;
+      box-shadow: none;
+    }
+
+    .header__submenu .header__menu-item:hover {
+      box-shadow: none;
     }
   }
 {%- endstyle -%}

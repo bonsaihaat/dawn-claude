@@ -81,7 +81,7 @@ details[open].menu-opening > .menu-drawer__submenu {
     background: rgba(var(--color-foreground), 0.5);
     opacity: 0;
     visibility: hidden;
-    z-index: 2;
+    z-index: 9998;
     transition: opacity 0s, visibility 0s;
   }
 
@@ -98,6 +98,7 @@ details[open].menu-opening > .menu-drawer__submenu {
     width: min(88vw, 36rem);
     height: 100vh;
     height: 100dvh;
+    z-index: 9999;
   }
 
   .js header-drawer .menu-drawer {
@@ -157,6 +158,7 @@ details[open].menu-opening > .menu-drawer__submenu {
   .menu-drawer__navigation-container {
     flex: 1;
     min-height: 0;
+    position: relative;
   }
 }
 

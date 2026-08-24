@@ -71,9 +71,93 @@ details[open].menu-opening > .menu-drawer__submenu {
   }
 }
 
+@media screen and (max-width: 749px) {
+  .js header-drawer > details > summary::before,
+  .js header-drawer > details[open]:not(.menu-opening) > summary::before {
+    content: '';
+    position: fixed;
+    cursor: default;
+    inset: 0;
+    background: rgba(var(--color-foreground), 0.5);
+    opacity: 0;
+    visibility: hidden;
+    z-index: 2;
+    transition: opacity 0s, visibility 0s;
+  }
+
+  header-drawer > details[open] > summary::before {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity var(--duration-default) ease, visibility var(--duration-default) ease;
+  }
+
+  header-drawer .menu-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: min(88vw, 36rem);
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  .js header-drawer .menu-drawer {
+    height: 100vh;
+    height: 100dvh;
+  }
+}
+
 .menu-drawer__inner-container {
   position: relative;
   height: 100%;
+}
+
+.menu-drawer__panel-header {
+  display: none;
+}
+
+@media screen and (max-width: 749px) {
+  .menu-drawer__inner-container {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .menu-drawer__panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    padding: 1.8rem 2rem;
+    border-bottom: 1px solid rgba(var(--color-foreground), 0.06);
+  }
+
+  .menu-drawer__panel-title {
+    font-family: var(--font-heading-family);
+    font-weight: var(--font-heading-weight);
+    font-size: 1.6rem;
+    color: rgb(var(--color-foreground));
+  }
+
+  .menu-drawer__panel-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.2rem;
+    height: 3.2rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: rgb(var(--color-foreground));
+  }
+
+  .menu-drawer__panel-close .svg-wrapper {
+    width: 1.6rem;
+    height: 1.6rem;
+  }
+
+  .menu-drawer__navigation-container {
+    flex: 1;
+    min-height: 0;
+  }
 }
 
 .menu-drawer__navigation-container {

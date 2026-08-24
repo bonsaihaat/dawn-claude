@@ -22,27 +22,25 @@
     </summary>
     <div id="menu-drawer" class="gradient menu-drawer motion-reduce color-{{ section.settings.menu_color_scheme }}">
       <div class="menu-drawer__inner-container">
+        <div class="menu-drawer__panel-header">
+          <span class="menu-drawer__panel-title">{{ 'sections.header.menu' | t }}</span>
+          <button
+            type="button"
+            class="menu-drawer__panel-close link focus-inset"
+            aria-label="{{ 'accessibility.close' | t }}"
+          >
+            <span class="svg-wrapper">
+              {{- 'icon-close.svg' | inline_asset_content -}}
+            </span>
+          </button>
+        </div>
         <div class="menu-drawer__navigation-container">
           {%- liquid
-            assign drawer_promo_banner = section.blocks | where: 'type', 'drawer_promo_banner' | first
             assign drawer_category_tiles = section.blocks | where: 'type', 'drawer_category_tile'
           -%}
           <nav class="menu-drawer__navigation">
-            {%- if drawer_promo_banner -%}
-              <a
-                href="{{ drawer_promo_banner.settings.link | default: '#' }}"
-                class="menu-drawer__promo-banner"
-                {%- if drawer_promo_banner.settings.image -%}
-                  style="background-image: url({{ drawer_promo_banner.settings.image | image_url: width: 700 }});"
-                {%- endif -%}
-                {{ drawer_promo_banner.shopify_attributes }}
-              >
-                <span class="menu-drawer__promo-banner-heading">{{ drawer_promo_banner.settings.heading | escape }}</span>
-              </a>
-            {%- endif -%}
-
-            {%- if drawer_promo_banner or drawer_category_tiles.size > 0 -%}
-              <h2 class="menu-drawer__tiles-heading">{{ 'sections.header.drawer_tiles_heading' | t }}</h2>
+            {%- if section.settings.drawer_menu_heading != blank -%}
+              <h2 class="menu-drawer__tiles-heading">{{ section.settings.drawer_menu_heading | escape }}</h2>
             {%- endif -%}
 
             <ul class="menu-drawer__menu has-submenu list-menu" role="list">

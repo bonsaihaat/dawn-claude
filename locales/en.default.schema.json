@@ -1106,6 +1106,10 @@
         "menu": {
           "label": "Menu"
         },
+        "drawer_menu_heading": {
+          "label": "Mobile menu heading",
+          "info": "Shown above the menu list in the mobile drawer. Leave blank to hide."
+        },
         "menu_type_desktop": {
           "label": "Menu type",
           "options__1": {
@@ -1177,21 +1181,6 @@
         }
       },
       "blocks": {
-        "drawer_promo_banner": {
-          "name": "Drawer promo banner",
-          "info": "Shown at the top of the mobile menu drawer.",
-          "settings": {
-            "image": {
-              "label": "Background image"
-            },
-            "heading": {
-              "label": "Heading"
-            },
-            "link": {
-              "label": "Link"
-            }
-          }
-        },
         "drawer_category_tile": {
           "name": "Drawer category tile",
           "info": "Shown in the mobile menu drawer's category list.",

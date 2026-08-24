@@ -287,7 +287,6 @@
     "header": {
       "announcement": "Announcement",
       "menu": "Menu",
-      "drawer_tiles_heading": "Shop by category",
       "cart_count": {
         "one": "{{ count }} item",
         "other": "{{ count }} items"

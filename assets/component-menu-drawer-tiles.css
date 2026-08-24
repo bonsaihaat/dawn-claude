@@ -1,41 +1,7 @@
-/* Mobile drawer promo banner + category tiles */
-
-.menu-drawer__promo-banner {
-  display: block;
-  position: relative;
-  min-height: 9rem;
-  margin: 0 0 1.6rem;
-  border-radius: 1.2rem;
-  background-color: #202b14;
-  background-size: cover;
-  background-position: center;
-  overflow: hidden;
-  text-decoration: none;
-}
-
-.menu-drawer__promo-banner:before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.15) 70%);
-}
-
-.menu-drawer__promo-banner-heading {
-  position: relative;
-  display: flex;
-  align-items: center;
-  height: 100%;
-  min-height: 9rem;
-  padding: 1.6rem 2rem;
-  color: #ffffff;
-  font-family: var(--font-heading-family);
-  font-weight: var(--font-heading-weight);
-  font-size: 1.8rem;
-  line-height: 1.25;
-}
+/* Mobile drawer boxed menu list */
 
 .menu-drawer__tiles-heading {
-  margin: 0 0 1rem;
+  margin: 0 2rem 1rem;
   font-size: 1.6rem;
   font-weight: var(--font-heading-weight);
   color: rgb(var(--color-button));
@@ -44,8 +10,20 @@
 .menu-drawer__menu.has-submenu {
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
-  margin: 0 0 2rem;
+  gap: 0;
+  margin: 0 2rem 2rem;
+  padding: 0.4rem;
+  border-radius: 1.6rem;
+  background-color: rgba(var(--color-button), 0.08);
+  overflow: hidden;
+}
+
+.menu-drawer__menu.has-submenu > li {
+  border-bottom: 1px solid rgba(var(--color-foreground), 0.06);
+}
+
+.menu-drawer__menu.has-submenu > li:last-child {
+  border-bottom: none;
 }
 
 .menu-drawer__menu-item--top {
@@ -66,27 +44,31 @@
   display: flex;
   align-items: center;
   gap: 1.2rem;
-  padding: 1rem 1.4rem;
+  padding: 1.2rem 1rem;
   border-radius: 1.2rem;
-  background-color: rgba(132, 184, 21, 0.12);
+  background-color: transparent;
   text-decoration: none;
   color: rgb(var(--color-foreground));
+  transition: background-color var(--duration-short) ease;
 }
 
+.menu-drawer__menu-item--active .menu-drawer__tile-link,
 .menu-drawer__tile-link.menu-drawer__tile--highlighted {
-  background-color: rgba(132, 184, 21, 0.22);
+  margin: 0.2rem 0;
+  background-color: rgba(var(--color-button), 0.28);
+  color: rgb(var(--color-foreground));
 }
 
 .menu-drawer__tile-image {
   flex-shrink: 0;
   width: 4.8rem;
   height: 4.8rem;
-  border-radius: 0.8rem;
+  border-radius: 1rem;
   object-fit: cover;
 }
 
 .menu-drawer__tile-image--placeholder {
-  background-color: rgba(132, 184, 21, 0.25);
+  background-color: rgba(var(--color-button), 0.22);
 }
 
 .menu-drawer__tile-title {

@@ -104,10 +104,18 @@
 }
 
 .menu-drawer__inner-submenu .menu-drawer__menu-item {
-  padding-left: 1.4rem;
+  padding: 1.2rem 1.4rem;
+  font-size: 1.5rem;
+}
+
+.menu-drawer__inner-submenu summary.menu-drawer__menu-item {
   padding-right: 1.4rem;
 }
 
 .menu-drawer__inner-submenu .menu-drawer__menu-item--active {
   background-color: rgba(var(--color-button), 0.28);
+}
+
+.menu-drawer__inner-submenu .menu-drawer__menu-item > .svg-wrapper {
+  right: 1.4rem;
 }

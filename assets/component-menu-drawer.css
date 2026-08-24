@@ -176,6 +176,10 @@ details[open].menu-opening > .menu-drawer__submenu {
     min-height: 0;
     position: relative;
   }
+
+  .menu-drawer__navigation {
+    padding-top: 1.2rem;
+  }
 }
 
 .menu-drawer__navigation-container {

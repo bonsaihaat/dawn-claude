@@ -43,6 +43,8 @@
 .menu-drawer__tile-link {
   display: flex;
   align-items: center;
+  box-sizing: border-box;
+  width: 100%;
   gap: 1.2rem;
   padding: 1.2rem 1rem;
   border-radius: 1.2rem;

@@ -78,7 +78,7 @@ details[open].menu-opening > .menu-drawer__submenu {
     position: fixed;
     cursor: default;
     inset: 0;
-    background: rgba(var(--color-foreground), 0.5);
+    background: rgba(var(--color-foreground), 0.65);
     opacity: 0;
     visibility: hidden;
     z-index: 9998;
@@ -104,6 +104,22 @@ details[open].menu-opening > .menu-drawer__submenu {
   .js header-drawer .menu-drawer {
     height: 100vh;
     height: 100dvh;
+  }
+
+  /*
+   * The announcement bar + header are bundled into one "always on top" sticky
+   * unit by the theme (.shopify-section-group-header-group), so raising the
+   * drawer's own z-index can't out-rank it from inside. Instead, hide that
+   * whole unit while the drawer is open, except for header-drawer itself
+   * (the hamburger button, the open panel, and the scrim).
+   */
+  body:has(header-drawer > details[open]) .shopify-section-group-header-group {
+    visibility: hidden;
+  }
+
+  body:has(header-drawer > details[open]) header-drawer,
+  body:has(header-drawer > details[open]) header-drawer * {
+    visibility: visible;
   }
 }
 

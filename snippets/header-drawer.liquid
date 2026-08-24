@@ -85,8 +85,9 @@
                             <span class="svg-wrapper">
                               {{- 'icon-arrow.svg' | inline_asset_content -}}
                             </span>
-                            {{ link.title | escape }}
+                            {{ 'sections.header.menu' | t }}
                           </button>
+                          <h2 class="menu-drawer__submenu-heading">{{ link.title | escape }}</h2>
                           <ul class="menu-drawer__menu list-menu" role="list" tabindex="-1">
                             {%- for childlink in link.links -%}
                               <li>
@@ -126,8 +127,9 @@
                                         <span class="svg-wrapper">
                                           {{- 'icon-arrow.svg' | inline_asset_content -}}
                                         </span>
-                                        {{ childlink.title | escape }}
+                                        {{ 'sections.header.menu' | t }}
                                       </button>
+                                      <h2 class="menu-drawer__submenu-heading">{{ childlink.title | escape }}</h2>
                                       <ul
                                         class="menu-drawer__menu list-menu"
                                         role="list"
@@ -148,12 +150,18 @@
                                           </li>
                                         {%- endfor -%}
                                       </ul>
+                                      <a href="{{ childlink.url }}" class="menu-drawer__view-all-button">
+                                        {{ 'sections.header.view_all' | t }}: {{ childlink.title | escape }}
+                                      </a>
                                     </div>
                                   </details>
                                 {%- endif -%}
                               </li>
                             {%- endfor -%}
                           </ul>
+                          <a href="{{ link.url }}" class="menu-drawer__view-all-button">
+                            {{ 'sections.header.view_all' | t }}: {{ link.title | escape }}
+                          </a>
                         </div>
                       </div>
                     </details>
@@ -186,6 +194,20 @@
                 </li>
               {%- endfor -%}
             </ul>
+
+            <div class="menu-drawer__account-links">
+              {%- if shop.customer_accounts_enabled -%}
+                <a href="{{ routes.account_url }}" class="menu-drawer__account-link link link--text">
+                  {{ 'customer.account.title' | t }}
+                </a>
+              {%- endif -%}
+              <a href="{{ routes.search_url }}" class="menu-drawer__account-link link link--text">
+                {{ 'general.search.search' | t }}
+              </a>
+            </div>
+            <div class="menu-drawer__copyright">
+              &copy; {{ shop.name }}
+            </div>
           </nav>
           <div class="menu-drawer__utility-links">
             {%- if show_country_selector or show_language_selector -%}

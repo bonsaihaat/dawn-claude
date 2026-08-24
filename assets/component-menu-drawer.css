@@ -101,6 +101,12 @@ details[open].menu-opening > .menu-drawer__submenu {
     z-index: 9999;
   }
 
+  .js header-drawer details[open] > .menu-drawer,
+  .js header-drawer details[open] > .menu-drawer__submenu {
+    transition-duration: 0.34s;
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
   .js header-drawer .menu-drawer {
     height: 100vh;
     height: 100dvh;
@@ -149,8 +155,8 @@ details[open].menu-opening > .menu-drawer__submenu {
 
   .menu-drawer__panel-title {
     font-family: var(--font-heading-family);
-    font-weight: var(--font-heading-weight);
-    font-size: 1.6rem;
+    font-weight: 700;
+    font-size: 1.9rem;
     color: rgb(var(--color-foreground));
   }
 
@@ -257,7 +263,7 @@ details[open].menu-opening > .menu-drawer__submenu {
 
 .menu-drawer__close-button {
   margin-top: 1.5rem;
-  padding: 1.2rem 2.6rem 1.2rem 3rem;
+  padding: 1.2rem 2rem;
   text-decoration: none;
   display: flex;
   align-items: center;

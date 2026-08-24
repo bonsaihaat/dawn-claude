@@ -10,14 +10,6 @@
 -%}
 
 <div class="hero-grid color-{{ section.settings.color_scheme }} page-width">
-  {%- if section.settings.badge_text != blank -%}
-    <p class="hero-grid__badge">{{ section.settings.badge_text | escape }}</p>
-  {%- endif -%}
-
-  {%- if section.settings.heading != blank -%}
-    <h2 class="hero-grid__heading">{{ section.settings.heading }}</h2>
-  {%- endif -%}
-
   <div class="hero-grid__layout">
     <div class="hero-grid__banner">
       {%- if section.settings.image != blank -%}
@@ -83,18 +75,6 @@
       "id": "color_scheme",
       "label": "t:sections.all.colors.label",
       "default": "scheme-1"
-    },
-    {
-      "type": "text",
-      "id": "badge_text",
-      "label": "Badge text",
-      "default": "Rated 4.9 by 10,000+ Bonsai Parents"
-    },
-    {
-      "type": "richtext",
-      "id": "heading",
-      "label": "Heading",
-      "default": "<p>India's No. 1 Bonsai Shop.</p>"
     },
     {
       "type": "image_picker",

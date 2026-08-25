@@ -14,9 +14,6 @@
   flex-direction: column;
   gap: 0.2rem;
   margin: 0 2rem 2rem;
-  padding: 0.6rem;
-  border-radius: 1.8rem;
-  background-color: rgba(var(--color-button), 0.08);
   overflow: hidden;
 }
 
@@ -106,12 +103,17 @@
   text-decoration: none;
 }
 
+.menu-drawer__divider {
+  height: 1px;
+  background-color: #eee7d8;
+  margin: 1.4rem 1rem 1.2rem;
+}
+
 .menu-drawer__copyright {
   margin: 1rem 2rem 0;
-  padding-top: 1.2rem;
-  border-top: 1px solid rgba(var(--color-foreground), 0.06);
+  padding-top: 0.4rem;
   font-size: 1.1rem;
-  color: rgba(var(--color-foreground), 0.45);
+  color: #9aa093;
 }
 
 .menu-drawer__submenu-heading {
@@ -142,9 +144,6 @@
   flex-direction: column;
   gap: 0.2rem;
   margin: 0 2rem 2rem;
-  padding: 0.6rem;
-  border-radius: 1.8rem;
-  background-color: rgba(var(--color-button), 0.08);
   overflow: hidden;
 }
 

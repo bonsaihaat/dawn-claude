@@ -177,6 +177,16 @@
     height: 4.8rem;
   }
 
+  /* Dawn's default .header__heading-link has its own 0.75rem padding (a
+     touch-target allowance) on top of the header row's own padding — the
+     mockup's logo has none, sitting flush with only the header's own
+     padding above/left of it. That extra 7.5px on every side was both
+     pushing the logo down (visibly more space above it) and right
+     (visibly less far left) than the mockup. */
+  .header__heading-link {
+    padding: 0;
+  }
+
   @media screen and (max-width: 989px) {
     .header {
       padding: 1.4rem 1.8rem 1.4rem;

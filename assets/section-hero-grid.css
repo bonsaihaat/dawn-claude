@@ -1,13 +1,18 @@
-.hero-grid {
-  padding-block: 2.2rem 0;
+/* Dawn's .color-scheme-1 (shared with the header) paints plain white, and
+   .page-width only covers the centered 1200px content column — the gutters
+   on wide viewports are the raw <body> background (also white by default),
+   which showed as a visible seam next to the header (whose full-bleed
+   .header-wrapper already covers edge-to-edge with its own override).
+   Mirror that pattern here: put the cream background on a full-bleed
+   wrapper *outside* .page-width, so it covers the whole viewport width
+   the same way the header does, matching the mockup's one continuous
+   #faf7f1 backdrop. */
+.hero-grid-wrapper.color-scheme-1 {
+  background-color: #faf7f1;
 }
 
-/* Dawn's .color-scheme-1 (shared with the header) paints a plain white
-   background — the header only looks cream because of its own override
-   elsewhere; give this section the same #faf7f1 the mockup uses as one
-   continuous backdrop, instead of leaving scheme-1's true white showing. */
-.hero-grid.color-scheme-1 {
-  background-color: #faf7f1;
+.hero-grid {
+  padding-block: 2.2rem 0;
 }
 
 .hero-grid__layout {

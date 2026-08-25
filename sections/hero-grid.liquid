@@ -7,7 +7,8 @@
   assign benefit_blocks = section.blocks | where: 'type', 'benefit'
 -%}
 
-<div class="hero-grid color-{{ section.settings.color_scheme }} page-width">
+<div class="hero-grid-wrapper color-{{ section.settings.color_scheme }}">
+<div class="hero-grid page-width">
   <div class="hero-grid__layout">
     {%- if slide_blocks.size > 0 -%}
       <hero-carousel class="hero-grid__carousel" data-autoplay-ms="5000">
@@ -121,6 +122,7 @@
       {%- endfor -%}
     </ul>
   {%- endif -%}
+</div>
 </div>
 
 {% schema %}

@@ -38,6 +38,12 @@
   white-space: nowrap;
   padding: 0 1.8rem;
   font-size: 1.2rem;
+  /* Dawn's global body style sets line-height to a 1.8x multiplier meant
+     for readable paragraph text, and this element never overrode it — the
+     ticker bar was inheriting that and rendering ~40% taller than the
+     mockup's plain default line-height. Reset to normal so text sizes
+     the bar tightly, matching the mockup. */
+  line-height: normal;
   letter-spacing: 0.04em;
   /* Dawn only loads a real 400/700 body font file (no 500) — requesting
      500 has no matching file and gets fake-bolded by the browser, reading

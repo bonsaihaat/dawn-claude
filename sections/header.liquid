@@ -118,6 +118,17 @@
     padding: {{ section.settings.padding_top | times: 0.5 | round: 0 }}px 3rem {{ section.settings.padding_bottom | times: 0.5 | round: 0 }}px 3rem;
   }
 
+  /* Dawn's .page-width class (also on this <header>) caps content to a
+     centered 1200px column via max-width + margin:auto. The mockup's header
+     row has no such cap — it's full-bleed edge-to-edge with only its own
+     flat padding, so on wide screens the logo/icons sit right near the true
+     browser edges instead of ~350px inset into a centered column like ours
+     did. Remove the cap so our row behaves the same way. */
+  .header.page-width {
+    max-width: none;
+    margin: 0;
+  }
+
   .section-header {
     position: sticky; /* This is for fixing a Safari z-index issue. PR #2147 */
     margin-bottom: {{ section.settings.margin_bottom | times: 0.75 | round: 0 }}px;
@@ -133,6 +144,8 @@
     .header {
       padding-top: {{ section.settings.padding_top }}px;
       padding-bottom: {{ section.settings.padding_bottom }}px;
+      padding-left: 4.8rem;
+      padding-right: 4.8rem;
     }
   }
 

@@ -44,10 +44,12 @@
         {%- endif -%}
       >
       {%- if placeholder_phrases.size > 0 -%}
-        {#- Browsers never render a blinking caret inside placeholder text, only
-        inside real input content, so the typing animation is drawn as this
-        overlay instead of animating the placeholder attribute. Hidden by CSS
-        the moment the input is focused or has a value. -#}
+        {%- comment -%}
+          Browsers never render a blinking caret inside placeholder text, only
+          inside real input content, so the typing animation is drawn as this
+          overlay instead of animating the placeholder attribute. Hidden by CSS
+          the moment the input is focused or has a value.
+        {%- endcomment -%}
         <span class="header__search-bar-typewriter" aria-hidden="true">
           <span class="header__search-bar-typewriter-text" data-typewriter-text></span
           ><span class="header__search-bar-typewriter-caret" data-typewriter-caret></span>

@@ -2,6 +2,14 @@
   padding-block: 2.2rem 0;
 }
 
+/* Dawn's .color-scheme-1 (shared with the header) paints a plain white
+   background — the header only looks cream because of its own override
+   elsewhere; give this section the same #faf7f1 the mockup uses as one
+   continuous backdrop, instead of leaving scheme-1's true white showing. */
+.hero-grid.color-scheme-1 {
+  background-color: #faf7f1;
+}
+
 .hero-grid__layout {
   display: flex;
   flex-wrap: wrap;

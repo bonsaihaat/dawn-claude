@@ -3,6 +3,9 @@
     if (input.dataset.typewriterInit) return;
     input.dataset.typewriterInit = 'true';
 
+    var overlay = input.parentElement && input.parentElement.querySelector('[data-typewriter-text]');
+    var overlayWrapper = overlay && overlay.parentElement;
+
     var raw = input.getAttribute('data-placeholder-phrases');
     if (!raw) return;
 
@@ -27,6 +30,7 @@
 
     if (phrases.length === 1 || reducedMotion) {
       input.setAttribute('placeholder', phrases[0]);
+      if (overlayWrapper) overlayWrapper.hidden = true;
       return;
     }
 
@@ -51,6 +55,32 @@
       return phrase.slice(prefix.length);
     });
 
+    // The overlay draws the animated text (with a real blinking caret, which
+    // browsers can't render inside a placeholder attribute); the input's own
+    // placeholder is cleared so it doesn't show doubled-up text behind it,
+    // and kept as a static fallback if the overlay isn't present in the DOM.
+    if (overlay) {
+      input.setAttribute('placeholder', '');
+      // :placeholder-shown can't tell us this (the placeholder is blank on
+      // purpose), so track "has a value" ourselves to hide the overlay once
+      // the visitor actually types something.
+      var syncOverlayVisibility = function () {
+        overlayWrapper.hidden = input.value.length > 0;
+      };
+      syncOverlayVisibility();
+      input.addEventListener('input', syncOverlayVisibility);
+    } else {
+      input.setAttribute('placeholder', prefix + suffixes[0]);
+    }
+
+    function render(text) {
+      if (overlay) {
+        overlay.textContent = text;
+      } else {
+        input.setAttribute('placeholder', text);
+      }
+    }
+
     var phraseIndex = 0;
     var charIndex = 0;
     var deleting = false;
@@ -62,7 +92,7 @@
 
       if (!deleting) {
         charIndex += 1;
-        input.setAttribute('placeholder', prefix + current.slice(0, charIndex));
+        render(prefix + current.slice(0, charIndex));
 
         if (charIndex === current.length) {
           deleting = true;
@@ -74,7 +104,7 @@
       }
 
       charIndex -= 1;
-      input.setAttribute('placeholder', prefix + current.slice(0, charIndex));
+      render(prefix + current.slice(0, charIndex));
 
       if (charIndex === 0) {
         deleting = false;

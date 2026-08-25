@@ -64,6 +64,51 @@
   opacity: 0.6;
 }
 
+.header__search-bar-typewriter {
+  position: absolute;
+  left: 4.2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  font-size: 1.3rem;
+  color: rgba(var(--color-foreground), 0.6);
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.header__search-bar-typewriter-caret {
+  display: inline-block;
+  width: 1px;
+  height: 1.4rem;
+  margin-left: 0.1rem;
+  background-color: currentColor;
+  animation: header-search-caret-blink 1s step-end infinite;
+}
+
+@keyframes header-search-caret-blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  50.01%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.header__search-bar .field__input:focus ~ .header__search-bar-typewriter,
+.header__search-bar-typewriter[hidden] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header__search-bar-typewriter-caret {
+    animation: none;
+  }
+}
+
 .header__search-bar .field__input:focus,
 .header__search-bar .field__input:focus-visible {
   outline: none;

@@ -224,7 +224,13 @@
     }
 
     .header__nav-row .header__menu-item {
-      font-weight: 600;
+      /* Dawn only loads real font files for the body weight (400/700) and
+         the chosen heading weight (600) — requesting font-weight:600 on the
+         body font family has no matching file, so the browser fake-bolds it,
+         rendering noticeably heavier than the mockup. Use the heading font
+         family/weight instead, which is a real loaded 600 file. */
+      font-family: var(--font-heading-family);
+      font-weight: var(--font-heading-weight);
       letter-spacing: 0.08em;
       padding-top: 1.2rem;
       padding-bottom: 0.9rem;

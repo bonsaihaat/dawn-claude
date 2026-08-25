@@ -39,7 +39,10 @@
   padding: 0 1.8rem;
   font-size: 1.2rem;
   letter-spacing: 0.04em;
-  font-weight: 500;
+  /* Dawn only loads a real 400/700 body font file (no 500) — requesting
+     500 has no matching file and gets fake-bolded by the browser, reading
+     heavier than the mockup. True 400 renders crisp with no synthesis. */
+  font-weight: var(--font-body-weight);
   color: rgb(var(--color-foreground));
 }
 

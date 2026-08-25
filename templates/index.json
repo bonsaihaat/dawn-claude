@@ -3,6 +3,30 @@
     "hero_grid": {
       "type": "hero-grid",
       "blocks": {
+        "slide_1": {
+          "type": "slide",
+          "settings": {
+            "eyebrow": "Real Bonsai, Not Stock Photos",
+            "headline": "What you see ships to you",
+            "subline": "Juniper Bonsai · hand-photographed, exactly as delivered"
+          }
+        },
+        "slide_2": {
+          "type": "slide",
+          "settings": {
+            "eyebrow": "Hand-trained for years",
+            "headline": "Grown by hand, chosen by you",
+            "subline": "Every tree shaped over years before it reaches you"
+          }
+        },
+        "slide_3": {
+          "type": "slide",
+          "settings": {
+            "eyebrow": "India's first dedicated bonsai platform",
+            "headline": "A living centerpiece for every space",
+            "subline": "From starter trees to statement pieces"
+          }
+        },
         "card_1": {
           "type": "promo_card",
           "settings": {
@@ -49,6 +73,9 @@
         }
       },
       "block_order": [
+        "slide_1",
+        "slide_2",
+        "slide_3",
         "card_1",
         "card_2",
         "benefit_1",
@@ -57,9 +84,6 @@
         "benefit_4"
       ],
       "settings": {
-        "image": "shopify:\/\/shop_images\/280071abbec0e2410032d47e6182ea0b.png",
-        "banner_link": "shopify://collections/all",
-        "banner_link_label": "Shop bonsai trees",
         "color_scheme": "scheme-1"
       }
     },

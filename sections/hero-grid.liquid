@@ -1,39 +1,93 @@
 {{ 'section-hero-grid.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'hero-carousel.js' | asset_url }}" defer="defer"></script>
 
 {%- liquid
-  assign full_width = '100vw'
-  assign widths = '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840'
-  assign fetch_priority = 'auto'
-  if section.index == 1
-    assign fetch_priority = 'high'
-  endif
+  assign widths = '750, 1100, 1600, 2000, 2600'
+  assign slide_blocks = section.blocks | where: 'type', 'slide'
+  assign benefit_blocks = section.blocks | where: 'type', 'benefit'
 -%}
 
 <div class="hero-grid color-{{ section.settings.color_scheme }} page-width">
   <div class="hero-grid__layout">
-    <div class="hero-grid__banner">
-      {%- if section.settings.image != blank -%}
-        {{
-          section.settings.image
-          | image_url: width: 3840
-          | image_tag: sizes: full_width, widths: widths, fetchpriority: fetch_priority, class: 'hero-grid__banner-image'
-        }}
-      {%- else -%}
-        {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg hero-grid__banner-image' }}
-      {%- endif -%}
-      {%- if section.settings.banner_link != blank -%}
-        <a href="{{ section.settings.banner_link }}" class="hero-grid__banner-link" aria-label="{{ section.settings.banner_link_label | escape }}"></a>
-      {%- endif -%}
-    </div>
+    {%- if slide_blocks.size > 0 -%}
+      <hero-carousel class="hero-grid__carousel" data-autoplay-ms="5000">
+        <div class="hero-grid__track">
+          {%- for block in slide_blocks -%}
+            <div class="hero-grid__slide{% if forloop.first %} is-active{% endif %}" data-slide {{ block.shopify_attributes }}>
+              {%- if block.settings.image != blank -%}
+                {%- liquid
+                  if forloop.first
+                    assign slide_loading = 'eager'
+                    assign slide_fetchpriority = 'high'
+                  else
+                    assign slide_loading = 'lazy'
+                    assign slide_fetchpriority = 'auto'
+                  endif
+                -%}
+                {{
+                  block.settings.image
+                  | image_url: width: 2600
+                  | image_tag:
+                    class: 'hero-grid__slide-image',
+                    widths: widths,
+                    sizes: '100vw',
+                    loading: slide_loading,
+                    fetchpriority: slide_fetchpriority
+                }}
+              {%- else -%}
+                {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg hero-grid__slide-image' }}
+              {%- endif -%}
+              <div class="hero-grid__slide-scrim"></div>
+              <div class="hero-grid__slide-copy">
+                {%- if block.settings.eyebrow != blank -%}
+                  <span class="hero-grid__slide-eyebrow">{{ block.settings.eyebrow | escape }}</span>
+                {%- endif -%}
+                {%- if block.settings.headline != blank -%}
+                  <h2 class="hero-grid__slide-headline">{{ block.settings.headline | escape }}</h2>
+                {%- endif -%}
+              </div>
+              {%- if block.settings.subline != blank -%}
+                <span class="hero-grid__slide-subline">{{ block.settings.subline | escape }}</span>
+              {%- endif -%}
+              {%- if block.settings.link != blank -%}
+                <a href="{{ block.settings.link }}" class="hero-grid__slide-link" aria-label="{{ block.settings.headline | strip_html | escape }}"></a>
+              {%- endif -%}
+            </div>
+          {%- endfor -%}
+        </div>
+
+        {%- if slide_blocks.size > 1 -%}
+          <button type="button" class="hero-grid__arrow hero-grid__arrow--prev" data-prev aria-label="{{ 'general.slider.previous_slide' | t }}">
+            <span class="svg-wrapper">{{ 'icon-arrow.svg' | inline_asset_content }}</span>
+          </button>
+          <button type="button" class="hero-grid__arrow hero-grid__arrow--next" data-next aria-label="{{ 'general.slider.next_slide' | t }}">
+            <span class="svg-wrapper">{{ 'icon-arrow.svg' | inline_asset_content }}</span>
+          </button>
+          <div class="hero-grid__dots" data-dots role="tablist">
+            {%- for block in slide_blocks -%}
+              <button
+                type="button"
+                class="hero-grid__dot{% if forloop.first %} is-active{% endif %}"
+                data-dot
+                role="tab"
+                aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+              >
+                <span class="visually-hidden">{{ 'general.slider.name' | t }} {{ forloop.index }}</span>
+              </button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </hero-carousel>
+    {%- endif -%}
 
     {%- for block in section.blocks -%}
       {%- if block.type == 'promo_card' -%}
         <div class="hero-grid__card hero-grid__card--{{ block.settings.tone }}" {{ block.shopify_attributes }}>
           {%- if block.settings.eyebrow != blank -%}
-            <p class="hero-grid__card-eyebrow">{{ block.settings.eyebrow | escape }}</p>
+            <span class="hero-grid__card-eyebrow">{{ block.settings.eyebrow | escape }}</span>
           {%- endif -%}
           {%- if block.settings.title != blank -%}
-            <p class="hero-grid__card-title">{{ block.settings.title }}</p>
+            <div class="hero-grid__card-title">{{ block.settings.title }}</div>
           {%- endif -%}
           {%- if block.settings.button_label != blank -%}
             <a href="{{ block.settings.button_link }}" class="hero-grid__card-link">
@@ -46,17 +100,14 @@
     {%- endfor -%}
   </div>
 
-  {%- liquid
-    assign benefit_blocks = section.blocks | where: 'type', 'benefit'
-  -%}
   {%- if benefit_blocks.size > 0 -%}
     <ul class="hero-grid__benefits list-unstyled" role="list">
       {%- for block in benefit_blocks -%}
         <li class="hero-grid__benefit" {{ block.shopify_attributes }}>
           <span class="hero-grid__benefit-icon">
-            {%- if block.settings.icon != blank -%}
-              {{ block.settings.icon | image_url: width: 80 | image_tag: loading: 'lazy', widths: '40, 80' }}
-            {%- endif -%}
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+              <path d="M4 12.5L9.5 18L20 6" stroke="#84b915" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
           </span>
           <span class="hero-grid__benefit-label">{{ block.settings.label | escape }}</span>
         </li>
@@ -75,25 +126,44 @@
       "id": "color_scheme",
       "label": "t:sections.all.colors.label",
       "default": "scheme-1"
-    },
-    {
-      "type": "image_picker",
-      "id": "image",
-      "label": "Banner image"
-    },
-    {
-      "type": "url",
-      "id": "banner_link",
-      "label": "Banner link"
-    },
-    {
-      "type": "text",
-      "id": "banner_link_label",
-      "label": "Banner link accessible label",
-      "default": "Shop the banner offer"
     }
   ],
   "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "eyebrow",
+          "label": "Eyebrow",
+          "default": "Real Bonsai, Not Stock Photos"
+        },
+        {
+          "type": "text",
+          "id": "headline",
+          "label": "Headline",
+          "default": "What you see ships to you"
+        },
+        {
+          "type": "text",
+          "id": "subline",
+          "label": "Subline badge",
+          "default": "Juniper Bonsai · hand-photographed, exactly as delivered"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    },
     {
       "type": "promo_card",
       "name": "Promo card",
@@ -139,11 +209,6 @@
       "name": "Benefit",
       "settings": [
         {
-          "type": "image_picker",
-          "id": "icon",
-          "label": "Icon"
-        },
-        {
           "type": "text",
           "id": "label",
           "label": "Label",
@@ -156,6 +221,9 @@
     {
       "name": "Hero grid",
       "blocks": [
+        { "type": "slide" },
+        { "type": "slide" },
+        { "type": "slide" },
         { "type": "promo_card" },
         { "type": "promo_card" },
         { "type": "benefit" },

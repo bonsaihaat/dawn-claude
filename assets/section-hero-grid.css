@@ -1,144 +1,294 @@
 .hero-grid {
-  padding-block: 2.5rem;
+  padding-block: 2.2rem 0;
 }
 
 .hero-grid__layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto auto;
+  display: flex;
+  flex-wrap: wrap;
   gap: 1.4rem;
 }
 
-/* Banner runs the full top edge, corner-cut on one side only -
-   deliberately not a plain rounded rectangle. */
-.hero-grid__banner {
+/* Mockup's literal spec: a single rounded card, background placeholder
+   #e7e2d3, aspect-ratio 4:5 on mobile stepping to 16:9 at the mockup's own
+   820px JS breakpoint (not Dawn's usual 750/990). */
+.hero-grid__carousel {
   position: relative;
-  grid-column: 1 / -1;
-  aspect-ratio: 21 / 9;
+  display: block;
+  flex: 1 1 100%;
+  border-radius: 2.6rem;
   overflow: hidden;
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 6% 100%, 0 82%);
+  background-color: #e7e2d3;
+  aspect-ratio: 4 / 5;
 }
 
-@media screen and (max-width: 989px) {
-  .hero-grid__banner {
-    aspect-ratio: 4 / 3;
-    clip-path: polygon(0 0, 100% 0, 100% 92%, 92% 100%, 0 100%);
+@media screen and (min-width: 820px) {
+  .hero-grid__carousel {
+    aspect-ratio: 16 / 9;
   }
 }
 
-.hero-grid__banner-image {
+.hero-grid__track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.hero-grid__slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+.hero-grid__slide.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.hero-grid__slide-image,
+.hero-grid__slide .placeholder-svg {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-.hero-grid__banner-link {
+.hero-grid__slide-scrim {
   position: absolute;
   inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(13, 14, 12, 0.4) 0%,
+    rgba(13, 14, 12, 0) 34%,
+    rgba(13, 14, 12, 0) 60%,
+    rgba(13, 14, 12, 0.55) 100%
+  );
 }
 
-/* Cards sit side-by-side under the banner on desktop, each with a single
-   soft notch instead of a uniform border-radius on all four corners. */
-.hero-grid__card {
-  grid-column: span 1;
-  padding: 1.8rem;
-  border-radius: 2.4rem 0.6rem 2.4rem 0.6rem;
+.hero-grid__slide-copy {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  padding: clamp(2rem, 4vw, 4rem);
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
-  justify-content: space-between;
-  min-height: 15rem;
+  gap: 1.2rem;
+  pointer-events: none;
+}
+
+.hero-grid__slide-eyebrow {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #c7e08f;
+}
+
+.hero-grid__slide-headline {
+  margin: 0;
+  font-weight: 600;
+  font-size: clamp(2.8rem, 4.6vw, 5.2rem);
+  line-height: 1.08;
+  color: #ffffff;
+  max-width: 13ch;
+}
+
+.hero-grid__slide-subline {
+  position: absolute;
+  left: clamp(1.6rem, 3vw, 3.2rem);
+  right: clamp(1.6rem, 3vw, 3.2rem);
+  bottom: clamp(1.6rem, 3vw, 3.2rem);
+  display: inline-block;
+  width: fit-content;
+  background: #faf7f1e8;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: 1.2rem;
+  padding: 1rem 1.6rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #0d0e0c;
+}
+
+.hero-grid__slide-link {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.hero-grid__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3.4rem;
+  height: 3.4rem;
+  border-radius: 50%;
+  background: #faf7f1cc;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+  padding: 0;
+}
+
+.hero-grid__arrow--prev {
+  left: 1.4rem;
+}
+
+.hero-grid__arrow--next {
+  right: 1.4rem;
+}
+
+.hero-grid__arrow .svg-wrapper {
+  width: 0.8rem;
+  height: 1.3rem;
+  color: #0d0e0c;
+}
+
+.hero-grid__arrow--prev .svg-wrapper {
+  transform: rotate(180deg);
+}
+
+.hero-grid__dots {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 1.4rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.7rem;
+  z-index: 3;
+}
+
+.hero-grid__dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: #faf7f1cc;
+  cursor: pointer;
+  transition: width 0.2s ease, background-color 0.2s ease;
+}
+
+.hero-grid__dot.is-active {
+  width: 2.2rem;
+  background: #84b915;
+}
+
+/* Two promo cards: mockup's literal gradient/light tones and pill CTAs. */
+.hero-grid__card {
+  flex: 1 1 32rem;
+  border-radius: 2rem;
+  padding: 2.6rem 2.6rem 2.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+  box-sizing: border-box;
 }
 
 .hero-grid__card--dark {
-  background: rgb(var(--color-foreground));
-  color: rgb(var(--color-background));
+  background: linear-gradient(160deg, #0d0e0c 0%, #1a2b0f 55%, #2f4a17 100%);
 }
 
 .hero-grid__card--light {
-  background: rgba(var(--color-foreground), 0.06);
-  color: rgb(var(--color-foreground));
+  background: #f1f6e6;
 }
 
 .hero-grid__card-eyebrow {
-  font-size: 1.3rem;
-  opacity: 0.75;
-  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.hero-grid__card--dark .hero-grid__card-eyebrow {
+  color: #a9d465;
+}
+
+.hero-grid__card--light .hero-grid__card-eyebrow {
+  color: #767d6c;
 }
 
 .hero-grid__card-title {
-  font-size: 2rem;
+  font-size: clamp(1.9rem, 2.4vw, 2.4rem);
   font-weight: 600;
+  line-height: 1.25;
   margin: 0;
+}
+
+.hero-grid__card--dark .hero-grid__card-title {
+  color: #faf7f1;
+}
+
+.hero-grid__card--light .hero-grid__card-title {
+  color: #0d0e0c;
 }
 
 .hero-grid__card-link {
   align-self: flex-start;
+  margin-top: 0.4rem;
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.7rem 1.4rem;
-  border-radius: 100px;
-  border: 1px solid currentColor;
+  gap: 0.4rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+  border-radius: 999px;
   text-decoration: none;
-  color: inherit;
-  margin-top: 0.6rem;
-}
-
-/* Benefit strip scrolls horizontally with snap points on every viewport,
-   rather than shrinking into a static 4-up grid at a fixed breakpoint. */
-.hero-grid__benefits {
-  display: flex;
-  gap: 1rem;
-  margin: 2rem 0 0;
-  padding: 0.4rem 0.2rem 1rem;
-  overflow-x: auto;
-  scroll-snap-type: x proximity;
-  -webkit-overflow-scrolling: touch;
-}
-
-.hero-grid__benefit {
-  flex: 0 0 auto;
-  scroll-snap-align: start;
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  padding: 0.8rem 1.4rem 0.8rem 0.8rem;
-  border-radius: 100px;
-  background: rgba(var(--color-foreground), 0.05);
   white-space: nowrap;
 }
 
-.hero-grid__benefit-icon {
-  width: 3.2rem;
-  height: 3.2rem;
-  border-radius: 50%;
-  background: rgb(var(--color-background));
+.hero-grid__card--dark .hero-grid__card-link {
+  background: linear-gradient(120deg, #84b915, #5c8f0e);
+  color: #0d0e0c;
+  padding: 1.2rem 2.2rem;
+}
+
+.hero-grid__card--light .hero-grid__card-link {
+  background: none;
+  border: 1.5px solid #871b0f;
+  color: #871b0f;
+  padding: 1.1rem 2.1rem;
+}
+
+/* Trust badges: plain white pill row, checkmark icon. */
+.hero-grid__benefits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  margin: 2.2rem 0 3rem;
+  padding: 0;
+}
+
+.hero-grid__benefit {
+  flex: 1 1 20rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  flex-shrink: 0;
+  gap: 0.8rem;
+  background: #ffffff;
+  border: 1px solid #eee7d8;
+  border-radius: 999px;
+  padding: 1rem 1.6rem;
+  box-sizing: border-box;
 }
 
-.hero-grid__benefit-icon img {
-  width: 60%;
-  height: 60%;
-  object-fit: contain;
+.hero-grid__benefit-icon {
+  flex-shrink: 0;
+  display: flex;
 }
 
 .hero-grid__benefit-label {
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   font-weight: 500;
-}
-
-@media screen and (max-width: 749px) {
-  .hero-grid__layout {
-    grid-template-columns: 1fr;
-  }
-
-  .hero-grid__card {
-    grid-column: 1;
-  }
+  color: #20241b;
+  white-space: nowrap;
 }

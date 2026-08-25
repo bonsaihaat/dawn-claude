@@ -72,7 +72,7 @@
   display: flex;
   align-items: center;
   font-size: 1.3rem;
-  color: rgba(var(--color-foreground), 0.6);
+  color: #767d6c;
   pointer-events: none;
   white-space: nowrap;
   overflow: hidden;
@@ -82,17 +82,17 @@
   display: inline-block;
   width: 1px;
   height: 1.4rem;
-  margin-left: 0.1rem;
+  margin-left: 0.2rem;
   background-color: currentColor;
-  animation: header-search-caret-blink 1s step-end infinite;
+  animation: header-search-caret-blink 0.9s step-end infinite;
 }
 
 @keyframes header-search-caret-blink {
   0%,
-  50% {
+  49% {
     opacity: 1;
   }
-  50.01%,
+  50%,
   100% {
     opacity: 0;
   }

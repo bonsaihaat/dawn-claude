@@ -168,6 +168,15 @@
     width: 2rem;
   }
 
+  /* Match the mockup's logo sizing exactly: height-driven, not width-driven
+     (Dawn's default), since a width-based size on our square icon+wordmark
+     mark inflates the header row's height far more than the mockup's
+     wide/thin wordmark logo ever did. */
+  .header__heading-logo {
+    width: auto;
+    height: 4.8rem;
+  }
+
   @media screen and (max-width: 989px) {
     .header {
       padding: 1.4rem 1.8rem 1.4rem;
@@ -187,7 +196,8 @@
 
   @media screen and (min-width: 990px) {
     .header__heading-logo {
-      width: 10rem;
+      width: auto;
+      height: 8.1rem;
     }
 
     .header__search-bar {

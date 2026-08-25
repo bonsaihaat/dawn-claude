@@ -35,7 +35,14 @@
                     fetchpriority: slide_fetchpriority
                 }}
               {%- else -%}
-                {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg hero-grid__slide-image' }}
+                <div class="hero-grid__slide-placeholder">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <rect x="3" y="4" width="18" height="16" rx="2" stroke="#9aa093" stroke-width="1.6"></rect>
+                    <circle cx="8.5" cy="9.5" r="1.5" stroke="#9aa093" stroke-width="1.6"></circle>
+                    <path d="M4 16l5-5 4 4 3-3 4 4" stroke="#9aa093" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+                  </svg>
+                  <span>Add slide {{ forloop.index }} image</span>
+                </div>
               {%- endif -%}
               <div class="hero-grid__slide-scrim"></div>
               <div class="hero-grid__slide-copy">

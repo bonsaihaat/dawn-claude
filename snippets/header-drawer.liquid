@@ -157,7 +157,7 @@
                                         {%- endfor -%}
                                       </ul>
                                       <a href="{{ childlink.url }}" class="menu-drawer__view-all-button">
-                                        {{ 'sections.header.view_all' | t }}: {{ childlink.title | escape }}
+                                        {{ 'sections.header.view_all' | t }} {{ childlink.title | escape }}
                                       </a>
                                     </div>
                                   </details>
@@ -166,7 +166,7 @@
                             {%- endfor -%}
                           </ul>
                           <a href="{{ link.url }}" class="menu-drawer__view-all-button">
-                            {{ 'sections.header.view_all' | t }}: {{ link.title | escape }}
+                            {{ 'sections.header.view_all' | t }} {{ link.title | escape }}
                           </a>
                         </div>
                       </div>

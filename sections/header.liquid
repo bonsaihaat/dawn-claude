@@ -267,6 +267,27 @@
       transition: box-shadow var(--duration-short) ease;
     }
 
+    /* Dawn's default caret is absolutely positioned, pinned to the right
+       edge of the <summary> with a fixed top offset tuned for Dawn's own
+       font metrics — ours drifted out of vertical alignment and sat far
+       from the text since it isn't part of the text's own flex flow. The
+       mockup renders its chevron inline right next to the label instead
+       (flex + small gap), so switch to that instead of nudging the fixed
+       offset. */
+    .header__nav-row summary.header__menu-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding-right: 0;
+    }
+
+    .header__nav-row summary.header__menu-item .icon-caret {
+      position: static;
+      height: 0.9rem;
+      width: 0.9rem;
+      flex-shrink: 0;
+    }
+
     .header__nav-row .header__menu-item:hover,
     .header__nav-row .header__menu-item:hover span,
     .header__nav-row details[open] > .header__menu-item {

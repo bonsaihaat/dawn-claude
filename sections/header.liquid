@@ -219,16 +219,8 @@
     }
 
     .header__search-bar {
-      /* justify-self:center let the pill float away from the logo on wide
-         screens, since it centers within the whole flexible middle grid
-         track instead of hugging the column-gap next to the logo — the
-         empty cream space beside the logo grew right along with the
-         viewport. Anchor it to the start of its track instead so the
-         gap next to the logo stays fixed at the column-gap, matching the
-         mockup's intent even though this deliberately deviates from its
-         literal flex behavior at very wide viewports. */
       max-width: 48rem;
-      justify-self: start;
+      justify-self: center;
     }
 
     .header__icons {

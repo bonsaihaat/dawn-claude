@@ -230,9 +230,7 @@
     .header__nav-row {
       background-color: #faf7f1;
       border-bottom-color: var(--bh-border);
-      /* Matches the mockup's own nav-row padding (0 24px 10px) — the
-         bottom padding lives here, not on the links themselves. */
-      padding-bottom: 1rem;
+      padding-bottom: 0.6rem;
     }
 
     .header__nav-row .list-menu--inline {
@@ -259,12 +257,8 @@
       font-family: var(--font-heading-family);
       font-weight: var(--font-heading-weight);
       letter-spacing: 0.08em;
-      /* Mockup's nav link has no top padding at all (padding:0 24px 10px on
-         the row, padding-bottom:6px on the link only) — ours added 1.2rem/
-         0.9rem on top of that, which is what made the band under the search
-         bar look taller than the mockup's. Match its literal padding. */
       padding-top: 0;
-      padding-bottom: 0.6rem;
+      padding-bottom: 0.4rem;
       box-shadow: inset 0 -2px 0 transparent;
       transition: box-shadow var(--duration-short) ease;
     }

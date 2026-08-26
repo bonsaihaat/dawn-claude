@@ -275,7 +275,12 @@
        (flex + small gap), so switch to that instead of nudging the fixed
        offset. */
     .header__nav-row summary.header__menu-item {
-      display: inline-flex;
+      /* Stay block-level (flex, not inline-flex) so this participates in
+         the same box layout as the plain <a> items — <summary> sits inside
+         non-flex <details>/<header-menu> wrappers, so as an inline-level
+         box it fell into normal text/baseline flow instead of matching
+         its siblings' block layout, dropping it out of alignment. */
+      display: flex;
       align-items: center;
       gap: 0.5rem;
       padding-right: 0;

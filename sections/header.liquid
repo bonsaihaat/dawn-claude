@@ -219,8 +219,16 @@
     }
 
     .header__search-bar {
+      /* justify-self:center let the pill float away from the logo on wide
+         screens, since it centers within the whole flexible middle grid
+         track instead of hugging the column-gap next to the logo — the
+         empty cream space beside the logo grew right along with the
+         viewport. Anchor it to the start of its track instead so the
+         gap next to the logo stays fixed at the column-gap, matching the
+         mockup's intent even though this deliberately deviates from its
+         literal flex behavior at very wide viewports. */
       max-width: 48rem;
-      justify-self: center;
+      justify-self: start;
     }
 
     .header__icons {
@@ -230,6 +238,9 @@
     .header__nav-row {
       background-color: #faf7f1;
       border-bottom-color: var(--bh-border);
+      /* Matches the mockup's own nav-row padding (0 24px 10px) — the
+         bottom padding lives here, not on the links themselves. */
+      padding-bottom: 1rem;
     }
 
     .header__nav-row .list-menu--inline {
@@ -239,6 +250,12 @@
       width: 100%;
       justify-content: center;
       gap: clamp(1.6rem, 3vw, 4rem);
+      /* Dawn's base .header__nav-row .list-menu--inline rule adds its own
+         0.4rem top/bottom padding on top of this row's own padding and the
+         menu item's own padding below — the mockup's nav row has no such
+         extra layer, so the stacked padding was rendering a visibly taller
+         gap under the search bar than the mockup's flush layout. */
+      padding: 0;
     }
 
     .header__nav-row .header__menu-item {
@@ -250,8 +267,12 @@
       font-family: var(--font-heading-family);
       font-weight: var(--font-heading-weight);
       letter-spacing: 0.08em;
-      padding-top: 1.2rem;
-      padding-bottom: 0.9rem;
+      /* Mockup's nav link has no top padding at all (padding:0 24px 10px on
+         the row, padding-bottom:6px on the link only) — ours added 1.2rem/
+         0.9rem on top of that, which is what made the band under the search
+         bar look taller than the mockup's. Match its literal padding. */
+      padding-top: 0;
+      padding-bottom: 0.6rem;
       box-shadow: inset 0 -2px 0 transparent;
       transition: box-shadow var(--duration-short) ease;
     }

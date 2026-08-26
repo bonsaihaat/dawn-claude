@@ -374,8 +374,20 @@
           <div class="header__heading-logo-wrapper">
             {%- assign logo_alt = settings.logo.alt | default: shop.name | escape -%}
             {%- assign logo_height = settings.logo_width | divided_by: settings.logo.aspect_ratio -%}
-            {% capture sizes %}(max-width: {{ settings.logo_width | times: 2 }}px) 50vw, {{ settings.logo_width }}px{% endcapture %}
-            {% capture widths %}{{ settings.logo_width }}, {{ settings.logo_width | times: 1.5 | round }}, {{ settings.logo_width | times: 2 }}{% endcapture %}
+            {%- comment -%}
+              .header__heading-logo is sized by height (4.8rem mobile / 8.1rem
+              desktop), not by settings.logo_width — that setting stopped
+              controlling the visual size once we switched to height-driven
+              CSS sizing to match the mockup. But sizes/widths below still
+              requested images sized for settings.logo_width (80px), well
+              under the real ~95px desktop render width, so on any 2x/3x
+              display the browser fetched a lower-resolution source than the
+              box needed and stretched it up — a real, visible blur. Base
+              the requested sizes on the actual rendered width instead.
+            {%- endcomment -%}
+            {%- assign logo_effective_width = 81 | times: settings.logo.aspect_ratio | round -%}
+            {% capture sizes %}(max-width: 989px) 56px, {{ logo_effective_width }}px{% endcapture %}
+            {% capture widths %}{{ logo_effective_width }}, {{ logo_effective_width | times: 2 }}, {{ logo_effective_width | times: 3 }}{% endcapture %}
             {{
               settings.logo
               | image_url: width: 600
@@ -407,8 +419,9 @@
           <div class="header__heading-logo-wrapper">
             {%- assign logo_alt = settings.logo.alt | default: shop.name | escape -%}
             {%- assign logo_height = settings.logo_width | divided_by: settings.logo.aspect_ratio -%}
-            {% capture sizes %}(min-width: 750px) {{ settings.logo_width }}px, 50vw{% endcapture %}
-            {% capture widths %}{{ settings.logo_width }}, {{ settings.logo_width | times: 1.5 | round }}, {{ settings.logo_width | times: 2 }}{% endcapture %}
+            {%- assign logo_effective_width = 81 | times: settings.logo.aspect_ratio | round -%}
+            {% capture sizes %}(max-width: 989px) 56px, {{ logo_effective_width }}px{% endcapture %}
+            {% capture widths %}{{ logo_effective_width }}, {{ logo_effective_width | times: 2 }}, {{ logo_effective_width | times: 3 }}{% endcapture %}
             {{
               settings.logo
               | image_url: width: 600

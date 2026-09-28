@@ -47,7 +47,9 @@
         "c1", "c2", "c3", "c4",
         "r1", "r2", "r3"
       ],
-      "settings": {}
+      "settings": {
+        "bestsellers_collection": "bonsai-plants-1"
+      }
     }
   },
   "order": ["main"]

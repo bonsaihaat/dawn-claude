@@ -1,0 +1,28 @@
+{%- comment -%}
+  Accepts: url, image (image object, optional), title, subtitle, price, badge
+{%- endcomment -%}
+<a href="{{ url | default: routes.all_products_collection_url }}" class="bh-card">
+  <div class="bh-card__media">
+    {%- if image != blank -%}
+      {{
+        image
+        | image_url: width: 800
+        | image_tag:
+          loading: 'lazy',
+          widths: '300, 400, 600, 800',
+          sizes: '(min-width: 820px) 280px, 40vw',
+          alt: title
+      }}
+    {%- endif -%}
+    {%- if badge != blank -%}
+      <span class="bh-card__badge">{{ badge }}</span>
+    {%- endif -%}
+  </div>
+  <div class="bh-card__info">
+    <span class="bh-card__name">{{ title }}</span>
+    {%- if subtitle != blank -%}
+      <span class="bh-card__sub">{{ subtitle }}</span>
+    {%- endif -%}
+    <span class="bh-card__price">{{ price }}</span>
+  </div>
+</a>

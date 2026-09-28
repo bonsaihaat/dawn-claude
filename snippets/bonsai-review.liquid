@@ -1,0 +1,34 @@
+{%- comment -%}
+  Accepts: quote, name, location, rating (1-5), photo (image or media image, optional), attributes (optional)
+{%- endcomment -%}
+{%- liquid
+  assign stars = rating | default: 5 | at_least: 1 | at_most: 5
+  if photo.preview_image
+    assign photo_image = photo.preview_image
+  else
+    assign photo_image = photo
+  endif
+-%}
+<div class="bh-review" {{ attributes }}>
+  <div class="bh-review__stars">
+    {%- for s in (1..stars) -%}
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="#5F8F2B" aria-hidden="true"><path d="M12 2.5l3.1 6.6 7.1.9-5.2 5 1.4 7-6.4-3.6-6.4 3.6 1.4-7-5.2-5 7.1-.9L12 2.5Z"/></svg>
+    {%- endfor -%}
+  </div>
+  <p class="bh-review__quote">“{{ quote | strip | escape | newline_to_br }}”</p>
+  <div class="bh-review__foot">
+    <div class="bh-review__avatar">
+      {%- if photo_image != blank -%}
+        {{ photo_image | image_url: width: 96, height: 96 | image_tag: loading: 'lazy', alt: name }}
+      {%- else -%}
+        {{ name | strip | slice: 0 | upcase | default: '+' }}
+      {%- endif -%}
+    </div>
+    <div class="bh-review__who">
+      <div class="bh-review__name">{{ name }}</div>
+      {%- if location != blank -%}
+        <div class="bh-review__loc">{{ location }}</div>
+      {%- endif -%}
+    </div>
+  </div>
+</div>

@@ -21,7 +21,9 @@
     {{ content_for_header }}
   </head>
   <body class="bh-body">
+    {% sections 'header-group' %}
     {{ content_for_layout }}
+    {% sections 'footer-group' %}
     <script src="{{ 'bonsai-theme.js' | asset_url }}" defer></script>
   </body>
 </html>

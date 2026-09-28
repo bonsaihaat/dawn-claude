@@ -1,0 +1,380 @@
+{%- comment -%}
+  Accepts: section, is_search, collection, results, filters, results_count,
+  sort_options, sort_by, default_sort_by, terms, paginate
+{%- endcomment -%}
+{%- liquid
+  assign chip_parent = nil
+  assign chip_child = nil
+  if is_search
+    assign terms_param = terms | url_encode
+    assign base_url = routes.search_url | append: '?q=' | append: terms_param | append: '&type=product'
+    assign clear_url = base_url
+    assign noun = section.settings.result_noun
+  else
+    if section.settings.menu != blank
+      for link in section.settings.menu.links
+        if link.url == collection.url
+          assign chip_parent = link
+        endif
+        for child in link.links
+          if child.url == collection.url
+            assign chip_parent = link
+            assign chip_child = child
+          endif
+        endfor
+      endfor
+    endif
+    assign clear_url = collection.url
+    if chip_child != nil
+      assign clear_url = chip_parent.url
+    endif
+    assign noun = collection.metafields.custom.result_noun.value | default: section.settings.result_noun
+  endif
+
+  assign current_sort = sort_by | default: default_sort_by
+  if current_sort != default_sort_by
+    if clear_url contains '?'
+      assign clear_url = clear_url | append: '&sort_by=' | append: current_sort
+    else
+      assign clear_url = clear_url | append: '?sort_by=' | append: current_sort
+    endif
+  endif
+
+  assign band_lines = section.settings.price_bands | newline_to_br | split: '<br />'
+  assign active_count = 0
+  assign filter_groups = ''
+  assign pills = ''
+-%}
+
+{%- capture icon_tick -%}
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12.5L9.5 18L20 6" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+{%- endcapture -%}
+{%- capture icon_x -%}
+  <svg width="9" height="9" viewBox="0 0 18 18" aria-hidden="true"><line x1="2" y1="2" x2="16" y2="16" stroke="#2E4716" stroke-width="2.4"/><line x1="16" y1="2" x2="2" y2="16" stroke="#2E4716" stroke-width="2.4"/></svg>
+{%- endcapture -%}
+
+{%- if chip_child != nil -%}
+  {%- capture pill -%}
+    <a href="{{ chip_parent.url }}" class="bh-plp__pill" data-bh-nav>{{ chip_child.title }}{{ icon_x }}</a>
+  {%- endcapture -%}
+  {%- assign pills = pills | append: pill -%}
+{%- endif -%}
+
+{%- for filter in filters -%}
+  {%- if filter.type == 'price_range' -%}
+    {%- liquid
+      assign price_set = false
+      if filter.min_value.value != nil or filter.max_value.value != nil
+        assign price_set = true
+      endif
+      assign cur_min = filter.min_value.value | default: 0
+      assign cur_max = filter.max_value.value | default: 99999999999
+      assign flags = ''
+      for line in band_lines
+        assign parts = line | strip | split: '|'
+        if parts.size == 0
+          continue
+        endif
+        assign b_min = parts[1] | plus: 0 | times: 100
+        assign b_max_raw = parts[2] | strip
+        assign on = '0'
+        if price_set and b_min >= cur_min
+          if b_max_raw == blank
+            if filter.max_value.value == nil
+              assign on = '1'
+            endif
+          else
+            assign b_last = b_max_raw | plus: 0 | times: 100 | minus: 1
+            if b_last <= cur_max
+              assign on = '1'
+            endif
+          endif
+        endif
+        assign flags = flags | append: on | append: ','
+      endfor
+      assign flag_list = flags | split: ','
+      if filter.url_to_remove contains '?'
+        assign sep = '&'
+      else
+        assign sep = '?'
+      endif
+    -%}
+    {%- capture group -%}
+      <div class="bh-plp__group">
+        <span class="bh-plp__group-title">{{ filter.label }}</span>
+        {%- assign i = 0 -%}
+        {%- for line in band_lines -%}
+          {%- assign parts = line | strip | split: '|' -%}
+          {%- if parts.size == 0 -%}{%- continue -%}{%- endif -%}
+          {%- liquid
+            assign this_on = flag_list[i]
+            assign new_min = 99999999999
+            assign new_max = -1
+            assign any = false
+            assign j = 0
+            for other in band_lines
+              assign o_parts = other | strip | split: '|'
+              if o_parts.size == 0
+                continue
+              endif
+              assign include = flag_list[j]
+              if j == i
+                if this_on == '1'
+                  assign include = '0'
+                else
+                  assign include = '1'
+                endif
+              endif
+              if include == '1'
+                assign any = true
+                assign o_min = o_parts[1] | plus: 0 | times: 100
+                if o_min < new_min
+                  assign new_min = o_min
+                endif
+                assign o_max_raw = o_parts[2] | strip
+                if o_max_raw == blank
+                  assign new_max = 'open'
+                elsif new_max != 'open'
+                  assign o_max = o_max_raw | plus: 0 | times: 100
+                  if o_max > new_max
+                    assign new_max = o_max
+                  endif
+                endif
+              endif
+              assign j = j | plus: 1
+            endfor
+            if any
+              assign href = filter.url_to_remove | append: sep
+              if new_min > 0
+                assign gte = new_min | divided_by: 100
+                assign href = href | append: filter.min_value.param_name | append: '=' | append: gte
+                if new_max != 'open'
+                  assign href = href | append: '&'
+                endif
+              endif
+              if new_max != 'open'
+                assign lte = new_max | minus: 1 | divided_by: 100.0
+                assign href = href | append: filter.max_value.param_name | append: '=' | append: lte
+              endif
+            else
+              assign href = filter.url_to_remove
+            endif
+          -%}
+          <a href="{{ href }}" class="bh-plp__opt{% if this_on == '1' %} is-on{% endif %}" data-bh-nav rel="nofollow">
+            <span class="bh-plp__box">{{ icon_tick }}</span>
+            <span class="bh-plp__opt-label">{{ parts[0] | strip }}</span>
+            <span class="bh-plp__opt-count"></span>
+          </a>
+          {%- if this_on == '1' -%}
+            {%- assign active_count = active_count | plus: 1 -%}
+            {%- capture pill -%}
+              <a href="{{ href }}" class="bh-plp__pill" data-bh-nav>{{ parts[0] | strip }}{{ icon_x }}</a>
+            {%- endcapture -%}
+            {%- assign pills = pills | append: pill -%}
+          {%- endif -%}
+          {%- assign i = i | plus: 1 -%}
+        {%- endfor -%}
+      </div>
+    {%- endcapture -%}
+    {%- assign filter_groups = filter_groups | append: group -%}
+  {%- elsif filter.values.size > 0 -%}
+    {%- capture group -%}
+      <div class="bh-plp__group">
+        <span class="bh-plp__group-title">{{ filter.label }}</span>
+        {%- for value in filter.values -%}
+          {%- if value.active -%}
+            {%- assign href = value.url_to_remove -%}
+          {%- else -%}
+            {%- assign href = value.url_to_add -%}
+          {%- endif -%}
+          <a href="{{ href }}" class="bh-plp__opt{% if value.active %} is-on{% endif %}" data-bh-nav rel="nofollow">
+            <span class="bh-plp__box">{{ icon_tick }}</span>
+            <span class="bh-plp__opt-label">{{ value.label }}</span>
+            <span class="bh-plp__opt-count">{{ value.count }}</span>
+          </a>
+          {%- if value.active -%}
+            {%- assign active_count = active_count | plus: 1 -%}
+            {%- capture pill -%}
+              <a href="{{ value.url_to_remove }}" class="bh-plp__pill" data-bh-nav>{{ value.label }}{{ icon_x }}</a>
+            {%- endcapture -%}
+            {%- assign pills = pills | append: pill -%}
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- endcapture -%}
+    {%- assign filter_groups = filter_groups | append: group -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- liquid
+  assign has_active = false
+  if pills != ''
+    assign has_active = true
+  endif
+  assign badge_count = active_count
+  if badge_count == 0 and chip_child != nil
+    assign badge_count = 1
+  endif
+-%}
+
+<div class="bh bh-plp" data-bh-plp data-section-id="{{ section.id }}">
+  <div class="bh-plp__wrap">
+
+    <nav class="bh-plp__crumbs" aria-label="Breadcrumb">
+      <a href="{{ routes.root_url }}">Home</a>
+      <span>/</span>
+      {%- if is_search -%}
+        <span class="bh-plp__crumb-current">Search</span>
+      {%- else -%}
+        {%- if chip_child != nil -%}
+          <a href="{{ chip_parent.url }}">{{ chip_parent.title }}</a>
+          <span>/</span>
+        {%- endif -%}
+        <span class="bh-plp__crumb-current">{{ collection.title }}</span>
+      {%- endif -%}
+    </nav>
+
+    <div class="bh-plp__head">
+      {%- if is_search -%}
+        <h1 class="bh-plp__title">
+          {%- if terms != blank -%}Results for “{{ terms }}”{%- else -%}{{ section.settings.search_heading }}{%- endif -%}
+        </h1>
+      {%- else -%}
+        <h1 class="bh-plp__title">{{ collection.title }}</h1>
+        {%- if collection.description != blank -%}
+          <p class="bh-plp__desc">{{ collection.description | strip_html }}</p>
+        {%- endif -%}
+      {%- endif -%}
+    </div>
+
+    {%- if is_search -%}
+      <form action="{{ routes.search_url }}" method="get" class="bh-plp__search" role="search">
+        <input type="search" name="q" value="{{ terms | escape }}" placeholder="Search for bonsai, pots, tools…" aria-label="Search">
+        <input type="hidden" name="type" value="product">
+        <input type="hidden" name="options[prefix]" value="last">
+        <button type="submit">Search</button>
+      </form>
+    {%- elsif chip_parent != nil and chip_parent.links.size > 0 -%}
+      <div class="bh-plp__chips">
+        <a href="{{ chip_parent.url }}" class="bh-plp__chip{% if chip_child == nil %} is-active{% endif %}">All</a>
+        {%- for child in chip_parent.links -%}
+          <a href="{{ child.url }}" class="bh-plp__chip{% if chip_child != nil and child.url == chip_child.url %} is-active{% endif %}">{{ child.title }}</a>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    <div class="bh-plp__body">
+
+      {%- if filter_groups != '' -%}
+        <aside class="bh-plp__aside">
+          <div class="bh-plp__aside-head">
+            <span class="bh-plp__aside-title">Filters</span>
+            {%- if has_active -%}
+              <a href="{{ clear_url }}" class="bh-plp__aside-clear" data-bh-nav>Clear all</a>
+            {%- endif -%}
+          </div>
+          {{ filter_groups }}
+        </aside>
+      {%- endif -%}
+
+      <div class="bh-plp__main">
+
+        <div class="bh-plp__toolbar">
+          <span class="bh-plp__count"><strong>{{ results_count }}</strong> {{ noun }}</span>
+          <div class="bh-plp__tools">
+            {%- if filter_groups != '' -%}
+              <button type="button" class="bh-plp__filter-btn" data-bh-sheet-open>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4" stroke="#1B1F17" stroke-width="2" stroke-linecap="round"/></svg>
+                Filter
+                {%- if has_active -%}
+                  <span class="bh-plp__filter-badge">{{ badge_count }}</span>
+                {%- endif -%}
+              </button>
+            {%- endif -%}
+            {%- if sort_options.size > 0 -%}
+              <div class="bh-plp__sort">
+                <select aria-label="Sort products" data-bh-sort>
+                  {%- for option in sort_options -%}
+                    {%- liquid
+                      case option.value
+                        when 'manual'
+                          assign sort_label = 'Featured'
+                        when 'relevance'
+                          assign sort_label = 'Featured'
+                        when 'price-ascending'
+                          assign sort_label = 'Price: Low to High'
+                        when 'price-descending'
+                          assign sort_label = 'Price: High to Low'
+                        when 'best-selling'
+                          assign sort_label = 'Best Selling'
+                        when 'created-descending'
+                          assign sort_label = 'Newest'
+                        else
+                          assign sort_label = ''
+                      endcase
+                    -%}
+                    {%- if sort_label != '' -%}
+                      <option value="{{ option.value }}"{% if option.value == current_sort %} selected{% endif %}>{{ sort_label }}</option>
+                    {%- endif -%}
+                  {%- endfor -%}
+                </select>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6l6-6" stroke="#1B1F17" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            {%- endif -%}
+          </div>
+        </div>
+
+        {%- if has_active -%}
+          <div class="bh-plp__pills">
+            {{ pills }}
+            <a href="{{ clear_url }}" class="bh-plp__pills-clear" data-bh-nav>Clear all</a>
+          </div>
+        {%- endif -%}
+
+        {%- if results_count > 0 -%}
+          <div class="bh-plp__grid" data-bh-grid>
+            {%- for item in results -%}
+              {%- if is_search and item.object_type != 'product' -%}{%- continue -%}{%- endif -%}
+              {%- render 'bonsai-listing-card', product: item -%}
+            {%- endfor -%}
+          </div>
+          {%- if paginate.next -%}
+            <div class="bh-plp__more-wrap">
+              <a href="{{ paginate.next.url }}" class="bh-plp__more" data-bh-more>Load more</a>
+            </div>
+          {%- endif -%}
+        {%- elsif is_search == false or terms != blank -%}
+          <div class="bh-plp__empty">
+            {%- if has_active -%}
+              <span class="bh-plp__empty-title">No {{ noun }} match these filters</span>
+              <span class="bh-plp__empty-text">Try removing a filter or two.</span>
+              <a href="{{ clear_url }}" class="bh-plp__empty-btn" data-bh-nav>Clear all filters</a>
+            {%- else -%}
+              <span class="bh-plp__empty-title">No {{ noun }} found</span>
+              <a href="{{ routes.all_products_collection_url }}" class="bh-plp__empty-btn">Browse all products</a>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+      </div>
+    </div>
+  </div>
+
+  {%- if filter_groups != '' -%}
+    <div class="bh-plp__sheet-backdrop" data-bh-sheet-close></div>
+    <div class="bh-plp__sheet" role="dialog" aria-modal="true" aria-label="Filters">
+      <div class="bh-plp__sheet-grab"><span></span></div>
+      <div class="bh-plp__sheet-head">
+        <span>Filters</span>
+        <button type="button" aria-label="Close filters" data-bh-sheet-close>
+          <svg width="15" height="15" viewBox="0 0 18 18" aria-hidden="true"><line x1="1" y1="1" x2="17" y2="17" stroke="#1B1F17" stroke-width="2"/><line x1="17" y1="1" x2="1" y2="17" stroke="#1B1F17" stroke-width="2"/></svg>
+        </button>
+      </div>
+      <div class="bh-plp__sheet-body" data-bh-sheet-body>{{ filter_groups }}</div>
+      <div class="bh-plp__sheet-foot">
+        <a href="{{ clear_url }}" class="bh-plp__sheet-clear" data-bh-nav>Clear all</a>
+        <button type="button" class="bh-plp__sheet-show" data-bh-sheet-close>Show {{ results_count }} results</button>
+      </div>
+    </div>
+  {%- endif -%}
+</div>

@@ -4,9 +4,6 @@
     "main": {
       "type": "bonsai-home",
       "blocks": {
-        "m1": { "type": "marquee", "settings": { "text": "Free shipping on orders above ₹1999" } },
-        "m2": { "type": "marquee", "settings": { "text": "Use code BONSAI10 for 10% off your first order" } },
-        "m3": { "type": "marquee", "settings": { "text": "Pan-India delivery in 3–5 days" } },
         "s1": { "type": "slide", "settings": { "headline": "What you see ships to you", "subline": "Juniper Bonsai · hand-photographed, exactly as delivered" } },
         "s2": { "type": "slide", "settings": { "headline": "Grown by hand, chosen by you", "subline": "Every tree shaped over years before it reaches you" } },
         "s3": { "type": "slide", "settings": { "headline": "A living centerpiece for every space", "subline": "From starter trees to statement pieces" } },
@@ -39,7 +36,6 @@
         "r3": { "type": "testimonial", "settings": { "rating": 5, "name": "Priya Deshmukh", "location": "Pune", "quote": "Beautiful ceramic pot and a gorgeous ficus. Customer support even helped me over WhatsApp when I had questions about repotting." } }
       },
       "block_order": [
-        "m1", "m2", "m3",
         "s1", "s2", "s3",
         "t1", "t2", "t3", "t4",
         "p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8",

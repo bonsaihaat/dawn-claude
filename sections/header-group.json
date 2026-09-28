@@ -1,130 +1,22 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "name": "t:sections.header.name",
   "type": "header",
   "sections": {
-    "promo-ticker": {
-      "type": "promo-ticker",
-      "blocks": {
-        "promo-ticker-0": {
-          "type": "message",
-          "settings": {
-            "text": "Free shipping on orders above ₹1999",
-            "link": ""
-          }
-        },
-        "promo-ticker-1": {
-          "type": "message",
-          "settings": {
-            "text": "Use code BONSAI10 for 10% off your first order",
-            "link": ""
-          }
-        },
-        "promo-ticker-2": {
-          "type": "message",
-          "settings": {
-            "text": "Pan-India delivery in 3–5 days",
-            "link": ""
-          }
-        }
-      },
-      "block_order": [
-        "promo-ticker-0",
-        "promo-ticker-1",
-        "promo-ticker-2"
-      ],
-      "settings": {
-        "color_scheme": "scheme-6",
-        "scroll_speed": 20,
-        "pause_on_hover": true,
-        "separator": ""
-      }
-    },
     "header": {
-      "type": "header",
+      "type": "bonsai-header",
       "blocks": {
-        "header-tile-0": {
-          "type": "drawer_category_tile",
-          "settings": {
-            "title": "Home",
-            "link": "/",
-            "badge": "",
-            "highlighted": false
-          }
-        },
-        "header-tile-1": {
-          "type": "drawer_category_tile",
-          "settings": {
-            "title": "Bonsai Plants",
-            "link": "/collections/bonsai-plants",
-            "badge": "",
-            "highlighted": false
-          }
-        },
-        "header-tile-2": {
-          "type": "drawer_category_tile",
-          "settings": {
-            "title": "Pots & Others",
-            "link": "/collections/pots-others",
-            "badge": "",
-            "highlighted": false
-          }
-        },
-        "header-tile-3": {
-          "type": "drawer_category_tile",
-          "settings": {
-            "title": "Blogs",
-            "link": "/blogs/news",
-            "badge": "",
-            "highlighted": false
-          }
-        },
-        "header-tile-4": {
-          "type": "drawer_category_tile",
-          "settings": {
-            "title": "Gallery",
-            "link": "/pages/gallery",
-            "badge": "",
-            "highlighted": false
-          }
-        }
+        "m1": { "type": "marquee", "settings": { "text": "Free shipping on orders above ₹1999" } },
+        "m2": { "type": "marquee", "settings": { "text": "Use code BONSAI10 for 10% off your first order" } },
+        "m3": { "type": "marquee", "settings": { "text": "Pan-India delivery in 3–5 days" } }
       },
-      "block_order": [
-        "header-tile-0",
-        "header-tile-1",
-        "header-tile-2",
-        "header-tile-3",
-        "header-tile-4"
-      ],
+      "block_order": ["m1", "m2", "m3"],
       "settings": {
-        "logo_position": "middle-left",
-        "mobile_logo_position": "center",
         "menu": "main-menu",
-        "drawer_menu_heading": "Shop",
-        "menu_type_desktop": "dropdown",
-        "sticky_header_type": "on-scroll-up",
-        "show_line_separator": true,
-        "search_placeholder_phrases": "Search for Bonsai Plants\nSearch for Bonsai Pots\nSearch for Bonsai Raw Material",
-        "color_scheme": "scheme-1",
-        "menu_color_scheme": "scheme-1",
-        "enable_country_selector": false,
-        "enable_language_selector": false,
-        "margin_bottom": 0,
-        "padding_top": 12,
-        "padding_bottom": 8
+        "search_phrases": "Bonsai Plants,Bonsai Pots,Fertilizers,Care Tools",
+        "show_marquee": true,
+        "whatsapp_number": "919999999999"
       }
     }
   },
-  "order": [
-    "promo-ticker",
-    "header"
-  ]
+  "order": ["header"]
 }

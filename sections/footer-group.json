@@ -1,1 +1,16 @@
-{"name":"t:sections.footer.name","type":"footer","sections":{"footer":{"type":"footer","settings":{"color_scheme":"scheme-1","newsletter_enable":true,"newsletter_heading":"Subscribe to our emails","enable_follow_on_shop":true,"show_social":true,"enable_country_selector":true,"enable_language_selector":true,"payment_enable":true,"show_policy":true,"margin_top":0,"padding_top":36,"padding_bottom":36}}},"order":["footer"]}
+{
+  "name": "t:sections.footer.name",
+  "type": "footer",
+  "sections": {
+    "footer": {
+      "type": "bonsai-footer",
+      "settings": {
+        "footer_blurb": "India's first dedicated bonsai platform — hand-trained trees, delivered healthy.",
+        "footer_col1_title": "Shop",
+        "footer_col2_title": "Support",
+        "whatsapp_number": "919999999999"
+      }
+    }
+  },
+  "order": ["footer"]
+}

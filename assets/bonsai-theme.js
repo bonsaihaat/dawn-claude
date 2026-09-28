@@ -6,18 +6,20 @@
   // items that arrive together (a row of cards, a swipe) are staggered in order
   if (document.documentElement.classList.contains('bh-anim')) {
     var revealObserver = new IntersectionObserver(function (entries) {
-      var batch = 0;
+      var batch = new Map(); // stagger counter per group, so groups arriving together start in parallel
       entries.forEach(function (entry) {
         if (!entry.isIntersecting) return;
         // A "group" (the sliding trust strip) reveals all its items at once, including off-screen ones
         var items = entry.target.hasAttribute('data-bh-reveal') ? entry.target.querySelectorAll('[data-bh-reveal-item]') : [entry.target];
         Array.prototype.forEach.call(items, function (item) {
-          item.style.setProperty('--bh-i', Math.min(batch++, 5));
+          var i = batch.get(item.parentNode) || 0;
+          batch.set(item.parentNode, i + 1);
+          item.style.setProperty('--bh-i', Math.min(i, 5));
           item.classList.add('is-revealed');
         });
         revealObserver.unobserve(entry.target);
       });
-    }, { threshold: 0.25, rootMargin: '0px 0px -15% 0px' });
+    }, { threshold: 0.25, rootMargin: '0px 0px -20% 0px' });
 
     document.querySelectorAll('[data-bh-reveal="group"], [data-bh-reveal]:not([data-bh-reveal="group"]) > *').forEach(function (el) {
       revealObserver.observe(el);

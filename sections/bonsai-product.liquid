@@ -1,0 +1,319 @@
+{{ 'bonsai-product.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'bonsai-product.js' | asset_url }}" defer></script>
+
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign wa_number = section.settings.whatsapp_number | remove: '+' | remove: ' '
+  assign wa_text = 'Hi! I have a question about the ' | append: product.title | append: '.' | url_encode | replace: '+', '%20'
+  assign wa_url = 'https://wa.me/' | append: wa_number | append: '?text=' | append: wa_text
+
+  assign crumb_collection = collection
+  if crumb_collection == blank
+    for c in product.collections
+      unless c.handle == 'all' or c.handle == 'frontpage'
+        assign crumb_collection = c
+        break
+      endunless
+    endfor
+  endif
+  if crumb_collection != blank
+    assign crumb_title = crumb_collection.title
+    assign crumb_url = crumb_collection.url
+  else
+    assign crumb_title = section.settings.fallback_crumb
+    assign crumb_url = routes.all_products_collection_url
+  endif
+
+  assign m = product.metafields.custom
+  assign light = m.light.value
+  assign spec_age = m.age.value
+  assign spec_height = m.height.value
+  assign spec_care = m.care_level.value
+
+  case light
+    when 'Full sun'
+      assign default_light = '4–6 hours of direct sun, outdoors on a balcony or terrace.'
+      assign default_water = 'Daily in summer, every 2–3 days in winter. Never let the soil dry out fully.'
+    when 'Bright indirect'
+      assign default_light = 'Near a bright window, away from harsh afternoon sun and AC vents.'
+      assign default_water = 'When the top 1 cm of soil feels dry — usually every 3–4 days.'
+    when 'Low light'
+      assign default_light = 'Tolerates low light; a few hours near a window each day keeps it lush.'
+      assign default_water = 'Every 5–7 days. Let the soil dry between waterings.'
+    else
+      assign default_light = ''
+      assign default_water = ''
+  endcase
+  assign care_light = m.care_light.value | default: default_light
+  assign care_water = m.care_water.value | default: default_water
+  assign care_soil = m.care_soil.value | default: section.settings.care_soil
+  assign in_box = m.whats_in_box.value | default: section.settings.in_box
+  assign shipping_text = m.shipping.value | default: section.settings.shipping_text
+
+  assign rating = product.metafields.reviews.rating.value
+  assign rating_count = product.metafields.reviews.rating_count.value | default: 0
+  assign trust_items = section.settings.trust_items | split: ','
+-%}
+
+{%- capture icon_check -%}
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12.5L9.5 18L20 6" stroke="#5F8F2B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+{%- endcapture -%}
+
+<div
+  class="bh bh-pdp"
+  data-bh-pdp
+  data-currency="{{ cart.currency.iso_code }}"
+  data-product-id="{{ product.id }}"
+  data-free-threshold="{{ section.settings.free_shipping_threshold }}"
+  data-shipping-fee="{{ section.settings.shipping_fee }}"
+  data-delivery-days="{{ section.settings.delivery_days }}"
+>
+  <div class="bh-pdp__wrap">
+
+    <nav class="bh-pdp__crumbs" aria-label="Breadcrumb">
+      <a href="{{ routes.root_url }}">Home</a>
+      <span>/</span>
+      <a href="{{ crumb_url }}">{{ crumb_title }}</a>
+      <span>/</span>
+      <span class="bh-pdp__crumb-current">{{ product.title }}</span>
+    </nav>
+
+    <div class="bh-pdp__layout">
+
+      <div class="bh-pdp__gallery">
+        <div class="bh-pdp__stage">
+          {%- for media in product.media -%}
+            <div class="bh-pdp__slide{% if forloop.first %} is-active{% endif %}" data-bh-slide="{{ forloop.index0 }}" data-media-id="{{ media.id }}">
+              {%- if forloop.first -%}
+                {%- assign media_loading = 'eager' -%}
+              {%- else -%}
+                {%- assign media_loading = 'lazy' -%}
+              {%- endif -%}
+              {%- assign media_alt = media.alt | default: product.title -%}
+              {{
+                media.preview_image
+                | image_url: width: 1600
+                | image_tag:
+                  widths: '400, 600, 800, 1000, 1200, 1600',
+                  sizes: '(min-width: 1180px) 580px, (min-width: 820px) 50vw, calc(100vw - 40px)',
+                  loading: media_loading,
+                  alt: media_alt
+              }}
+            </div>
+          {%- endfor -%}
+          {%- if section.settings.photo_badge != blank -%}
+            <span class="bh-pdp__photo-badge">{{ icon_check }} {{ section.settings.photo_badge }}</span>
+          {%- endif -%}
+        </div>
+        {%- if product.media.size > 1 -%}
+          <div class="bh-pdp__thumbs">
+            {%- for media in product.media -%}
+              <button type="button" class="bh-pdp__thumb{% if forloop.first %} is-active{% endif %}" data-bh-thumb="{{ forloop.index0 }}" aria-label="Show photo {{ forloop.index }}">
+                {{ media.preview_image | image_url: width: 300 | image_tag: loading: 'lazy', widths: '150, 300', sizes: '140px', alt: '' }}
+              </button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      <div class="bh-pdp__info">
+        <div class="bh-pdp__titles">
+          <h1 class="bh-pdp__title">{{ product.title }}</h1>
+          {%- if rating != blank -%}
+            {%- assign full_stars = rating.rating | round -%}
+            {%- assign rating_label = rating.rating | round: 1 | append: '' -%}
+            {%- unless rating_label contains '.' -%}{%- assign rating_label = rating_label | append: '.0' -%}{%- endunless -%}
+            <a href="#reviews" class="bh-pdp__rating">
+              <span class="bh-pdp__stars">
+                {%- for i in (1..5) -%}
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="{% if i <= full_stars %}#5F8F2B{% else %}#dfe6cf{% endif %}" aria-hidden="true"><path d="M12 2.5l3.1 6.6 7.1.9-5.2 5 1.4 7-6.4-3.6-6.4 3.6 1.4-7-5.2-5 7.1-.9L12 2.5Z"/></svg>
+                {%- endfor -%}
+              </span>
+              <strong>{{ rating_label }}</strong>
+              <span class="bh-pdp__rating-count">{{ rating_count }} reviews</span>
+            </a>
+          {%- endif -%}
+        </div>
+
+        <div class="bh-pdp__price-row">
+          <span class="bh-pdp__price" data-bh-total>{{ current_variant.price | money_without_trailing_zeros }}</span>
+          <span class="bh-pdp__tax">{{ section.settings.tax_note }}</span>
+        </div>
+
+        {%- if product.description != blank -%}
+          <div class="bh-pdp__desc">{{ product.description }}</div>
+        {%- endif -%}
+
+        {%- if spec_age != blank or spec_height != blank or light != blank or spec_care != blank -%}
+          <div class="bh-pdp__specs">
+            {%- if spec_age != blank -%}
+              <div class="bh-pdp__spec"><span class="bh-pdp__spec-label">Age</span><span class="bh-pdp__spec-value">{{ spec_age }}</span></div>
+            {%- endif -%}
+            {%- if spec_height != blank -%}
+              <div class="bh-pdp__spec"><span class="bh-pdp__spec-label">Height</span><span class="bh-pdp__spec-value">{{ spec_height }}</span></div>
+            {%- endif -%}
+            {%- if light != blank -%}
+              <div class="bh-pdp__spec"><span class="bh-pdp__spec-label">Light</span><span class="bh-pdp__spec-value">{{ light }}</span></div>
+            {%- endif -%}
+            {%- if spec_care != blank -%}
+              <div class="bh-pdp__spec"><span class="bh-pdp__spec-label">Care level</span><span class="bh-pdp__spec-value">{{ spec_care }}</span></div>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        {%- unless product.has_only_default_variant -%}
+          <fieldset class="bh-pdp__options">
+            <legend class="bh-pdp__spec-label">{{ product.options | join: ' / ' }}</legend>
+            {%- for variant in product.variants -%}
+              <label class="bh-pdp__option{% if variant.id == current_variant.id %} is-selected{% endif %}{% unless variant.available %} is-unavailable{% endunless %}">
+                <input type="radio" name="bh-variant" value="{{ variant.id }}" data-price="{{ variant.price }}" data-available="{{ variant.available }}" data-media-id="{{ variant.featured_media.id }}"{% if variant.id == current_variant.id %} checked{% endif %}>
+                <span class="bh-pdp__radio"></span>
+                <span class="bh-pdp__option-text">
+                  <span class="bh-pdp__option-label">{{ variant.title }}</span>
+                  {%- unless variant.available -%}<span class="bh-pdp__option-note">Sold out</span>{%- endunless -%}
+                </span>
+                <span class="bh-pdp__option-price">{{ variant.price | money_without_trailing_zeros }}</span>
+              </label>
+            {%- endfor -%}
+          </fieldset>
+        {%- endunless -%}
+
+        <div class="bh-pdp__buy">
+          <div class="bh-pdp__qty">
+            <button type="button" data-bh-qty="-1" aria-label="Decrease quantity">−</button>
+            <span data-bh-qty-value>1</span>
+            <button type="button" data-bh-qty="1" aria-label="Increase quantity">+</button>
+          </div>
+          <button type="button" class="bh-pdp__add" data-bh-add data-variant-id="{{ current_variant.id }}" data-price="{{ current_variant.price }}"{% unless current_variant.available %} disabled{% endunless %}>
+            {%- if current_variant.available -%}Add to cart{%- else -%}Sold out{%- endif -%}
+          </button>
+          <button type="button" class="bh-pdp__wish" data-bh-wish aria-label="Add to wishlist" aria-pressed="false">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" stroke="#1B1F17" stroke-width="1.7" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <a href="{{ wa_url }}" target="_blank" rel="noopener" class="bh-pdp__ask">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3a9 9 0 0 0-7.8 13.4L3 21l4.8-1.2A9 9 0 1 0 12 3Z" stroke="#1B1F17" stroke-width="1.7" stroke-linejoin="round"/></svg>
+          {{ section.settings.whatsapp_label }}
+        </a>
+
+        <div class="bh-pdp__delivery">
+          <span class="bh-pdp__delivery-title">Check delivery</span>
+          <form class="bh-pdp__pin-form" data-bh-pin-form novalidate>
+            <input type="text" inputmode="numeric" maxlength="6" placeholder="Enter pincode" aria-label="Pincode" data-bh-pin>
+            <button type="submit">Check</button>
+          </form>
+          <span class="bh-pdp__delivery-msg" data-bh-pin-msg hidden></span>
+          {%- if trust_items.size > 0 -%}
+            <div class="bh-pdp__trust">
+              {%- for t in trust_items -%}
+                <span>{{ icon_check }}{{ t | strip }}</span>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+        </div>
+
+        <div class="bh-pdp__accordion">
+          {%- if care_light != blank or care_water != blank or care_soil != blank -%}
+            <div class="bh-pdp__acc is-open" data-bh-acc>
+              <button type="button" class="bh-pdp__acc-btn" aria-expanded="true">
+                <span>Care guide</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6l6-6" stroke="#1B1F17" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="bh-pdp__acc-body">
+                {%- if care_light != blank -%}<div class="bh-pdp__acc-row"><span class="bh-pdp__acc-label">Light</span><span class="bh-pdp__acc-text">{{ care_light }}</span></div>{%- endif -%}
+                {%- if care_water != blank -%}<div class="bh-pdp__acc-row"><span class="bh-pdp__acc-label">Water</span><span class="bh-pdp__acc-text">{{ care_water }}</span></div>{%- endif -%}
+                {%- if care_soil != blank -%}<div class="bh-pdp__acc-row"><span class="bh-pdp__acc-label">Soil &amp; repotting</span><span class="bh-pdp__acc-text">{{ care_soil }}</span></div>{%- endif -%}
+              </div>
+            </div>
+          {%- endif -%}
+          {%- if in_box != blank -%}
+            <div class="bh-pdp__acc" data-bh-acc>
+              <button type="button" class="bh-pdp__acc-btn" aria-expanded="false">
+                <span>What’s in the box</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6l6-6" stroke="#1B1F17" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="bh-pdp__acc-body"><div class="bh-pdp__acc-row"><span class="bh-pdp__acc-text">{{ in_box }}</span></div></div>
+            </div>
+          {%- endif -%}
+          {%- if shipping_text != blank -%}
+            <div class="bh-pdp__acc" data-bh-acc>
+              <button type="button" class="bh-pdp__acc-btn" aria-expanded="false">
+                <span>Shipping &amp; replacement</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6l6-6" stroke="#1B1F17" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="bh-pdp__acc-body"><div class="bh-pdp__acc-row"><span class="bh-pdp__acc-text">{{ shipping_text }}</span></div></div>
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+
+    {%- liquid
+      assign related_source = crumb_collection
+      if related_source == blank
+        assign related_source = collections.all
+      endif
+      assign related_count = 0
+    -%}
+    {%- capture related_cards -%}
+      {%- for p in related_source.products -%}
+        {%- if p.id == product.id -%}{%- continue -%}{%- endif -%}
+        {%- if related_count >= 4 -%}{%- break -%}{%- endif -%}
+        {%- assign related_count = related_count | plus: 1 -%}
+        {%- assign related_price = p.price | money_without_trailing_zeros -%}
+        {%- render 'bonsai-product-card',
+          url: p.url,
+          image: p.featured_media,
+          title: p.title,
+          subtitle: p.metafields.custom.subtitle,
+          price: related_price
+        -%}
+      {%- endfor -%}
+    {%- endcapture -%}
+    {%- if related_count > 0 -%}
+      <div class="bh-pdp__related">
+        <div class="bh-pdp__related-head">
+          <h2 class="bh-pdp__h2">{{ section.settings.related_heading }}</h2>
+          <a href="{{ crumb_url }}" class="bh-pdp__view-all">View all →</a>
+        </div>
+        <div class="bh-pdp__related-grid">{{ related_cards }}</div>
+      </div>
+    {%- endif -%}
+  </div>
+
+  <div class="bh-pdp__sticky" data-bh-sticky>
+    <div class="bh-pdp__sticky-info">
+      <span class="bh-pdp__sticky-name">{{ product.title }}</span>
+      <span class="bh-pdp__sticky-price" data-bh-total>{{ current_variant.price | money_without_trailing_zeros }}</span>
+    </div>
+    <button type="button" class="bh-pdp__add" data-bh-add-proxy{% unless current_variant.available %} disabled{% endunless %}>
+      {%- if current_variant.available -%}Add to cart{%- else -%}Sold out{%- endif -%}
+    </button>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Bonsai product page",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "fallback_crumb", "label": "Breadcrumb fallback label", "default": "Bonsai Plants" },
+    { "type": "text", "id": "photo_badge", "label": "Photo badge", "default": "Real photo · this tree ships" },
+    { "type": "text", "id": "tax_note", "label": "Price note", "default": "Inclusive of all taxes" },
+    { "type": "header", "content": "WhatsApp" },
+    { "type": "text", "id": "whatsapp_number", "label": "WhatsApp number", "default": "919999999999", "info": "Country code + number, digits only." },
+    { "type": "text", "id": "whatsapp_label", "label": "Button label", "default": "Ask about this tree on WhatsApp" },
+    { "type": "header", "content": "Delivery check" },
+    { "type": "range", "id": "delivery_days", "label": "Estimated delivery (days)", "min": 1, "max": 14, "step": 1, "default": 4 },
+    { "type": "number", "id": "free_shipping_threshold", "label": "Free shipping from (₹)", "default": 1999 },
+    { "type": "number", "id": "shipping_fee", "label": "Shipping fee (₹)", "default": 99 },
+    { "type": "text", "id": "trust_items", "label": "Trust items", "default": "Arrives healthy,Free replacement,Care support", "info": "Comma-separated." },
+    { "type": "header", "content": "Accordion defaults", "info": "Per-product metafields (custom.care_light, custom.care_water, custom.care_soil, custom.whats_in_box, custom.shipping) override these." },
+    { "type": "textarea", "id": "care_soil", "label": "Soil & repotting", "default": "Well-draining bonsai mix. Repot every 2–3 years in early spring." },
+    { "type": "textarea", "id": "in_box", "label": "What’s in the box", "default": "The exact tree in the photos, your chosen pot, a printed care card and a moisture-safe travel wrap." },
+    { "type": "textarea", "id": "shipping_text", "label": "Shipping & replacement", "default": "Pan-India delivery in 3–5 days. If your tree arrives damaged, share a photo within 48 hours and we’ll replace it free." },
+    { "type": "header", "content": "Related products" },
+    { "type": "text", "id": "related_heading", "label": "Heading", "default": "You may also like" }
+  ]
+}
+{% endschema %}

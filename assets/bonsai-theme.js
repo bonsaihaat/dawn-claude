@@ -1,4 +1,22 @@
 (function () {
+  // Scroll reveals: stagger each group's children once it enters the viewport
+  if (document.documentElement.classList.contains('bh-anim')) {
+    var revealObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-revealed');
+        revealObserver.unobserve(entry.target);
+      });
+    }, { rootMargin: '0px 0px -12% 0px' });
+
+    document.querySelectorAll('[data-bh-reveal]').forEach(function (group) {
+      Array.prototype.forEach.call(group.children, function (child, i) {
+        child.style.setProperty('--bh-i', Math.min(i, 7));
+      });
+      revealObserver.observe(group);
+    });
+  }
+
   document.querySelectorAll('[data-bh]').forEach(function (root) {
     // Mobile drawer with main pane and per-category sub panes
     var subPanes = root.querySelectorAll('[data-bh-subpane]');

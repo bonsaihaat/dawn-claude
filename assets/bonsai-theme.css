@@ -3,6 +3,8 @@ body.bh-body { background: #faf7f1; }
 
 @keyframes bh-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @keyframes bh-caret { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+@keyframes bh-nudge { 0%, 55%, 100% { transform: translateX(0); } 30% { transform: translateX(5px); } 78% { transform: translateX(3px); } }
+@keyframes bh-parallax { from { transform: translateY(-8%) scale(1.18); } to { transform: translateY(8%) scale(1.18); } }
 
 .bh { font-family: 'Archivo', Helvetica, Arial, sans-serif; background: #faf7f1; }
 /* Pin inherited metrics so header/footer render the same under theme.liquid (Dawn globals) as under bonsai.liquid */
@@ -134,7 +136,9 @@ body.bh-body { background: #faf7f1; }
 .bh .bh-promo--light .bh-promo__btn { background: none; border: 1.5px solid #1B1F17; padding: 11px 21px; }
 
 /* Trust badges */
-.bh-trust { display: flex; flex-wrap: wrap; gap: 12px; margin: 22px 0 30px; }
+.bh-trust { margin: 22px 0 30px; }
+.bh-trust__set { display: flex; flex-wrap: wrap; gap: 12px; }
+.bh-trust__set--clone { display: none; }
 .bh-trust__item { flex: 1 1 200px; display: flex; align-items: center; justify-content: center; gap: 8px; background: #ffffff; border: 1px solid #eee7d8; border-radius: 999px; padding: 10px 16px; box-sizing: border-box; }
 .bh-trust__label { font-size: 12.5px; font-weight: 500; color: #20241b; white-space: nowrap; }
 
@@ -179,6 +183,36 @@ body.bh-body { background: #faf7f1; }
   .bh-reviews { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin: 0 0 40px; padding: 0; overflow: visible; }
   .bh-review { flex: initial; }
 }
+/* Trust strip loops as a marquee on mobile instead of wrapping */
+@media (max-width: 819.98px) and (prefers-reduced-motion: no-preference) {
+  .bh-trust { margin-left: -20px; margin-right: -20px; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%); }
+  .bh-trust__track { display: flex; width: max-content; animation: bh-marquee 24s linear infinite; }
+  .bh-trust:active .bh-trust__track { animation-play-state: paused; }
+  .bh-trust__set { flex-wrap: nowrap; gap: 10px; padding-right: 10px; }
+  .bh-trust__set--clone { display: flex; }
+  .bh-trust__item { flex: 0 0 auto; }
+}
+
+/* Scroll reveals: .bh-anim is set on <html> by the homepage only when motion is allowed */
+.bh-anim [data-bh-reveal]:not([data-bh-reveal="head"]) > * { opacity: 0; transform: translateY(16px); }
+.bh-anim [data-bh-reveal].is-revealed > * { opacity: 1; transform: none; transition: opacity 0.6s ease, transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1); transition-delay: calc(var(--bh-i, 0) * 70ms); }
+.bh-anim [data-bh-reveal="head"] .bh-h2 { overflow: clip; padding-bottom: 0.12em; margin-bottom: -0.12em; }
+.bh-anim [data-bh-reveal="head"] .bh-h2__inner { display: block; transform: translateY(110%); }
+.bh-anim [data-bh-reveal="head"] .bh-head__link { opacity: 0; }
+.bh-anim [data-bh-reveal="head"].is-revealed .bh-h2__inner { transform: none; transition: transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.bh-anim [data-bh-reveal="head"].is-revealed .bh-head__link { opacity: 1; transition: opacity 0.5s ease 0.25s; }
+.bh-head__arrow { display: inline-block; }
+.bh-anim [data-bh-reveal="head"].is-revealed .bh-head__arrow { animation: bh-nudge 0.9s ease-in-out 0.7s 1; }
+
+/* Category tiles: image drifts slower than the tile as it scrolls (no-op where scroll timelines are unsupported) */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* clip, not hidden: a hidden-overflow tile would become the scroll container view() tracks */
+    .bh-cat { overflow: clip; }
+    .bh-cat img { animation: bh-parallax linear both; animation-timeline: view(); }
+  }
+}
+
 .bh-review__stars { display: flex; gap: 3px; }
 .bh-review__quote { margin: 0; font-size: 14.5px; line-height: 1.6; color: #20241b; }
 .bh-review__foot { display: flex; align-items: center; gap: 12px; margin-top: auto; padding-top: 14px; border-top: 1px solid #eee7d8; }

@@ -1,5 +1,13 @@
 {%- assign all_url = routes.all_products_collection_url -%}
 
+{%- unless request.design_mode -%}
+  <script>
+    if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.documentElement.classList.add('bh-anim');
+    }
+  </script>
+{%- endunless -%}
+
 <div class="bh" data-bh>
   <div class="bh-main">
 
@@ -69,12 +77,19 @@
     {%- assign trust_blocks = section.blocks | where: 'type', 'trust' -%}
     {%- if trust_blocks.size > 0 -%}
       <div class="bh-trust">
-        {%- for block in trust_blocks -%}
-          <div class="bh-trust__item" {{ block.shopify_attributes }}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12.5L9.5 18L20 6" stroke="#5F8F2B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span class="bh-trust__label">{{ block.settings.label }}</span>
-          </div>
-        {%- endfor -%}
+        <div class="bh-trust__track">
+          {%- comment -%} Second copy only shows on mobile, where the strip loops as a marquee {%- endcomment -%}
+          {%- for copy in (1..2) -%}
+            <div class="bh-trust__set{% if copy == 2 %} bh-trust__set--clone{% endif %}" data-bh-reveal{% if copy == 2 %} aria-hidden="true"{% endif %}>
+              {%- for block in trust_blocks -%}
+                <div class="bh-trust__item"{% if copy == 1 %} {{ block.shopify_attributes }}{% endif %}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12.5L9.5 18L20 6" stroke="#5F8F2B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span class="bh-trust__label">{{ block.settings.label }}</span>
+                </div>
+              {%- endfor -%}
+            </div>
+          {%- endfor -%}
+        </div>
       </div>
     {%- endif -%}
 
@@ -98,12 +113,12 @@
         {%- assign row_url = all_url -%}
       {%- endif -%}
 
-      <div class="bh-head">
-        <div><h2 class="bh-h2">{{ row_heading }}</h2></div>
-        <a href="{{ row_url }}" class="bh-head__link">View all →</a>
+      <div class="bh-head" data-bh-reveal="head">
+        <div><h2 class="bh-h2"><span class="bh-h2__inner">{{ row_heading }}</span></h2></div>
+        <a href="{{ row_url }}" class="bh-head__link">View all <span class="bh-head__arrow" aria-hidden="true">→</span></a>
       </div>
 
-      <div class="bh-products">
+      <div class="bh-products" data-bh-reveal>
         {%- if row_collection != blank and row_collection.products_count > 0 -%}
           {%- for product in row_collection.products limit: 8 -%}
             {%- assign product_price = product.price | money_without_trailing_zeros -%}
@@ -137,10 +152,10 @@
 
     {%- assign category_blocks = section.blocks | where: 'type', 'category' -%}
     {%- if category_blocks.size > 0 -%}
-      <div style="margin:8px 0 18px;">
-        <h2 class="bh-h2">{{ section.settings.categories_heading }}</h2>
+      <div style="margin:8px 0 18px;" data-bh-reveal="head">
+        <h2 class="bh-h2"><span class="bh-h2__inner">{{ section.settings.categories_heading }}</span></h2>
       </div>
-      <div class="bh-cats">
+      <div class="bh-cats" data-bh-reveal>
         {%- for block in category_blocks -%}
           <a href="{{ block.settings.link | default: all_url }}" class="bh-cat" {{ block.shopify_attributes }}>
             {%- if block.settings.image != blank -%}
@@ -159,10 +174,10 @@
 
     {%- assign review_blocks = section.blocks | where: 'type', 'testimonial' -%}
     {%- if review_blocks.size > 0 -%}
-      <div style="margin:8px 0 18px;">
-        <h2 class="bh-h2">{{ section.settings.testimonials_heading }}</h2>
+      <div style="margin:8px 0 18px;" data-bh-reveal="head">
+        <h2 class="bh-h2"><span class="bh-h2__inner">{{ section.settings.testimonials_heading }}</span></h2>
       </div>
-      <div class="bh-reviews">
+      <div class="bh-reviews" data-bh-reveal>
         {%- for block in review_blocks -%}
           <div class="bh-review" {{ block.shopify_attributes }}>
             <div class="bh-review__stars">

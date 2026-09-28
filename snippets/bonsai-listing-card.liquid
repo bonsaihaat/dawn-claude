@@ -1,0 +1,63 @@
+{%- comment -%}
+  Accepts: product
+{%- endcomment -%}
+{%- liquid
+  assign m = product.metafields.custom
+  assign subtitle = m.subtitle.value
+  if subtitle == blank
+    assign light = m.light.value
+    assign age = m.age.value
+    if light != blank and age != blank
+      assign subtitle = light | append: ' · ' | append: age
+    else
+      assign subtitle = age | default: light
+    endif
+  endif
+  assign rating = product.metafields.reviews.rating.value
+  assign variant = product.selected_or_first_available_variant
+-%}
+<div class="bh-plp-card">
+  <div class="bh-plp-card__media">
+    <a href="{{ product.url }}" class="bh-plp-card__img" tabindex="-1" aria-hidden="true">
+      {%- if product.featured_media != blank -%}
+        {{
+          product.featured_media
+          | image_url: width: 800
+          | image_tag:
+            loading: 'lazy',
+            widths: '300, 400, 600, 800',
+            sizes: '(min-width: 820px) 240px, 45vw',
+            alt: product.title
+        }}
+      {%- endif -%}
+    </a>
+    {%- if m.badge.value != blank -%}
+      <span class="bh-plp-card__badge">{{ m.badge.value }}</span>
+    {%- endif -%}
+    <button type="button" class="bh-plp-card__wish" data-bh-wish="{{ product.id }}" aria-label="Add to wishlist" aria-pressed="false">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" stroke="#1B1F17" stroke-width="1.7" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+  <a href="{{ product.url }}" class="bh-plp-card__info">
+    <span class="bh-plp-card__name">{{ product.title }}</span>
+    {%- if subtitle != blank -%}
+      <span class="bh-plp-card__sub">{{ subtitle }}</span>
+    {%- endif -%}
+    {%- if rating != blank -%}
+      {%- assign rating_label = rating.rating | round: 1 | append: '' -%}
+      {%- unless rating_label contains '.' -%}{%- assign rating_label = rating_label | append: '.0' -%}{%- endunless -%}
+      <span class="bh-plp-card__rating">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="#5F8F2B" aria-hidden="true"><path d="M12 2.5l3.1 6.6 7.1.9-5.2 5 1.4 7-6.4-3.6-6.4 3.6 1.4-7-5.2-5 7.1-.9L12 2.5Z"/></svg>
+        <strong>{{ rating_label }}</strong> (<span>{{ product.metafields.reviews.rating_count.value | default: 0 }}</span>)
+      </span>
+    {%- endif -%}
+    <span class="bh-plp-card__price">{{ product.price | money_without_trailing_zeros }}</span>
+  </a>
+  {%- if product.available == false -%}
+    <button type="button" class="bh-plp-card__cart" disabled>Sold out</button>
+  {%- elsif product.has_only_default_variant -%}
+    <button type="button" class="bh-plp-card__cart" data-bh-add="{{ variant.id }}">Add to cart</button>
+  {%- else -%}
+    <a href="{{ product.url }}" class="bh-plp-card__cart">Choose options</a>
+  {%- endif -%}
+</div>

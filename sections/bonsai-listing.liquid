@@ -1,0 +1,48 @@
+{{ 'bonsai-listing.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'bonsai-listing.js' | asset_url }}" defer></script>
+
+{%- if template.name == 'search' -%}
+  {%- paginate search.results by section.settings.products_per_page -%}
+    {%- render 'bonsai-listing',
+      section: section,
+      is_search: true,
+      results: search.results,
+      filters: search.filters,
+      results_count: search.results_count,
+      sort_options: search.sort_options,
+      sort_by: search.sort_by,
+      default_sort_by: search.default_sort_by,
+      terms: search.terms,
+      paginate: paginate
+    -%}
+  {%- endpaginate -%}
+{%- else -%}
+  {%- paginate collection.products by section.settings.products_per_page -%}
+    {%- render 'bonsai-listing',
+      section: section,
+      is_search: false,
+      collection: collection,
+      results: collection.products,
+      filters: collection.filters,
+      results_count: collection.products_count,
+      sort_options: collection.sort_options,
+      sort_by: collection.sort_by,
+      default_sort_by: collection.default_sort_by,
+      paginate: paginate
+    -%}
+  {%- endpaginate -%}
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Bonsai product listing",
+  "tag": "section",
+  "settings": [
+    { "type": "link_list", "id": "menu", "label": "Category chips menu", "default": "main-menu", "info": "Chips show the sub-links of the menu item that links to the current collection." },
+    { "type": "range", "id": "products_per_page", "label": "Products per page", "min": 8, "max": 48, "step": 4, "default": 24 },
+    { "type": "text", "id": "result_noun", "label": "Result noun", "default": "products", "info": "Used in \"14 products\" and the empty state. Override per collection with the custom.result_noun metafield (e.g. \"bonsai\")." },
+    { "type": "textarea", "id": "price_bands", "label": "Price bands", "default": "Under ₹999||999\n₹999 – ₹1,999|999|2000\n₹2,000 – ₹3,999|2000|4000\n₹4,000 & above|4000|", "info": "One per line: label|min|max (max exclusive, blank = no limit). Replaces Shopify's price range filter." },
+    { "type": "text", "id": "search_heading", "label": "Search page heading", "default": "Search" }
+  ]
+}
+{% endschema %}

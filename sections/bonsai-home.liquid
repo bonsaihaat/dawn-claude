@@ -1,0 +1,544 @@
+{%- liquid
+  assign all_url = routes.all_products_collection_url
+  assign wa_number = section.settings.whatsapp_number | remove: '+' | remove: ' '
+  assign wa_url = 'https://wa.me/' | append: wa_number
+  assign phrases = section.settings.search_phrases | split: ','
+-%}
+
+{%- capture nav_data -%}
+  {%- if section.settings.menu != blank -%}
+    {%- for link in section.settings.menu.links -%}
+      {{- link.title | escape -}}§{{- link.url -}}§
+      {%- for child in link.links -%}
+        {{- child.title | escape -}}‡{{- child.url -}}
+        {%- unless forloop.last -%}†{%- endunless -%}
+      {%- endfor -%}
+      §{%- if link.current -%}1{%- endif -%}
+      {%- unless forloop.last -%}¶{%- endunless -%}
+    {%- endfor -%}
+  {%- else -%}
+    Home§{{ routes.root_url }}§§1¶Bonsai Plants§{{ all_url }}§Indoor &amp; Easy-Care Bonsai‡{{ all_url }}†Outdoor Bonsai‡{{ all_url }}†Premium &amp; Collector’s Bonsai‡{{ all_url }}†Gift Bonsai &amp; Hampers‡{{ all_url }}†Pre-Bonsai &amp; Raw Material‡{{ all_url }}§¶Pots &amp; Others§{{ all_url }}§Ceramic Pots‡{{ all_url }}†Wooden Pots‡{{ all_url }}†Trays &amp; Saucers‡{{ all_url }}†Soil &amp; Fertilizers‡{{ all_url }}†Accessories‡{{ all_url }}§¶Blogs§/blogs/news§§¶Gallery§/pages/gallery§§
+  {%- endif -%}
+{%- endcapture -%}
+{%- assign nav_items = nav_data | strip | split: '¶' -%}
+
+{%- capture logo_markup -%}
+  {%- if section.settings.logo != blank -%}
+    {{ section.settings.logo | image_url: width: 400 | image_tag: alt: shop.name }}
+  {%- else -%}
+    <img src="{{ 'bonsai-logo.png' | asset_url }}" alt="{{ shop.name | escape }}" width="2400" height="802">
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- capture icon_bag -%}
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z" stroke="#1B1F17" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 0 1 6 0v2" stroke="#1B1F17" stroke-width="1.6"/></svg>
+{%- endcapture -%}
+
+{%- capture icon_search -%}
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="#767d6c" stroke-width="1.8"/><line x1="21" y1="21" x2="16.5" y2="16.5" stroke="#767d6c" stroke-width="1.8" stroke-linecap="round"/></svg>
+{%- endcapture -%}
+
+{%- capture search_pill -%}
+  <a href="{{ routes.search_url }}" class="bh-search" aria-label="Search">
+    {{ icon_search }}
+    <span class="bh-search__text">Search for&nbsp;<span data-bh-typed></span><span class="bh-search__caret"></span></span>
+  </a>
+{%- endcapture -%}
+
+<div class="bh" data-bh data-bh-phrases="{{ phrases | json | escape }}">
+
+  {%- assign marquee_blocks = section.blocks | where: 'type', 'marquee' -%}
+  {%- if section.settings.show_marquee and marquee_blocks.size > 0 -%}
+    <div class="bh-marquee">
+      <div class="bh-marquee__track">
+        {%- for i in (1..2) -%}
+          <div class="bh-marquee__group"{% if i == 2 %} aria-hidden="true"{% endif %}>
+            {%- for block in marquee_blocks -%}
+              <span class="bh-marquee__item" {% if i == 1 %}{{ block.shopify_attributes }}{% endif %}>{{ block.settings.text }}</span>
+            {%- endfor -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- endif -%}
+
+  <div class="bh-header--mobile">
+    <div class="bh-mh__bar">
+      <button type="button" class="bh-mh__menu-btn" data-bh-open-drawer aria-label="Open menu">
+        <svg width="21" height="15" viewBox="0 0 21 15" fill="none" aria-hidden="true"><line x1="0" y1="1" x2="21" y2="1" stroke="#1B1F17" stroke-width="1.8"/><line x1="0" y1="7.5" x2="21" y2="7.5" stroke="#1B1F17" stroke-width="1.8"/><line x1="0" y1="14" x2="21" y2="14" stroke="#1B1F17" stroke-width="1.8"/></svg>
+      </button>
+      <a href="{{ routes.root_url }}" class="bh-mh__logo">{{ logo_markup }}</a>
+      <a href="{{ routes.cart_url }}" class="bh-mh__cart" aria-label="Cart">
+        {{ icon_bag }}
+        <span class="bh-badge">{{ cart.item_count }}</span>
+      </a>
+    </div>
+    <div class="bh-mh__search">{{ search_pill }}</div>
+
+    <div class="bh-backdrop" data-bh-close-drawer></div>
+
+    <div class="bh-drawer" role="dialog" aria-label="Menu">
+      <div class="bh-drawer__head">
+        <a href="{{ routes.root_url }}" style="line-height:0;text-decoration:none;">{{ logo_markup }}</a>
+        <button type="button" class="bh-drawer__close" data-bh-close-drawer aria-label="Close menu">
+          <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true"><line x1="1" y1="1" x2="17" y2="17" stroke="#1B1F17" stroke-width="2"/><line x1="17" y1="1" x2="1" y2="17" stroke="#1B1F17" stroke-width="2"/></svg>
+        </button>
+      </div>
+      <div class="bh-drawer__rule"></div>
+
+      <div class="bh-drawer__body">
+        <div class="bh-pane bh-pane--main">
+          {%- for item in nav_items -%}
+            {%- assign f = item | split: '§' -%}
+            {%- assign label = f[0] | strip -%}
+            {%- if f[2] != blank -%}
+              <button type="button" class="bh-dnav" data-bh-open-sub="{{ forloop.index }}">
+                <span class="bh-dnav__label">{{ label }}</span>
+                <svg width="7" height="12" viewBox="0 0 7 12" fill="none" aria-hidden="true"><path d="M1 1L6 6L1 11" stroke="#5F8F2B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            {%- else -%}
+              <a href="{{ f[1] | strip }}" class="bh-dnav"><span class="bh-dnav__label">{{ label }}</span></a>
+            {%- endif -%}
+          {%- endfor -%}
+          <div class="bh-drawer__sep"></div>
+          <div class="bh-drawer__minor">
+            <a href="{{ routes.account_url }}">Account</a>
+            <a href="{{ section.settings.wishlist_url | default: routes.account_url }}">Wishlist</a>
+          </div>
+          <div class="bh-drawer__copy">© {{ shop.name }}</div>
+        </div>
+
+        {%- for item in nav_items -%}
+          {%- assign f = item | split: '§' -%}
+          {%- if f[2] != blank -%}
+            {%- assign label = f[0] | strip -%}
+            {%- assign kids = f[2] | split: '†' -%}
+            <div class="bh-pane bh-pane--sub" data-bh-subpane="{{ forloop.index }}">
+              <button type="button" class="bh-sub__back" data-bh-back>
+                <svg width="8" height="13" viewBox="0 0 8 13" fill="none" aria-hidden="true"><path d="M7 1L1 6.5L7 12" stroke="#1B1F17" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>Menu</span>
+              </button>
+              <div class="bh-sub__title">{{ label }}</div>
+              {%- for kid in kids -%}
+                {%- assign kp = kid | split: '‡' -%}
+                <a href="{{ kp[1] | strip }}" class="bh-sub__link"><span>{{ kp[0] | strip }}</span></a>
+              {%- endfor -%}
+              <a href="{{ f[1] | strip }}" class="bh-sub__all">View All {{ label }}</a>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+
+  <div class="bh-header--desktop">
+    <div class="bh-dh__bar">
+      <a href="{{ routes.root_url }}" class="bh-dh__logo">{{ logo_markup }}</a>
+      {{ search_pill }}
+      <div class="bh-dh__icons">
+        <a href="{{ routes.account_url }}" aria-label="Account">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="4" stroke="#1B1F17" stroke-width="1.6"/><path d="M4 20c1.5-4 4.7-6 8-6s6.5 2 8 6" stroke="#1B1F17" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </a>
+        <a href="{{ routes.cart_url }}" class="bh-dh__cart" aria-label="Cart">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z" stroke="#1B1F17" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 0 1 6 0v2" stroke="#1B1F17" stroke-width="1.6"/></svg>
+          <span class="bh-badge">{{ cart.item_count }}</span>
+        </a>
+      </div>
+    </div>
+    <nav class="bh-nav" aria-label="Main">
+      {%- for item in nav_items -%}
+        {%- assign f = item | split: '§' -%}
+        <div class="bh-nav__item">
+          <a href="{{ f[1] | strip }}" class="bh-nav__link{% if f[3] contains '1' %} is-active{% endif %}">
+            {{ f[0] | strip }}
+            {%- if f[2] != blank -%}
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6l6-6" stroke="#1B1F17" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            {%- endif -%}
+          </a>
+          {%- if f[2] != blank -%}
+            {%- assign kids = f[2] | split: '†' -%}
+            <div class="bh-nav__dropdown">
+              {%- for kid in kids -%}
+                {%- assign kp = kid | split: '‡' -%}
+                <a href="{{ kp[1] | strip }}">{{ kp[0] | strip }}</a>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </nav>
+  </div>
+
+  {%- if wa_number != blank -%}
+    <a href="{{ wa_url }}" target="_blank" rel="noopener" aria-label="Chat on WhatsApp" class="bh-whatsapp">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3a9 9 0 0 0-7.8 13.4L3 21l4.8-1.2A9 9 0 1 0 12 3Z" fill="#ffffff"/><path d="M12 4.6a7.4 7.4 0 0 0-6.4 11l.2.4-.9 3.3 3.4-.9.4.2A7.4 7.4 0 1 0 12 4.6Z" fill="#25D366"/><path d="M9.1 7.9c-.2-.5-.4-.5-.6-.5h-.5c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.3s1 2.6 1.1 2.8c.1.2 2 3.1 4.9 4.2 2.4.9 2.9.7 3.4.7.5-.1 1.7-.7 1.9-1.3.2-.7.2-1.2.2-1.3-.1-.1-.2-.2-.5-.3l-2-1c-.3-.1-.5-.1-.6.1l-.6.8c-.1.2-.3.2-.5.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.5-1.9-.2-.3 0-.4.1-.6l.4-.5c.1-.2.2-.3.2-.5.1-.2 0-.4 0-.5-.1-.2-.6-1.5-.9-2Z" fill="#ffffff"/></svg>
+    </a>
+  {%- endif -%}
+
+  <div class="bh-main">
+
+    {%- assign slide_blocks = section.blocks | where: 'type', 'slide' -%}
+    {%- if slide_blocks.size > 0 -%}
+      <div class="bh-hero">
+        {%- for block in slide_blocks -%}
+          <div class="bh-slide{% if forloop.first %} is-active{% endif %}" data-bh-slide {{ block.shopify_attributes }}>
+            {%- if block.settings.image != blank -%}
+              {%- if forloop.first -%}
+                {%- assign slide_loading = 'eager' -%}
+              {%- else -%}
+                {%- assign slide_loading = 'lazy' -%}
+              {%- endif -%}
+              {{
+                block.settings.image
+                | image_url: width: 2400
+                | image_tag:
+                  class: 'bh-slide__img',
+                  widths: '600, 900, 1200, 1600, 2000, 2400',
+                  sizes: '(min-width: 1180px) 1140px, calc(100vw - 40px)',
+                  loading: slide_loading,
+                  alt: block.settings.headline
+              }}
+            {%- endif -%}
+            <div class="bh-slide__shade"></div>
+            <div class="bh-slide__top">
+              <h1 class="bh-slide__title">{{ block.settings.headline }}</h1>
+            </div>
+            {%- if block.settings.subline != blank -%}
+              <div class="bh-slide__bottom">
+                <span class="bh-slide__chip">{{ block.settings.subline }}</span>
+              </div>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+
+        {%- if slide_blocks.size > 1 -%}
+          <button type="button" class="bh-hero__arrow bh-hero__arrow--prev" data-bh-prev aria-label="Previous slide">
+            <svg width="8" height="13" viewBox="0 0 8 13" fill="none" aria-hidden="true"><path d="M7 1L1 6.5L7 12" stroke="#1B1F17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button type="button" class="bh-hero__arrow bh-hero__arrow--next" data-bh-next aria-label="Next slide">
+            <svg width="8" height="13" viewBox="0 0 8 13" fill="none" aria-hidden="true"><path d="M1 1L7 6.5L1 12" stroke="#1B1F17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="bh-hero__dots">
+            {%- for block in slide_blocks -%}
+              <button type="button" class="bh-hero__dot{% if forloop.first %} is-active{% endif %}" data-bh-dot aria-label="Go to slide {{ forloop.index }}"></button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="bh-promos">
+      <div class="bh-promo bh-promo--dark">
+        <span class="bh-promo__eyebrow">{{ section.settings.promo1_eyebrow }}</span>
+        <div class="bh-promo__title">{{ section.settings.promo1_title }}</div>
+        <a href="{{ section.settings.promo1_url | default: all_url }}" class="bh-promo__btn">{{ section.settings.promo1_button }}</a>
+      </div>
+      <div class="bh-promo bh-promo--light">
+        <span class="bh-promo__eyebrow">{{ section.settings.promo2_eyebrow }}</span>
+        <div class="bh-promo__title">{{ section.settings.promo2_title }}</div>
+        <a href="{{ section.settings.promo2_url | default: all_url }}" class="bh-promo__btn">{{ section.settings.promo2_button }}</a>
+      </div>
+    </div>
+
+    {%- assign trust_blocks = section.blocks | where: 'type', 'trust' -%}
+    {%- if trust_blocks.size > 0 -%}
+      <div class="bh-trust">
+        {%- for block in trust_blocks -%}
+          <div class="bh-trust__item" {{ block.shopify_attributes }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12.5L9.5 18L20 6" stroke="#5F8F2B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="bh-trust__label">{{ block.settings.label }}</span>
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    {%- for row in (1..2) -%}
+      {%- if row == 1 -%}
+        {%- assign row_heading = section.settings.bestsellers_heading -%}
+        {%- assign row_collection = section.settings.bestsellers_collection -%}
+        {%- assign row_button = section.settings.bestsellers_button -%}
+        {%- assign row_blocks = section.blocks | where: 'type', 'product' -%}
+        {%- assign row_btn_class = 'bh-btn--dark' -%}
+      {%- else -%}
+        {%- assign row_heading = section.settings.accessories_heading -%}
+        {%- assign row_collection = section.settings.accessories_collection -%}
+        {%- assign row_button = section.settings.accessories_button -%}
+        {%- assign row_blocks = section.blocks | where: 'type', 'accessory' -%}
+        {%- assign row_btn_class = 'bh-btn--outline' -%}
+      {%- endif -%}
+      {%- if row_collection != blank -%}
+        {%- assign row_url = row_collection.url -%}
+      {%- else -%}
+        {%- assign row_url = all_url -%}
+      {%- endif -%}
+
+      <div class="bh-head">
+        <div><h2 class="bh-h2">{{ row_heading }}</h2></div>
+        <a href="{{ row_url }}" class="bh-head__link">View all →</a>
+      </div>
+
+      <div class="bh-products">
+        {%- if row_collection != blank and row_collection.products_count > 0 -%}
+          {%- for product in row_collection.products limit: 8 -%}
+            {%- assign product_price = product.price | money_without_trailing_zeros -%}
+            {%- render 'bonsai-product-card',
+              url: product.url,
+              image: product.featured_media,
+              title: product.title,
+              subtitle: product.metafields.custom.subtitle,
+              price: product_price,
+              badge: product.metafields.custom.badge
+            -%}
+          {%- endfor -%}
+        {%- else -%}
+          {%- for block in row_blocks -%}
+            {%- render 'bonsai-product-card',
+              url: block.settings.link,
+              image: block.settings.image,
+              title: block.settings.title,
+              subtitle: block.settings.subtitle,
+              price: block.settings.price,
+              badge: block.settings.badge
+            -%}
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+
+      <div class="bh-center">
+        <a href="{{ row_url }}" class="bh-btn {{ row_btn_class }}">{{ row_button }}</a>
+      </div>
+    {%- endfor -%}
+
+    {%- assign category_blocks = section.blocks | where: 'type', 'category' -%}
+    {%- if category_blocks.size > 0 -%}
+      <div style="margin:8px 0 18px;">
+        <h2 class="bh-h2">{{ section.settings.categories_heading }}</h2>
+      </div>
+      <div class="bh-cats">
+        {%- for block in category_blocks -%}
+          <a href="{{ block.settings.link | default: all_url }}" class="bh-cat" {{ block.shopify_attributes }}>
+            {%- if block.settings.image != blank -%}
+              {{
+                block.settings.image
+                | image_url: width: 800
+                | image_tag: loading: 'lazy', widths: '300, 500, 800', sizes: '(min-width: 820px) 280px, 50vw', alt: block.settings.label
+              }}
+            {%- endif -%}
+            <div class="bh-cat__shade"></div>
+            <span class="bh-cat__label">{{ block.settings.label }}</span>
+          </a>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    {%- assign review_blocks = section.blocks | where: 'type', 'testimonial' -%}
+    {%- if review_blocks.size > 0 -%}
+      <div style="margin:8px 0 18px;">
+        <h2 class="bh-h2">{{ section.settings.testimonials_heading }}</h2>
+      </div>
+      <div class="bh-reviews">
+        {%- for block in review_blocks -%}
+          <div class="bh-review" {{ block.shopify_attributes }}>
+            <div class="bh-review__stars">
+              {%- for s in (1..block.settings.rating) -%}
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="#5F8F2B" aria-hidden="true"><path d="M12 2.5l3.1 6.6 7.1.9-5.2 5 1.4 7-6.4-3.6-6.4 3.6 1.4-7-5.2-5 7.1-.9L12 2.5Z"/></svg>
+              {%- endfor -%}
+            </div>
+            <p class="bh-review__quote">“{{ block.settings.quote }}”</p>
+            <div class="bh-review__foot">
+              <div class="bh-review__avatar">
+                {%- if block.settings.avatar != blank -%}
+                  {{ block.settings.avatar | image_url: width: 96, height: 96 | image_tag: loading: 'lazy', alt: block.settings.name }}
+                {%- else -%}
+                  +
+                {%- endif -%}
+              </div>
+              <div class="bh-review__who">
+                <div class="bh-review__name">{{ block.settings.name }}</div>
+                <div class="bh-review__loc">{{ block.settings.location }}</div>
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+  </div>
+
+  <div class="bh-footer">
+    <div class="bh-footer__inner">
+      <div class="bh-footer__top">
+        <div class="bh-footer__brand">
+          {%- if section.settings.footer_logo != blank -%}
+            {{ section.settings.footer_logo | image_url: width: 400 | image_tag: alt: shop.name, loading: 'lazy' }}
+          {%- else -%}
+            <img src="{{ 'bonsai-logo-light.png' | asset_url }}" alt="{{ shop.name | escape }}" width="2400" height="802" loading="lazy">
+          {%- endif -%}
+          <p class="bh-footer__blurb">{{ section.settings.footer_blurb }}</p>
+          <div class="bh-footer__social">
+            <a href="{{ settings.social_instagram_link | default: '#' }}" aria-label="Instagram">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" stroke="#f4f7ea" stroke-width="1.8"/><circle cx="12" cy="12" r="4" stroke="#f4f7ea" stroke-width="1.8"/><circle cx="17.5" cy="6.5" r="1.2" fill="#f4f7ea"/></svg>
+            </a>
+            <a href="{{ settings.social_facebook_link | default: '#' }}" aria-label="Facebook">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 8.5h2V5h-2c-2.2 0-4 1.8-4 4v2H9v3h2v7h3v-7h2.2l.8-3H14v-2c0-.55.45-.5 1-.5Z" fill="#f4f7ea"/></svg>
+            </a>
+            <a href="{{ settings.social_youtube_link | default: '#' }}" aria-label="YouTube">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2" y="5.5" width="20" height="13" rx="4" stroke="#f4f7ea" stroke-width="1.8"/><path d="M10.5 9.5v5l4.3-2.5-4.3-2.5Z" fill="#f4f7ea"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="bh-footer__cols">
+          <div class="bh-footer__col">
+            <span class="bh-footer__title">{{ section.settings.footer_col1_title }}</span>
+            {%- if section.settings.footer_col1_menu != blank -%}
+              {%- for link in section.settings.footer_col1_menu.links -%}
+                <a href="{{ link.url }}">{{ link.title | escape }}</a>
+              {%- endfor -%}
+            {%- else -%}
+              <a href="{{ all_url }}">Bonsai Plants</a>
+              <a href="{{ all_url }}">Pots &amp; Accessories</a>
+              <a href="{{ all_url }}">All Products</a>
+              <a href="/pages/gallery">Gallery</a>
+            {%- endif -%}
+          </div>
+          <div class="bh-footer__col">
+            <span class="bh-footer__title">{{ section.settings.footer_col2_title }}</span>
+            {%- if section.settings.footer_col2_menu != blank -%}
+              {%- for link in section.settings.footer_col2_menu.links -%}
+                <a href="{{ link.url }}">{{ link.title | escape }}</a>
+              {%- endfor -%}
+            {%- else -%}
+              <a href="/pages/bonsai-care-guide">Bonsai Care Guide</a>
+              <a href="/policies/refund-policy">Shipping &amp; Returns</a>
+              <a href="/pages/faq">FAQs</a>
+            {%- endif -%}
+            {%- if wa_number != blank -%}
+              <a href="{{ wa_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>
+            {%- endif -%}
+          </div>
+        </div>
+      </div>
+
+      <div class="bh-footer__rule"></div>
+
+      <div class="bh-footer__bottom">
+        <span class="bh-footer__copy">© {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</span>
+        <div class="bh-footer__legal">
+          <a href="/policies/privacy-policy">Privacy Policy</a>
+          <a href="/policies/terms-of-service">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% schema %}
+{
+  "name": "Bonsai Haat homepage",
+  "tag": "section",
+  "max_blocks": 50,
+  "settings": [
+    { "type": "header", "content": "Header" },
+    { "type": "image_picker", "id": "logo", "label": "Logo" },
+    { "type": "link_list", "id": "menu", "label": "Menu", "info": "Leave empty to use the design's default navigation." },
+    { "type": "url", "id": "wishlist_url", "label": "Wishlist link" },
+    { "type": "text", "id": "search_phrases", "label": "Search bar phrases", "default": "Bonsai Plants,Bonsai Pots,Fertilizers,Care Tools", "info": "Comma-separated, typed out one after another." },
+    { "type": "checkbox", "id": "show_marquee", "label": "Show announcement marquee", "default": true },
+    { "type": "text", "id": "whatsapp_number", "label": "WhatsApp number", "default": "919999999999", "info": "Country code + number, digits only." },
+    { "type": "header", "content": "Promo cards" },
+    { "type": "text", "id": "promo1_eyebrow", "label": "Card 1 eyebrow", "default": "New to bonsai?" },
+    { "type": "text", "id": "promo1_title", "label": "Card 1 title", "default": "Shop beginner-friendly trees" },
+    { "type": "text", "id": "promo1_button", "label": "Card 1 button", "default": "Under ₹999 →" },
+    { "type": "url", "id": "promo1_url", "label": "Card 1 link" },
+    { "type": "text", "id": "promo2_eyebrow", "label": "Card 2 eyebrow", "default": "Already growing one?" },
+    { "type": "text", "id": "promo2_title", "label": "Card 2 title", "default": "Explore pots, tools & feed" },
+    { "type": "text", "id": "promo2_button", "label": "Card 2 button", "default": "Shop accessories →" },
+    { "type": "url", "id": "promo2_url", "label": "Card 2 link" },
+    { "type": "header", "content": "Bestsellers row" },
+    { "type": "text", "id": "bestsellers_heading", "label": "Heading", "default": "Bestselling Bonsai" },
+    { "type": "collection", "id": "bestsellers_collection", "label": "Collection", "info": "When set, shows this collection's products instead of the 'Product' blocks." },
+    { "type": "text", "id": "bestsellers_button", "label": "Button label", "default": "View All Bonsai Plants →" },
+    { "type": "header", "content": "Accessories row" },
+    { "type": "text", "id": "accessories_heading", "label": "Heading", "default": "Pots & Accessories" },
+    { "type": "collection", "id": "accessories_collection", "label": "Collection", "info": "When set, shows this collection's products instead of the 'Accessory' blocks." },
+    { "type": "text", "id": "accessories_button", "label": "Button label", "default": "View All Pots & Accessories →" },
+    { "type": "header", "content": "Other headings" },
+    { "type": "text", "id": "categories_heading", "label": "Categories heading", "default": "Shop by Category" },
+    { "type": "text", "id": "testimonials_heading", "label": "Testimonials heading", "default": "Loved by bonsai parents across India" },
+    { "type": "header", "content": "Footer" },
+    { "type": "image_picker", "id": "footer_logo", "label": "Footer logo", "info": "Light version for the dark footer." },
+    { "type": "textarea", "id": "footer_blurb", "label": "Blurb", "default": "India's first dedicated bonsai platform — hand-trained trees, delivered healthy." },
+    { "type": "text", "id": "footer_col1_title", "label": "Column 1 title", "default": "Shop" },
+    { "type": "link_list", "id": "footer_col1_menu", "label": "Column 1 menu" },
+    { "type": "text", "id": "footer_col2_title", "label": "Column 2 title", "default": "Support" },
+    { "type": "link_list", "id": "footer_col2_menu", "label": "Column 2 menu" }
+  ],
+  "blocks": [
+    {
+      "type": "marquee",
+      "name": "Marquee message",
+      "settings": [{ "type": "text", "id": "text", "label": "Text", "default": "Free shipping on orders above ₹1999" }]
+    },
+    {
+      "type": "slide",
+      "name": "Hero slide",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "headline", "label": "Headline", "default": "What you see ships to you" },
+        { "type": "text", "id": "subline", "label": "Caption", "default": "Juniper Bonsai · hand-photographed, exactly as delivered" }
+      ]
+    },
+    {
+      "type": "trust",
+      "name": "Trust badge",
+      "settings": [{ "type": "text", "id": "label", "label": "Label", "default": "Hand-trained trees" }]
+    },
+    {
+      "type": "product",
+      "name": "Product (bestsellers)",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "title", "label": "Name", "default": "Juniper Bonsai" },
+        { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "Indoor · 6 yrs trained" },
+        { "type": "text", "id": "price", "label": "Price", "default": "₹1,499" },
+        { "type": "text", "id": "badge", "label": "Badge" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    },
+    {
+      "type": "accessory",
+      "name": "Product (accessories)",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "title", "label": "Name", "default": "Glazed Ceramic Pot" },
+        { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "6 inch · drainage hole" },
+        { "type": "text", "id": "price", "label": "Price", "default": "₹599" },
+        { "type": "text", "id": "badge", "label": "Badge" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    },
+    {
+      "type": "category",
+      "name": "Category tile",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "label", "label": "Label", "default": "Indoor Bonsai" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    },
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        { "type": "image_picker", "id": "avatar", "label": "Avatar" },
+        { "type": "range", "id": "rating", "label": "Stars", "min": 1, "max": 5, "step": 1, "default": 5 },
+        { "type": "textarea", "id": "quote", "label": "Quote", "default": "The juniper arrived exactly like the photos." },
+        { "type": "text", "id": "name", "label": "Name", "default": "Ritika Malhotra" },
+        { "type": "text", "id": "location", "label": "Location", "default": "Mumbai" }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -171,7 +171,7 @@ body.bh-body { background: #faf7f1; }
 .bh .bh-head__link { flex-shrink: 0; font-size: 13px; font-weight: 600; color: #1B1F17; text-decoration: none; white-space: nowrap; }
 
 /* Product rows */
-.bh-products { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 -20px 34px; padding: 0 20px 6px; scroll-padding: 0 20px; scrollbar-width: none; }
+.bh-products { display: flex; gap: 12px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; margin: 0 -20px 34px; padding: 0 20px 6px; scroll-padding: 0 20px; scrollbar-width: none; }
 .bh-products::-webkit-scrollbar { display: none; }
 .bh-card { display: flex; flex-direction: column; text-decoration: none; flex: 0 0 40%; scroll-snap-align: start; }
 @media (min-width: 820px) {
@@ -199,7 +199,7 @@ body.bh-body { background: #faf7f1; }
 .bh-cat__label { position: absolute; left: 14px; bottom: 14px; right: 14px; font-size: 15px; font-weight: 600; color: #ffffff; }
 
 /* Testimonials */
-.bh-reviews { display: flex; gap: 14px; margin: 0 -20px 40px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 20px 18px; scrollbar-width: none; }
+.bh-reviews { display: flex; gap: 14px; margin: 0 -20px 40px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; padding: 4px 20px 18px; scrollbar-width: none; }
 .bh-reviews::-webkit-scrollbar { display: none; }
 .bh-review { flex: 0 0 84%; scroll-snap-align: center; background: #ffffff; border-radius: 22px; padding: 24px 22px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 16px 36px -20px rgba(20, 26, 15, 0.18); box-sizing: border-box; }
 @media (min-width: 820px) {

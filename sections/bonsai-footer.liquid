@@ -1,6 +1,6 @@
 {%- liquid
   assign all_url = routes.all_products_collection_url
-  assign wa_number = section.settings.whatsapp_number | remove: '+' | remove: ' '
+  assign wa_number = settings.whatsapp_number | remove: '+' | remove: ' '
   assign wa_url = 'https://wa.me/' | append: wa_number
 -%}
 
@@ -83,8 +83,7 @@
     { "type": "text", "id": "footer_col1_title", "label": "Column 1 title", "default": "Shop" },
     { "type": "link_list", "id": "footer_col1_menu", "label": "Column 1 menu" },
     { "type": "text", "id": "footer_col2_title", "label": "Column 2 title", "default": "Support" },
-    { "type": "link_list", "id": "footer_col2_menu", "label": "Column 2 menu" },
-    { "type": "text", "id": "whatsapp_number", "label": "WhatsApp number", "default": "919999999999", "info": "Country code + number, digits only." }
+    { "type": "link_list", "id": "footer_col2_menu", "label": "Column 2 menu" }
   ]
 }
 {% endschema %}

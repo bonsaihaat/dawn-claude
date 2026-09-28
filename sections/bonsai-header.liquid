@@ -1,5 +1,5 @@
 {%- liquid
-  assign wa_number = section.settings.whatsapp_number | remove: '+' | remove: ' '
+  assign wa_number = settings.whatsapp_number | remove: '+' | remove: ' '
   assign wa_url = 'https://wa.me/' | append: wa_number
   assign phrases = section.settings.search_phrases | split: ','
   assign all_url = routes.all_products_collection_url
@@ -187,8 +187,7 @@
     { "type": "link_list", "id": "menu", "label": "Menu", "info": "Leave empty to use the design's default navigation." },
     { "type": "url", "id": "wishlist_url", "label": "Wishlist link" },
     { "type": "text", "id": "search_phrases", "label": "Search bar phrases", "default": "Bonsai Plants,Bonsai Pots,Fertilizers,Care Tools", "info": "Comma-separated, typed out one after another." },
-    { "type": "checkbox", "id": "show_marquee", "label": "Show announcement marquee", "default": true },
-    { "type": "text", "id": "whatsapp_number", "label": "WhatsApp number", "default": "919999999999", "info": "Country code + number, digits only." }
+    { "type": "checkbox", "id": "show_marquee", "label": "Show announcement marquee", "default": true }
   ],
   "blocks": [
     {

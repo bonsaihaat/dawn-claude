@@ -1466,5 +1466,17 @@
         "label": "t:settings_schema.customer_accounts.settings.customer_account_menu.label"
       }
     ]
+  },
+  {
+    "name": "Contact",
+    "settings": [
+      {
+        "type": "text",
+        "id": "whatsapp_number",
+        "label": "WhatsApp number",
+        "default": "919340957839",
+        "info": "Country code + number, digits only. Used by the header, footer and product page WhatsApp buttons."
+      }
+    ]
   }
 ]

@@ -1,4 +1,25 @@
 (function () {
+  // iOS Safari only applies :active (press feedback) when a touch listener exists
+  document.addEventListener('touchstart', function () {}, { passive: true });
+
+  // Scroll reveals: stagger each group's children once it enters the viewport
+  if (document.documentElement.classList.contains('bh-anim')) {
+    var revealObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-revealed');
+        revealObserver.unobserve(entry.target);
+      });
+    }, { rootMargin: '0px 0px -12% 0px' });
+
+    document.querySelectorAll('[data-bh-reveal]').forEach(function (group) {
+      Array.prototype.forEach.call(group.children, function (child, i) {
+        child.style.setProperty('--bh-i', Math.min(i, 7));
+      });
+      revealObserver.observe(group);
+    });
+  }
+
   document.querySelectorAll('[data-bh]').forEach(function (root) {
     // Mobile drawer with main pane and per-category sub panes
     var subPanes = root.querySelectorAll('[data-bh-subpane]');
@@ -37,7 +58,7 @@
       if (e.key === 'Escape') closeDrawer();
     });
 
-    // Hero carousel: 5s autoplay, restarted on manual navigation
+    // Hero carousel: 5s autoplay (matches the dot fill in bonsai-theme.css), restarted on manual navigation
     var slides = root.querySelectorAll('[data-bh-slide]');
     var dots = root.querySelectorAll('[data-bh-dot]');
     var active = 0;
@@ -46,8 +67,17 @@
     function goTo(i) {
       if (!slides.length) return;
       active = (i + slides.length) % slides.length;
-      slides.forEach(function (s, idx) { s.classList.toggle('is-active', idx === active); });
-      dots.forEach(function (d, idx) { d.classList.toggle('is-active', idx === active); });
+      slides.forEach(function (s, idx) {
+        s.classList.toggle('is-active', idx === active);
+        s.classList.toggle('is-zoomed', idx === active);
+      });
+      dots.forEach(function (d, idx) {
+        d.classList.toggle('is-active', idx === active);
+        // Restart the progress fill even when the same dot stays active
+        if (idx === active && d.getAnimations) {
+          d.getAnimations({ subtree: true }).forEach(function (a) { a.currentTime = 0; });
+        }
+      });
     }
     function startAutoplay() {
       clearInterval(autoplay);
@@ -63,6 +93,12 @@
       d.addEventListener('click', function () { goTo(idx); startAutoplay(); });
     });
     startAutoplay();
+    // Start the first slide's push-in after it has painted at its resting scale
+    if (slides.length) {
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { slides[active].classList.add('is-zoomed'); });
+      });
+    }
 
     // Search placeholder typewriter
     var typedEls = root.querySelectorAll('[data-bh-typed]');

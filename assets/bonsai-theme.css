@@ -218,6 +218,11 @@ body.bh-body { background: #faf7f1; }
 /* Scroll reveals: .bh-anim is set on <html> by the homepage only when motion is allowed */
 .bh-anim [data-bh-reveal]:not([data-bh-reveal="group"]) > *, .bh-anim [data-bh-reveal-item] { opacity: 0; transform: translateY(48px); }
 .bh-anim [data-bh-reveal] .is-revealed { --bh-d: calc(var(--bh-i, 0) * 200ms); opacity: 1; transform: none; transition: opacity 1.4s ease var(--bh-d), transform 1.8s cubic-bezier(0.22, 0.61, 0.36, 1) var(--bh-d), scale 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+/* Sideways-swiping rows on mobile: a quick fade in place, so cards never slide, get clipped or lag behind a swipe */
+@media (max-width: 819.98px) {
+  .bh-anim .bh-products[data-bh-reveal] > *, .bh-anim .bh-reviews[data-bh-reveal] > * { transform: none; }
+  .bh-anim .bh-products[data-bh-reveal] > .is-revealed, .bh-anim .bh-reviews[data-bh-reveal] > .is-revealed { transition: opacity 0.4s ease, scale 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+}
 
 /* Press feedback: tappables sink slightly and spring back (uses `scale`, so it never fights reveal transforms) */
 @media (prefers-reduced-motion: no-preference) {

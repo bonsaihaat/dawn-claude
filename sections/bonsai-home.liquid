@@ -81,13 +81,13 @@
 
     {%- assign trust_blocks = section.blocks | where: 'type', 'trust' -%}
     {%- if trust_blocks.size > 0 -%}
-      <div class="bh-trust">
+      <div class="bh-trust" data-bh-reveal="group">
         <div class="bh-trust__track">
           {%- comment -%} Second copy only shows on mobile, where the strip loops as a marquee {%- endcomment -%}
           {%- for copy in (1..2) -%}
-            <div class="bh-trust__set{% if copy == 2 %} bh-trust__set--clone{% endif %}" data-bh-reveal{% if copy == 2 %} aria-hidden="true"{% endif %}>
+            <div class="bh-trust__set{% if copy == 2 %} bh-trust__set--clone{% endif %}"{% if copy == 2 %} aria-hidden="true"{% endif %}>
               {%- for block in trust_blocks -%}
-                <div class="bh-trust__item"{% if copy == 1 %} {{ block.shopify_attributes }}{% endif %}>
+                <div class="bh-trust__item" data-bh-reveal-item{% if copy == 1 %} {{ block.shopify_attributes }}{% endif %}>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12.5L9.5 18L20 6" stroke="#5F8F2B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
                   <span class="bh-trust__label">{{ block.settings.label }}</span>
                 </div>

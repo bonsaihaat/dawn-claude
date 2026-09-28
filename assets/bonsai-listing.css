@@ -66,19 +66,19 @@
 .bh-plp__grid.is-loading, .bh-plp.is-loading .bh-plp__main { opacity: 0.55; transition: opacity 0.15s ease; }
 
 /* Card */
-.bh-plp-card { display: flex; flex-direction: column; }
+.bh-plp-card { display: flex; flex-direction: column; height: 100%; }
 .bh-plp-card__media { position: relative; border-radius: 18px; overflow: hidden; aspect-ratio: 1 / 1; background: #eef4e0; }
 .bh-plp-card__img { position: absolute; inset: 0; display: block; }
 .bh-plp-card__img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 .bh-plp-card__badge { position: absolute; top: 10px; left: 10px; background: #2E4716; color: #faf7f1; font-size: 10.5px; font-weight: 600; letter-spacing: 0.03em; padding: 5px 10px; border-radius: 999px; pointer-events: none; }
 .bh-plp-card__wish { position: absolute; top: 8px; right: 8px; width: 34px; height: 34px; border-radius: 50%; background: #faf7f1e6; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
 .bh-plp-card__wish[aria-pressed="true"] svg { fill: #5F8F2B; }
-.bh .bh-plp-card__info { padding-top: 12px; display: flex; flex-direction: column; gap: 3px; text-decoration: none; }
-.bh-plp-card__name { font-size: 14px; font-weight: 600; color: #1B1F17; }
+.bh .bh-plp-card__info { padding-top: 12px; display: flex; flex-direction: column; gap: 3px; text-decoration: none; flex: 1 0 auto; }
+.bh-plp-card__name { font-size: 14px; font-weight: 600; color: #1B1F17; line-height: 1.35; min-height: calc(2em * 1.35); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
 .bh-plp-card__sub { font-size: 12px; color: #767d6c; }
 .bh-plp-card__rating { display: flex; align-items: center; gap: 4px; font-size: 12px; color: #4b524a; margin-top: 2px; }
 .bh-plp-card__rating strong { color: #1B1F17; }
-.bh-plp-card__price { font-size: 15px; font-weight: 700; color: #1B1F17; margin-top: 4px; }
+.bh-plp-card__price { font-size: 15px; font-weight: 700; color: #1B1F17; margin-top: auto; padding-top: 4px; }
 .bh .bh-plp-card__cart { display: block; margin-top: 10px; font-family: inherit; font-size: 13px; font-weight: 700; padding: 11px 12px; border-radius: 999px; cursor: pointer; box-sizing: border-box; transition: background 0.2s ease, color 0.2s ease; background: none; color: #1B1F17; border: 1.5px solid #1B1F17; text-align: center; text-decoration: none; }
 .bh .bh-plp-card__cart.is-added { background: #5F8F2B; color: #ffffff; border-color: #5F8F2B; }
 .bh .bh-plp-card__cart:disabled { opacity: 0.5; cursor: not-allowed; }

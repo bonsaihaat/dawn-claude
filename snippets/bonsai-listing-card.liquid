@@ -39,7 +39,7 @@
     </button>
   </div>
   <a href="{{ product.url }}" class="bh-plp-card__info">
-    <span class="bh-plp-card__name">{{ product.title }}</span>
+    <span class="bh-plp-card__name" title="{{ product.title | escape }}">{{ product.title }}</span>
     {%- if subtitle != blank -%}
       <span class="bh-plp-card__sub">{{ subtitle }}</span>
     {%- endif -%}

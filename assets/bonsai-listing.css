@@ -11,7 +11,7 @@
 .bh-plp__desc { margin: 0; font-size: 14px; line-height: 1.55; color: #4b524a; max-width: 56ch; text-wrap: pretty; }
 
 /* Category chips */
-.bh-plp__chips { display: flex; gap: 8px; overflow-x: auto; margin: 0 -20px 18px; padding: 0 20px 2px; scrollbar-width: none; }
+.bh-plp__chips { display: flex; gap: 8px; overflow-x: auto; overflow-y: hidden; margin: 0 -20px 18px; padding: 0 20px 2px; scrollbar-width: none; }
 .bh-plp__chips::-webkit-scrollbar { display: none; }
 .bh .bh-plp__chip { flex-shrink: 0; font-size: 13px; font-weight: 600; padding: 10px 18px; border-radius: 999px; white-space: nowrap; box-sizing: border-box; text-decoration: none; background: #ffffff; color: #1B1F17; border: 1px solid #e3dccb; }
 .bh .bh-plp__chip.is-active { background: #1B1F17; color: #faf7f1; border-color: #1B1F17; }

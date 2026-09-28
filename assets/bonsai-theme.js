@@ -11,6 +11,12 @@
         if (!entry.isIntersecting) return;
         // A "group" (the sliding trust strip) reveals all its items at once, including off-screen ones
         var items = entry.target.hasAttribute('data-bh-reveal') ? entry.target.querySelectorAll('[data-bh-reveal-item]') : [entry.target];
+        // In a sideways-swiping row (mobile), reveal the whole row at once so cards don't fade in mid-swipe
+        var row = entry.target.parentNode;
+        if (!entry.target.hasAttribute('data-bh-reveal') && row.scrollWidth > row.clientWidth) {
+          items = Array.prototype.filter.call(row.children, function (child) { return !child.classList.contains('is-revealed'); });
+          items.forEach(function (child) { revealObserver.unobserve(child); });
+        }
         Array.prototype.forEach.call(items, function (item) {
           var i = batch.get(item.parentNode) || 0;
           batch.set(item.parentNode, i + 1);

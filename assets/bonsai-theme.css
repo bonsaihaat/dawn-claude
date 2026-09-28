@@ -3,6 +3,8 @@ body.bh-body { background: #faf7f1; }
 
 @keyframes bh-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @keyframes bh-caret { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+@keyframes bh-rise { from { opacity: 0; transform: translateY(0.45em); } to { opacity: 1; transform: none; } }
+@keyframes bh-dot-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 
 .bh { font-family: 'Archivo', Helvetica, Arial, sans-serif; background: #faf7f1; }
 /* Pin inherited metrics so header/footer render the same under theme.liquid (Dawn globals) as under bonsai.liquid */
@@ -106,6 +108,7 @@ body.bh-body { background: #faf7f1; }
 .bh-slide { position: absolute; inset: 0; transition: opacity 0.6s ease; opacity: 0; pointer-events: none; }
 .bh-slide.is-active { opacity: 1; pointer-events: auto; }
 .bh-slide__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.bh-word { display: inline-block; }
 .bh-slide__shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(27, 31, 23, 0.4) 0%, rgba(27, 31, 23, 0) 34%, rgba(27, 31, 23, 0) 60%, rgba(27, 31, 23, 0.55) 100%); pointer-events: none; }
 .bh-slide__top { position: absolute; left: 0; right: 0; top: 0; padding: clamp(20px, 4vw, 40px); display: flex; flex-direction: column; gap: 12px; pointer-events: none; }
 .bh-slide__title { margin: 0; font-weight: 700; font-size: clamp(28px, 4.6vw, 52px); line-height: 1.08; color: #ffffff; max-width: 13ch; }
@@ -115,8 +118,20 @@ body.bh-body { background: #faf7f1; }
 .bh-hero__arrow--prev { left: 14px; }
 .bh-hero__arrow--next { right: 14px; }
 .bh-hero__dots { position: absolute; left: 0; right: 0; bottom: 14px; display: flex; justify-content: center; gap: 7px; z-index: 3; }
-.bh-hero__dot { width: 6px; height: 6px; border-radius: 999px; border: none; cursor: pointer; padding: 0; background: #faf7f1cc; }
-.bh-hero__dot.is-active { width: 22px; background: #5F8F2B; }
+.bh-hero__dot { position: relative; overflow: hidden; width: 6px; height: 6px; border-radius: 999px; border: none; cursor: pointer; padding: 0; background: #faf7f1cc; transition: width 0.35s ease; }
+.bh-hero__dot.is-active { width: 22px; }
+.bh-hero__dot.is-active::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: #5F8F2B; transform-origin: left; }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Slow push-in on the active slide; the leaving slide resets only after its 0.6s fade */
+  .bh-slide__img { transition: transform 0s linear 0.6s; }
+  .bh-slide.is-zoomed .bh-slide__img { transform: scale(1.08); transition: transform 6s cubic-bezier(0.25, 0.6, 0.3, 1); }
+  /* Headline words, then the chip, rise in each time a slide becomes active */
+  .bh-slide.is-active .bh-word { animation: bh-rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(0.15s + var(--w, 0) * 70ms); }
+  .bh-slide.is-active .bh-slide__chip { animation: bh-rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(0.3s + var(--words, 0) * 70ms); }
+  /* Active dot fills over the autoplay interval (5s, matches bonsai-theme.js) */
+  .bh-hero__dot.is-active::after { animation: bh-dot-fill 5s linear both; }
+}
 
 /* Promo cards */
 .bh-promos { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 16px; }
@@ -134,9 +149,21 @@ body.bh-body { background: #faf7f1; }
 .bh .bh-promo--light .bh-promo__btn { background: none; border: 1.5px solid #1B1F17; padding: 11px 21px; }
 
 /* Trust badges */
-.bh-trust { display: flex; flex-wrap: wrap; gap: 12px; margin: 22px 0 30px; }
+.bh-trust { margin: 22px 0 30px; }
+.bh-trust__set { display: flex; flex-wrap: wrap; gap: 12px; }
+.bh-trust__set--clone { display: none; }
 .bh-trust__item { flex: 1 1 200px; display: flex; align-items: center; justify-content: center; gap: 8px; background: #ffffff; border: 1px solid #eee7d8; border-radius: 999px; padding: 10px 16px; box-sizing: border-box; }
 .bh-trust__label { font-size: 12.5px; font-weight: 500; color: #20241b; white-space: nowrap; }
+
+/* Trust strip loops as a marquee on mobile instead of wrapping */
+@media (max-width: 819.98px) and (prefers-reduced-motion: no-preference) {
+  .bh-trust { margin-left: -20px; margin-right: -20px; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%); }
+  .bh-trust__track { display: flex; width: max-content; animation: bh-marquee 24s linear infinite; }
+  .bh-trust:active .bh-trust__track { animation-play-state: paused; }
+  .bh-trust__set { flex-wrap: nowrap; gap: 10px; padding-right: 10px; }
+  .bh-trust__set--clone { display: flex; }
+  .bh-trust__item { flex: 0 0 auto; }
+}
 
 /* Section headings */
 .bh-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin: 8px 0 18px; }
@@ -187,6 +214,17 @@ body.bh-body { background: #faf7f1; }
 .bh-review__who { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .bh-review__name { font-size: 13.5px; font-weight: 600; color: #1B1F17; }
 .bh-review__loc { font-size: 12px; color: #767d6c; }
+
+/* Scroll reveals: .bh-anim is set on <html> by the homepage only when motion is allowed */
+.bh-anim [data-bh-reveal] > * { opacity: 0; transform: translateY(16px); }
+.bh-anim [data-bh-reveal].is-revealed > * { --bh-d: calc(var(--bh-i, 0) * 70ms); opacity: 1; transform: none; transition: opacity 0.6s ease var(--bh-d), transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) var(--bh-d), scale 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+/* Press feedback: tappables sink slightly and spring back (uses `scale`, so it never fights reveal transforms) */
+@media (prefers-reduced-motion: no-preference) {
+  .bh-card, .bh-cat, .bh .bh-btn, .bh .bh-promo__btn, .bh-hero__arrow { -webkit-tap-highlight-color: transparent; transition: scale 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .bh-card:active, .bh-cat:active, .bh .bh-btn:active, .bh .bh-promo__btn:active { scale: 0.97; }
+  .bh-hero__arrow:active { scale: 0.9; }
+}
 
 /* Footer */
 .bh-footer { background: linear-gradient(180deg, #1B1F17 0%, #22301a 100%); padding: 36px 20px 24px; margin-top: 8px; }

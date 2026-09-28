@@ -44,7 +44,8 @@
         "r1", "r2", "r3"
       ],
       "settings": {
-        "bestsellers_collection": "bestsellers"
+        "bestsellers_collection": "bestsellers",
+        "accessories_collection": "pots-and-accessories"
       }
     }
   },

@@ -2,21 +2,25 @@
   // iOS Safari only applies :active (press feedback) when a touch listener exists
   document.addEventListener('touchstart', function () {}, { passive: true });
 
-  // Scroll reveals: stagger each group's children once it enters the viewport
+  // Scroll reveals: each item fades up once it is itself well inside the viewport;
+  // items that arrive together (a row of cards, a swipe) are staggered in order
   if (document.documentElement.classList.contains('bh-anim')) {
     var revealObserver = new IntersectionObserver(function (entries) {
+      var batch = 0;
       entries.forEach(function (entry) {
         if (!entry.isIntersecting) return;
-        entry.target.classList.add('is-revealed');
+        // A "group" (the sliding trust strip) reveals all its items at once, including off-screen ones
+        var items = entry.target.hasAttribute('data-bh-reveal') ? entry.target.querySelectorAll('[data-bh-reveal-item]') : [entry.target];
+        Array.prototype.forEach.call(items, function (item) {
+          item.style.setProperty('--bh-i', Math.min(batch++, 5));
+          item.classList.add('is-revealed');
+        });
         revealObserver.unobserve(entry.target);
       });
-    }, { rootMargin: '0px 0px -12% 0px' });
+    }, { threshold: 0.25, rootMargin: '0px 0px -15% 0px' });
 
-    document.querySelectorAll('[data-bh-reveal]').forEach(function (group) {
-      Array.prototype.forEach.call(group.children, function (child, i) {
-        child.style.setProperty('--bh-i', Math.min(i, 7));
-      });
-      revealObserver.observe(group);
+    document.querySelectorAll('[data-bh-reveal="group"], [data-bh-reveal]:not([data-bh-reveal="group"]) > *').forEach(function (el) {
+      revealObserver.observe(el);
     });
   }
 

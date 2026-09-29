@@ -32,6 +32,31 @@
     });
   }
 
+  // Sideways rows with arrow buttons (desktop): arrows show only when the row overflows,
+  // move one page of cards, and dim at either end
+  document.querySelectorAll('[data-bh-scroller]').forEach(function (row) {
+    var arrows = row.previousElementSibling && row.previousElementSibling.querySelector('[data-bh-scroll-arrows]');
+    if (!arrows) return;
+    var prev = arrows.querySelector('[data-bh-scroll-prev]');
+    var next = arrows.querySelector('[data-bh-scroll-next]');
+    function update() {
+      var max = row.scrollWidth - row.clientWidth;
+      arrows.hidden = max <= 1;
+      prev.disabled = row.scrollLeft <= 1;
+      next.disabled = row.scrollLeft >= max - 1;
+    }
+    function page(dir) {
+      var card = row.firstElementChild;
+      var step = card ? card.getBoundingClientRect().width + parseFloat(getComputedStyle(row).columnGap || 0) : row.clientWidth;
+      row.scrollBy({ left: dir * step * Math.max(1, Math.floor((row.clientWidth + 1) / step)), behavior: 'smooth' });
+    }
+    prev.addEventListener('click', function () { page(-1); });
+    next.addEventListener('click', function () { page(1); });
+    row.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  });
+
   document.querySelectorAll('[data-bh]').forEach(function (root) {
     // Mobile drawer with main pane and per-category sub panes
     var subPanes = root.querySelectorAll('[data-bh-subpane]');

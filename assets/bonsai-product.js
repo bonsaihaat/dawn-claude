@@ -137,8 +137,9 @@
       var d = new Date();
       d.setDate(d.getDate() + days);
       var when = d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
-      var free = (state.price * state.qty) / 100 >= freeFrom;
-      setPinMsg('Delivered to ' + pin + ' by ' + when + (free ? ' · Free shipping' : ' · ' + money.format(fee) + ' shipping'));
+      var free = freeFrom > 0 && (state.price * state.qty) / 100 >= freeFrom;
+      var cost = free ? ' · Free shipping' : fee > 0 ? ' · ' + money.format(fee) + ' shipping' : '';
+      setPinMsg('Delivered to ' + pin + ' by ' + when + cost);
     });
 
     // Accordion: one section open at a time

@@ -51,7 +51,7 @@
         <strong>{{ rating_label }}</strong> (<span>{{ product.metafields.reviews.rating_count.value | default: 0 }}</span>)
       </span>
     {%- endif -%}
-    <span class="bh-plp-card__price">{{ product.price | money_without_trailing_zeros }}</span>
+    <span class="bh-plp-card__price">{%- render 'bonsai-money', amount: product.price -%}</span>
   </a>
   {%- if product.available == false -%}
     <button type="button" class="bh-plp-card__cart" disabled>Sold out</button>

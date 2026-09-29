@@ -16,7 +16,11 @@
         "show_marquee": true,
         "whatsapp_number": "919999999999"
       }
+    },
+    "cart-drawer": {
+      "type": "bonsai-cart-drawer",
+      "settings": {}
     }
   },
-  "order": ["header"]
+  "order": ["header", "cart-drawer"]
 }

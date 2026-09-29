@@ -28,6 +28,7 @@
   class="bh bh-cart{% if cart.item_count > 0 %} has-items{% endif %}"
   data-bh-cart
   data-section-id="{{ section.id }}"
+  data-count="{{ cart.item_count }}"
   data-delivery-url="{{ section.settings.delivery_check_url }}"
   data-delivery-min="{{ section.settings.delivery_days_min }}"
   data-delivery-max="{{ section.settings.delivery_days_max }}"

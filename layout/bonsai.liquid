@@ -24,6 +24,7 @@
     {% sections 'header-group' %}
     {{ content_for_layout }}
     {% sections 'footer-group' %}
+    <script src="{{ 'standard-actions-override.js' | asset_url }}" defer></script>
     <script src="{{ 'bonsai-theme.js' | asset_url }}" defer></script>
   </body>
 </html>

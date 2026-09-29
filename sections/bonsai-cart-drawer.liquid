@@ -1,0 +1,199 @@
+{%- comment -%}
+  Slide-in cart. Lives in the header group so it is on every page except the
+  cart page; assets/bonsai-cart.js opens it from the header cart icon and
+  after add to cart, and re-renders it through the Section Rendering API.
+{%- endcomment -%}
+{%- unless template.name == 'cart' -%}
+{{ 'bonsai-cart-drawer.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'bonsai-cart.js' | asset_url }}" defer></script>
+
+{%- liquid
+  assign wa_number = section.settings.whatsapp_number | remove: '+' | remove: ' '
+  assign free_from = shop.metafields.custom.free_shipping_threshold.value | times: 100
+  assign trust_items = section.settings.trust_items | split: ','
+
+  assign shop_url = routes.all_products_collection_url
+  assign chip_links = blank
+  for link in linklists[section.settings.menu].links
+    if link.title == section.settings.menu_item
+      assign shop_url = link.url
+      assign chip_links = link.links
+      break
+    endif
+  endfor
+-%}
+
+<div
+  class="bh-cd{% if cart.item_count > 0 %} has-items{% endif %}"
+  data-bh-cart
+  data-bh-drawer
+  data-section-id="{{ section.id }}"
+  data-count="{{ cart.item_count }}"
+>
+  <div class="bh-cd__backdrop" data-bh-drawer-close></div>
+
+  <div class="bh-cd__panel" role="dialog" aria-modal="true" aria-label="Cart" data-bh-drawer-panel inert>
+    <form id="bh-cd-checkout" action="{{ routes.cart_url }}" method="post"></form>
+
+    <div class="bh-cd__head">
+      <div class="bh-cd__head-row">
+        <span class="bh-cd__title">Your cart <span data-bh-part="count">({{ cart.item_count }})</span></span>
+        <button type="button" class="bh-cd__close" aria-label="Close cart" data-bh-drawer-close>
+          <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true"><line x1="1" y1="1" x2="17" y2="17" stroke="#1B1F17" stroke-width="2"/><line x1="17" y1="1" x2="1" y2="17" stroke="#1B1F17" stroke-width="2"/></svg>
+        </button>
+      </div>
+      {%- if cart.item_count > 0 and free_from > 0 -%}
+        {%- liquid
+          assign remaining = free_from | minus: cart.total_price
+          assign ship_pct = cart.total_price | times: 100.0 | divided_by: free_from | round
+          if ship_pct > 100
+            assign ship_pct = 100
+          endif
+        -%}
+        <div class="bh-cd__ship" data-bh-part="ship">
+          <span class="bh-cd__ship-msg">
+            {%- if remaining <= 0 -%}
+              You’ve unlocked free shipping ✓
+            {%- else -%}
+              You’re {% render 'bonsai-money', amount: remaining %} away from free shipping
+            {%- endif -%}
+          </span>
+          <div class="bh-cd__ship-track"><div class="bh-cd__ship-fill" style="width:{{ ship_pct }}%;"></div></div>
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="bh-cd__body">
+      {%- if cart.item_count > 0 -%}
+        <div data-bh-part="items">
+          {%- for item in cart.items -%}
+            {%- liquid
+              assign m = item.product.metafields.custom
+              assign subtitle = m.subtitle.value
+              if subtitle == blank
+                assign light = m.light.value
+                assign age = m.age.value
+                if light != blank and age != blank
+                  assign subtitle = light | append: ' · ' | append: age
+                else
+                  assign subtitle = age | default: light
+                endif
+              endif
+              assign max_qty = ''
+              assign at_max = false
+              if item.variant.inventory_management == 'shopify' and item.variant.inventory_policy == 'deny'
+                assign max_qty = item.variant.inventory_quantity
+                if item.quantity >= max_qty
+                  assign at_max = true
+                endif
+              endif
+            -%}
+            <div class="bh-cd-line" data-bh-line="{{ item.key }}" data-qty="{{ item.quantity }}" data-max="{{ max_qty }}">
+              <a href="{{ item.url }}" class="bh-cd-line__img" tabindex="-1" aria-hidden="true">
+                {%- if item.image != blank -%}
+                  {{ item.image | image_url: width: 160 | image_tag: loading: 'lazy', widths: '80, 160', sizes: '72px', alt: item.product.title }}
+                {%- endif -%}
+              </a>
+              <div class="bh-cd-line__info">
+                <a href="{{ item.url }}" class="bh-cd-line__name">{{ item.product.title }}</a>
+                {%- if subtitle != blank -%}
+                  <span class="bh-cd-line__sub">{{ subtitle }}</span>
+                {%- endif -%}
+                <div class="bh-cd-line__price">
+                  {%- if item.variant.compare_at_price > item.original_price -%}
+                    <span class="bh-cd-line__compare">{% render 'bonsai-money', amount: item.variant.compare_at_price %}</span>
+                    <span class="bh-cd-line__sale">Sale</span>
+                  {%- endif -%}
+                  <span class="bh-cd-line__each">{% render 'bonsai-money', amount: item.original_price %}</span>
+                </div>
+                <span class="bh-cd-line__error" data-bh-line-error hidden></span>
+                <div class="bh-cd-line__controls">
+                  <div class="bh-cd-line__qty">
+                    <button type="button" aria-label="Decrease quantity" data-bh-dec>−</button>
+                    <span data-bh-qty>{{ item.quantity }}</span>
+                    <button type="button" aria-label="Increase quantity" data-bh-inc{% if at_max %} disabled{% endif %}>+</button>
+                    <span class="bh-cd-line__spin" aria-hidden="true"></span>
+                  </div>
+                  <button type="button" class="bh-cd-line__remove" data-bh-remove>Remove</button>
+                </div>
+              </div>
+            </div>
+          {%- endfor -%}
+        </div>
+      {%- else -%}
+        <div class="bh-cd__empty">
+          <div class="bh-cd__empty-icon">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z" stroke="#5F8F2B" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 0 1 6 0v2" stroke="#5F8F2B" stroke-width="1.6"/></svg>
+          </div>
+          <span class="bh-cd__empty-title">{{ section.settings.empty_title }}</span>
+          <p class="bh-cd__empty-text">{{ section.settings.empty_text }}</p>
+          <a href="{{ shop_url }}" class="bh-cd__empty-btn">{{ section.settings.empty_button }}</a>
+          {%- if chip_links != blank -%}
+            <div class="bh-cd__chips">
+              {%- for link in chip_links -%}
+                {%- comment -%} Menu titles end in "Bonsai" ("Outdoor Bonsai"); the chips drop it. {%- endcomment -%}
+                <a href="{{ link.url }}">{{ link.title | remove: ' Bonsai' }}</a>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- if cart.item_count > 0 -%}
+      <div class="bh-cd__foot">
+        <button type="button" class="bh-cd__note-toggle" aria-expanded="false" data-bh-note-toggle>
+          <span>{{ section.settings.note_label }}</span>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6l6-6" stroke="#1B1F17" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <textarea class="bh-cd__note" name="note" form="bh-cd-checkout" rows="2" placeholder="Add a note" aria-label="Order note" data-bh-note>{{ cart.note }}</textarea>
+
+        <div class="bh-cd__part" data-bh-part="totals">
+          {%- for discount in cart.discount_applications -%}
+            <div class="bh-cd__discount">
+              <span class="bh-cd__discount-label">Discount <span class="bh-cd__discount-pill">{{ discount.title }}</span></span>
+              <span class="bh-cd__discount-amt">−{% render 'bonsai-money', amount: discount.total_allocated_amount %}</span>
+            </div>
+          {%- endfor -%}
+          <div class="bh-cd__subtotal">
+            <span class="bh-cd__subtotal-label">Subtotal</span>
+            <span class="bh-cd__subtotal-val">{% render 'bonsai-money', amount: cart.total_price %}</span>
+          </div>
+        </div>
+        <span class="bh-cd__tax">{% if cart.taxes_included %}Taxes included. Shipping calculated at checkout.{% else %}Taxes and shipping calculated at checkout.{% endif %}</span>
+
+        <button type="submit" name="checkout" form="bh-cd-checkout" class="bh-cd__checkout" data-bh-part="checkout">Checkout · {% render 'bonsai-money', amount: cart.total_price %}</button>
+        <a href="{{ routes.cart_url }}" class="bh-cd__view">View cart</a>
+
+        <div class="bh-cd__rule"></div>
+        <div class="bh-cd__trust">
+          {%- for t in trust_items -%}
+            <span><svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12.5L9.5 18L20 6" stroke="#5F8F2B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>{{ t | strip }}</span>
+          {%- endfor -%}
+        </div>
+        <a href="https://wa.me/{{ wa_number }}" target="_blank" rel="noopener" class="bh-cd__help">{{ section.settings.whatsapp_label }}</a>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+{%- endunless -%}
+
+{% schema %}
+{
+  "name": "Bonsai cart drawer",
+  "tag": "div",
+  "settings": [
+    { "type": "paragraph", "content": "Opens from the header cart icon and after Add to cart. The free-shipping bar reads the shop metafield custom.free_shipping_threshold." },
+    { "type": "text", "id": "note_label", "label": "Order note toggle", "default": "Add order note / gift message" },
+    { "type": "text", "id": "trust_items", "label": "Trust items", "default": "Arrives healthy,Free replacement,Bonsai care support", "info": "Comma-separated." },
+    { "type": "text", "id": "whatsapp_number", "label": "WhatsApp number", "default": "919999999999", "info": "Country code + number, digits only." },
+    { "type": "text", "id": "whatsapp_label", "label": "WhatsApp link label", "default": "Need help choosing? Chat on WhatsApp" },
+    { "type": "header", "content": "Empty cart" },
+    { "type": "text", "id": "empty_title", "label": "Heading", "default": "Your cart is empty" },
+    { "type": "text", "id": "empty_text", "label": "Text", "default": "Start with a bonsai that matches your space." },
+    { "type": "text", "id": "empty_button", "label": "Button label", "default": "Shop bonsai →" },
+    { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" },
+    { "type": "text", "id": "menu_item", "label": "Menu item for button and chips", "default": "Bonsai Plants", "info": "The button links to this menu item; its sub-items become the chips." }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,176 @@
+{
+  "layout": "bonsai",
+  "sections": {
+    "main": {
+      "type": "bonsai-about",
+      "blocks": {
+        "craft_1": {
+          "type": "craft",
+          "settings": {
+            "label": "Miniature Landscapes"
+          }
+        },
+        "craft_2": {
+          "type": "craft",
+          "settings": {
+            "label": "Table-top Landscapes"
+          }
+        },
+        "craft_3": {
+          "type": "craft",
+          "settings": {
+            "label": "Penjing"
+          }
+        },
+        "craft_4": {
+          "type": "craft",
+          "settings": {
+            "label": "Terrarium"
+          }
+        },
+        "craft_5": {
+          "type": "craft",
+          "settings": {
+            "label": "Ikebana"
+          }
+        },
+        "craft_6": {
+          "type": "craft",
+          "settings": {
+            "label": "Kokedama"
+          }
+        },
+        "stat_1": {
+          "type": "stat",
+          "settings": {
+            "value": "10+",
+            "label": "Years of bonsai practice"
+          }
+        },
+        "stat_2": {
+          "type": "stat",
+          "settings": {
+            "value": "300+",
+            "label": "Bonsais delivered"
+          }
+        },
+        "stat_3": {
+          "type": "stat",
+          "settings": {
+            "value": "Pan-India",
+            "label": "Shipping coverage"
+          }
+        },
+        "stat_4": {
+          "type": "stat",
+          "settings": {
+            "value": "2016",
+            "label": "Serving since"
+          }
+        },
+        "feature_1": {
+          "type": "feature",
+          "settings": {
+            "icon": "star",
+            "title": "First Indian store dedicated to bonsai",
+            "text": "A platform built only for bonsai and its care, not a general nursery add-on."
+          }
+        },
+        "feature_2": {
+          "type": "feature",
+          "settings": {
+            "icon": "hand",
+            "title": "Designed by an expert artist",
+            "text": "Every tree is trained and styled under Purnima’s supervision."
+          }
+        },
+        "feature_3": {
+          "type": "feature",
+          "settings": {
+            "icon": "heart",
+            "title": "Personal attention to every design",
+            "text": "No mass-produced shapes — each plant is individually assessed and styled."
+          }
+        },
+        "feature_4": {
+          "type": "feature",
+          "settings": {
+            "icon": "gift",
+            "title": "Bulk orders for gifting",
+            "text": "Corporate and festive gifting orders, handled with care."
+          }
+        },
+        "feature_5": {
+          "type": "feature",
+          "settings": {
+            "icon": "truck",
+            "title": "Free shipping across India",
+            "text": "Subject to courier serviceability at your pincode."
+          }
+        },
+        "feature_6": {
+          "type": "feature",
+          "settings": {
+            "icon": "shield",
+            "title": "Safe, shock-proof packaging",
+            "text": "Trees travel padded and secured to arrive healthy."
+          }
+        },
+        "step_1": {
+          "type": "step",
+          "settings": {
+            "title": "Hand-trained & styled",
+            "text": "Each tree is shaped and finished by our artist before it’s listed."
+          }
+        },
+        "step_2": {
+          "type": "step",
+          "settings": {
+            "title": "Carefully packed",
+            "text": "Cling wrap, bubble wrap, thermocol and cardboard keep it secure."
+          }
+        },
+        "step_3": {
+          "type": "step",
+          "settings": {
+            "title": "Shipped with tracking",
+            "text": "Sent via trusted couriers, with tracking shared on dispatch."
+          }
+        },
+        "step_4": {
+          "type": "step",
+          "settings": {
+            "title": "Care support after delivery",
+            "text": "Our team is on WhatsApp if you have questions once it arrives."
+          }
+        }
+      },
+      "block_order": [
+        "craft_1",
+        "craft_2",
+        "craft_3",
+        "craft_4",
+        "craft_5",
+        "craft_6",
+        "stat_1",
+        "stat_2",
+        "stat_3",
+        "stat_4",
+        "feature_1",
+        "feature_2",
+        "feature_3",
+        "feature_4",
+        "feature_5",
+        "feature_6",
+        "step_1",
+        "step_2",
+        "step_3",
+        "step_4"
+      ],
+      "settings": {}
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

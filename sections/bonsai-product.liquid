@@ -269,6 +269,22 @@
           price: related_price
         -%}
       {%- endfor -%}
+      {%- if related_count < 4 and related_source != collections.all -%}
+        {%- for p in collections.all.products -%}
+          {%- if p.id == product.id -%}{%- continue -%}{%- endif -%}
+          {%- if related_source.products contains p -%}{%- continue -%}{%- endif -%}
+          {%- if related_count >= 4 -%}{%- break -%}{%- endif -%}
+          {%- assign related_count = related_count | plus: 1 -%}
+          {%- assign related_price = p.price | money_without_trailing_zeros -%}
+          {%- render 'bonsai-product-card',
+            url: p.url,
+            image: p.featured_media,
+            title: p.title,
+            subtitle: p.metafields.custom.subtitle,
+            price: related_price
+          -%}
+        {%- endfor -%}
+      {%- endif -%}
     {%- endcapture -%}
     {%- if related_count > 0 -%}
       <div class="bh-pdp__related">

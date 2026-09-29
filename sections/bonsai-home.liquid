@@ -47,6 +47,8 @@
                   {%- assign slide_url = entry.link_product.value.url -%}
                 {%- elsif entry.link_collection.value != blank -%}
                   {%- assign slide_url = entry.link_collection.value.url -%}
+                {%- elsif entry.link_page.value != blank -%}
+                  {%- assign slide_url = entry.link_page.value.url -%}
                 {%- else -%}
                   {%- assign slide_url = '' -%}
                 {%- endif -%}

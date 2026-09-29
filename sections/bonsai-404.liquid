@@ -4,7 +4,19 @@
   assign wa_number = settings.whatsapp_number | remove: '+' | remove: ' '
   assign wa_url = 'https://wa.me/' | append: wa_number
   assign popular = section.settings.popular_searches | split: ','
-  assign categories = section.blocks | where: 'type', 'category'
+
+  comment
+    Category tiles are the sub-items of one main-menu item (the main categories),
+    followed by one extra collection.
+  endcomment
+  assign cat_links = blank
+  for link in linklists[section.settings.menu].links
+    if link.title == section.settings.menu_item
+      assign cat_links = link.links
+      break
+    endif
+  endfor
+  assign extra = section.settings.extra_collection
   assign favourites = section.settings.products_collection | default: collections['bestsellers']
 -%}
 
@@ -48,25 +60,28 @@
       {%- endif -%}
     </div>
 
-    {%- if categories.size > 0 -%}
+    {%- if cat_links != blank or extra != blank -%}
       <div class="bh-nf__block">
         <h2 class="bh-nf__h2">{{ section.settings.categories_heading }}</h2>
         <div class="bh-nf__cats">
-          {%- for block in categories -%}
-            {%- liquid
-              assign cat_collection = block.settings.collection
-              assign cat_image = block.settings.image | default: cat_collection.featured_image
-              assign cat_label = block.settings.label | default: cat_collection.title
-              assign cat_url = block.settings.link | default: cat_collection.url | default: routes.all_products_collection_url
-            -%}
-            <a href="{{ cat_url }}" class="bh-nf__cat" {{ block.shopify_attributes }}>
-              {%- if cat_image != blank -%}
-                {{ cat_image | image_url: width: 600 | image_tag: loading: 'lazy', widths: '300, 400, 600', sizes: '(min-width: 820px) 190px, 45vw', alt: cat_label }}
+          {%- for link in cat_links -%}
+            <a href="{{ link.url }}" class="bh-nf__cat">
+              {%- if link.type == 'collection_link' and link.object.featured_image != blank -%}
+                {{ link.object.featured_image | image_url: width: 600 | image_tag: loading: 'lazy', widths: '300, 400, 600', sizes: '(min-width: 820px) 190px, 45vw', alt: link.title }}
               {%- endif -%}
               <div class="bh-nf__cat-shade"></div>
-              <span class="bh-nf__cat-label">{{ cat_label }}</span>
+              <span class="bh-nf__cat-label">{{ link.title }}</span>
             </a>
           {%- endfor -%}
+          {%- if extra != blank -%}
+            <a href="{{ extra.url }}" class="bh-nf__cat">
+              {%- if extra.featured_image != blank -%}
+                {{ extra.featured_image | image_url: width: 600 | image_tag: loading: 'lazy', widths: '300, 400, 600', sizes: '(min-width: 820px) 190px, 45vw', alt: extra.title }}
+              {%- endif -%}
+              <div class="bh-nf__cat-shade"></div>
+              <span class="bh-nf__cat-label">{{ extra.title }}</span>
+            </a>
+          {%- endif -%}
         </div>
       </div>
     {%- endif -%}
@@ -123,7 +138,9 @@
     { "type": "text", "id": "popular_searches", "label": "Popular searches", "default": "Ficus,Jade,Juniper,Indoor bonsai,Ceramic pots,Bonsai tools", "info": "Comma-separated. Each opens a product search." },
     { "type": "header", "content": "Categories" },
     { "type": "text", "id": "categories_heading", "label": "Heading", "default": "Browse categories" },
-    { "type": "paragraph", "content": "Add a 'Category' block for each tile. The row hides when there are none." },
+    { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" },
+    { "type": "text", "id": "menu_item", "label": "Menu item", "default": "Bonsai Plants", "info": "Its sub-items become the tiles, with their collection images." },
+    { "type": "collection", "id": "extra_collection", "label": "Extra tile", "info": "One more collection shown after the menu tiles, e.g. Pots & Accessories." },
     { "type": "header", "content": "Products" },
     { "type": "text", "id": "products_heading", "label": "Heading", "default": "Customer favourites" },
     { "type": "collection", "id": "products_collection", "label": "Collection", "info": "Shows its first 4 products. Defaults to the collection with handle \"bestsellers\"." },
@@ -133,18 +150,6 @@
     { "type": "text", "id": "whatsapp_label", "label": "WhatsApp button label", "default": "Chat on WhatsApp", "info": "Uses the WhatsApp number in Theme settings → Contact." },
     { "type": "text", "id": "contact_label", "label": "Contact button label", "default": "Contact us" },
     { "type": "url", "id": "contact_link", "label": "Contact button link", "info": "Defaults to /pages/contact." }
-  ],
-  "blocks": [
-    {
-      "type": "category",
-      "name": "Category",
-      "settings": [
-        { "type": "collection", "id": "collection", "label": "Collection", "info": "Fills in the link, label and image when those are left empty." },
-        { "type": "text", "id": "label", "label": "Label" },
-        { "type": "image_picker", "id": "image", "label": "Image" },
-        { "type": "url", "id": "link", "label": "Link" }
-      ]
-    }
   ],
   "presets": [ { "name": "Bonsai 404" } ]
 }

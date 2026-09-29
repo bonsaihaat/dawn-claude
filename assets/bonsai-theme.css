@@ -172,7 +172,6 @@ body.bh-body { background: #faf7f1; }
 /* Section headings */
 .bh-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin: 8px 0 18px; }
 .bh-h2 { margin: 0; font-size: clamp(24px, 2.6vw, 30px); line-height: 1.15; font-weight: 800; color: #1B1F17; text-wrap: balance; }
-.bh .bh-head__link { flex-shrink: 0; font-size: 13px; font-weight: 600; color: #1B1F17; text-decoration: none; white-space: nowrap; }
 
 /* Product rows */
 .bh-products { display: flex; gap: 12px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; margin: 0 -20px 34px; padding: 0 20px 6px; scroll-padding: 0 20px; scrollbar-width: none; }

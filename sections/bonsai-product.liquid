@@ -64,8 +64,8 @@
   data-bh-pdp
   data-currency="{{ cart.currency.iso_code }}"
   data-product-id="{{ product.id }}"
-  data-free-threshold="{{ section.settings.free_shipping_threshold }}"
-  data-shipping-fee="{{ section.settings.shipping_fee }}"
+  data-free-threshold="{{ shop.metafields.custom.free_shipping_threshold.value }}"
+  data-shipping-fee="{{ shop.metafields.custom.standard_shipping_fee.value }}"
   data-delivery-days="{{ section.settings.delivery_days }}"
 >
   <div class="bh-pdp__wrap">
@@ -136,7 +136,7 @@
         </div>
 
         <div class="bh-pdp__price-row">
-          <span class="bh-pdp__price" data-bh-total>{{ current_variant.price | money_without_trailing_zeros }}</span>
+          <span class="bh-pdp__price" data-bh-total>{%- render 'bonsai-money', amount: current_variant.price -%}</span>
           <span class="bh-pdp__tax">{{ section.settings.tax_note }}</span>
         </div>
 
@@ -172,7 +172,7 @@
                   <span class="bh-pdp__option-label">{{ variant.title }}</span>
                   {%- unless variant.available -%}<span class="bh-pdp__option-note">Sold out</span>{%- endunless -%}
                 </span>
-                <span class="bh-pdp__option-price">{{ variant.price | money_without_trailing_zeros }}</span>
+                <span class="bh-pdp__option-price">{%- render 'bonsai-money', amount: variant.price -%}</span>
               </label>
             {%- endfor -%}
           </fieldset>
@@ -260,7 +260,7 @@
         {%- if p.id == product.id -%}{%- continue -%}{%- endif -%}
         {%- if related_count >= 4 -%}{%- break -%}{%- endif -%}
         {%- assign related_count = related_count | plus: 1 -%}
-        {%- assign related_price = p.price | money_without_trailing_zeros -%}
+        {%- capture related_price -%}{%- render 'bonsai-money', amount: p.price -%}{%- endcapture -%}
         {%- render 'bonsai-product-card',
           url: p.url,
           image: p.featured_media,
@@ -300,7 +300,7 @@
   <div class="bh-pdp__sticky" data-bh-sticky>
     <div class="bh-pdp__sticky-info">
       <span class="bh-pdp__sticky-name">{{ product.title }}</span>
-      <span class="bh-pdp__sticky-price" data-bh-total>{{ current_variant.price | money_without_trailing_zeros }}</span>
+      <span class="bh-pdp__sticky-price" data-bh-total>{%- render 'bonsai-money', amount: current_variant.price -%}</span>
     </div>
     <button type="button" class="bh-pdp__add" data-bh-add-proxy{% unless current_variant.available %} disabled{% endunless %}>
       {%- if current_variant.available -%}Add to cart{%- else -%}Sold out{%- endif -%}
@@ -318,10 +318,8 @@
     { "type": "text", "id": "tax_note", "label": "Price note", "default": "Inclusive of all taxes" },
     { "type": "header", "content": "WhatsApp" },
     { "type": "text", "id": "whatsapp_label", "label": "Button label", "default": "Ask about this tree on WhatsApp" },
-    { "type": "header", "content": "Delivery check" },
+    { "type": "header", "content": "Delivery check", "info": "Free-shipping threshold and fee come from the shop metafields custom.free_shipping_threshold and custom.standard_shipping_fee (Settings → Custom data → Shop)." },
     { "type": "range", "id": "delivery_days", "label": "Estimated delivery (days)", "min": 1, "max": 14, "step": 1, "default": 4 },
-    { "type": "number", "id": "free_shipping_threshold", "label": "Free shipping from (₹)", "default": 1999 },
-    { "type": "number", "id": "shipping_fee", "label": "Shipping fee (₹)", "default": 99 },
     { "type": "text", "id": "trust_items", "label": "Trust items", "default": "Arrives healthy,Free replacement,Care support", "info": "Comma-separated." },
     { "type": "header", "content": "Accordion defaults", "info": "Per-product metafields (custom.care_light, custom.care_water, custom.care_soil, custom.whats_in_box, custom.shipping) override these." },
     { "type": "textarea", "id": "care_soil", "label": "Soil & repotting", "default": "Well-draining bonsai mix. Repot every 2–3 years in early spring." },

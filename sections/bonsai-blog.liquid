@@ -1,0 +1,147 @@
+{{ 'bonsai-blog.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign heading = section.settings.heading | default: blog.title
+  assign per_step = section.settings.posts_per_load
+-%}
+
+<div class="bh bh-blog" data-bh-blog>
+  <div class="bh-blog__wrap">
+    <nav class="bh-blog__crumbs" aria-label="Breadcrumb">
+      <a href="{{ routes.root_url }}">Home</a>
+      <span>/</span>
+      <span class="bh-blog__crumb-current">{{ heading }}</span>
+    </nav>
+
+    <div class="bh-blog__intro">
+      <h1 class="bh-blog__title">{{ heading }}</h1>
+      {%- if section.settings.subheading != blank -%}
+        <p class="bh-blog__sub">{{ section.settings.subheading }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- paginate blog.articles by 25 -%}
+      {%- liquid
+        assign has_featured = false
+        if paginate.current_page == 1 and blog.articles.size > 0
+          assign has_featured = true
+        endif
+      -%}
+
+      {%- for article in blog.articles -%}
+        {%- liquid
+          assign words = article.content | replace: '<', ' <' | strip_html | split: ' ' | size
+          assign minutes = words | plus: 199 | divided_by: 200 | at_least: 1
+          assign excerpt = article.excerpt_or_content | strip_html | strip | truncatewords: 24
+          capture meta
+            echo article.published_at | date: '%-d %b %Y'
+            echo ' · '
+            echo minutes
+            echo ' min read'
+          endcapture
+        -%}
+        {%- if forloop.first and has_featured -%}
+          <a href="{{ article.url }}" class="bh-blog__featured">
+            <div class="bh-blog__featured-img">
+              {%- if article.image -%}
+                {{ article.image | image_url: width: 1400 | image_tag: loading: 'eager', fetchpriority: 'high', widths: '600, 900, 1200, 1400', sizes: '(min-width: 1180px) 620px, (min-width: 820px) 54vw, 100vw', alt: article.image.alt | default: article.title }}
+              {%- endif -%}
+            </div>
+            <div class="bh-blog__featured-body">
+              <span class="bh-blog__featured-title">{{ article.title | escape }}</span>
+              {%- if excerpt != blank -%}<span class="bh-blog__featured-excerpt">{{ excerpt }}</span>{%- endif -%}
+              <span class="bh-blog__featured-meta">{{ meta }}</span>
+              <span class="bh-blog__featured-cta">Read article →</span>
+            </div>
+          </a>
+          <div class="bh-blog__grid" data-bh-blog-grid>
+        {%- else -%}
+          {%- if forloop.first -%}<div class="bh-blog__grid" data-bh-blog-grid>{%- endif -%}
+          {%- liquid
+            assign position = forloop.index
+            if has_featured
+              assign position = forloop.index0
+            endif
+          -%}
+          <a href="{{ article.url }}" class="bh-blog__card"{% if position > per_step %} hidden{% endif %} data-bh-blog-card>
+            <div class="bh-blog__card-img">
+              {%- if article.image -%}
+                {{ article.image | image_url: width: 800 | image_tag: loading: 'lazy', widths: '400, 600, 800', sizes: '(min-width: 1180px) 380px, (min-width: 640px) 50vw, 100vw', alt: article.image.alt | default: article.title }}
+              {%- endif -%}
+            </div>
+            <div class="bh-blog__card-body">
+              <span class="bh-blog__card-title">{{ article.title | escape }}</span>
+              {%- if excerpt != blank -%}<span class="bh-blog__card-excerpt">{{ excerpt }}</span>{%- endif -%}
+              <span class="bh-blog__card-meta">{{ meta }}</span>
+            </div>
+          </a>
+        {%- endif -%}
+        {%- if forloop.last -%}</div>{%- endif -%}
+      {%- else -%}
+        <div class="bh-blog__empty">{{ section.settings.empty_text }}</div>
+      {%- endfor -%}
+
+      {%- if blog.articles.size > 0 -%}
+        <div class="bh-blog__more"{% if paginate.next == nil %} data-bh-blog-last hidden{% endif %}>
+          <a href="{{ paginate.next.url }}" class="bh-blog__more-btn" data-bh-blog-more data-next="{{ paginate.next.url }}" data-section="{{ section.id }}" data-step="{{ per_step }}">{{ section.settings.load_more_label }}</a>
+        </div>
+      {%- endif -%}
+    {%- endpaginate -%}
+  </div>
+</div>
+
+<script>
+  (function () {
+    var root = document.currentScript.previousElementSibling;
+    var btn = root.querySelector('[data-bh-blog-more]');
+    var grid = root.querySelector('[data-bh-blog-grid]');
+    if (!btn || !grid) return;
+    var wrap = btn.parentNode;
+    var step = parseInt(btn.dataset.step, 10) || 6;
+    var next = btn.dataset.next;
+
+    function hiddenCards() { return grid.querySelectorAll('[data-bh-blog-card][hidden]'); }
+    function sync() { wrap.hidden = !hiddenCards().length && !next; }
+    function reveal() {
+      var cards = hiddenCards();
+      for (var i = 0; i < cards.length && i < step; i++) cards[i].hidden = false;
+      sync();
+    }
+
+    wrap.removeAttribute('data-bh-blog-last');
+    sync();
+
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (hiddenCards().length || !next) return reveal();
+      var url = next + (next.indexOf('?') > -1 ? '&' : '?') + 'section_id=' + btn.dataset.section;
+      btn.setAttribute('aria-busy', 'true');
+      fetch(url).then(function (r) { return r.text(); }).then(function (html) {
+        var doc = new DOMParser().parseFromString(html, 'text/html');
+        doc.querySelectorAll('[data-bh-blog-card]').forEach(function (card) {
+          card.hidden = true;
+          grid.appendChild(document.importNode(card, true));
+        });
+        var more = doc.querySelector('[data-bh-blog-more]');
+        next = more && !more.parentNode.hasAttribute('data-bh-blog-last') ? more.dataset.next : '';
+        btn.removeAttribute('aria-busy');
+        reveal();
+      }).catch(function () { window.location.href = next; });
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Bonsai Blog",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Blogs", "info": "Leave blank to use the blog title." },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "Care guides, styling tips and tree notes from our growers." },
+    { "type": "range", "id": "posts_per_load", "label": "Articles shown per load", "min": 3, "max": 12, "step": 3, "default": 6 },
+    { "type": "text", "id": "load_more_label", "label": "Load more label", "default": "Load more articles" },
+    { "type": "text", "id": "empty_text", "label": "Empty blog text", "default": "No articles yet." }
+  ],
+  "presets": [{ "name": "Bonsai Blog" }]
+}
+{% endschema %}

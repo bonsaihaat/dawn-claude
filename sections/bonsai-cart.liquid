@@ -1,0 +1,319 @@
+{{ 'bonsai-cart.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'bonsai-cart.js' | asset_url }}" defer></script>
+
+{%- liquid
+  assign wa_number = settings.whatsapp_number | remove: '+' | remove: ' '
+  assign wa_url = 'https://wa.me/' | append: wa_number
+  assign free_from = shop.metafields.custom.free_shipping_threshold.value | times: 100
+  assign payment_chips = section.settings.payment_chips | split: ','
+  assign trust_items = section.settings.trust_items | split: ','
+
+  assign shop_url = routes.all_products_collection_url
+  assign chip_links = blank
+  for link in linklists[section.settings.menu].links
+    if link.title == section.settings.menu_item
+      assign shop_url = link.url
+      assign chip_links = link.links
+      break
+    endif
+  endfor
+  assign best = section.settings.bestsellers | default: collections['bestsellers']
+-%}
+
+{%- capture icon_bag -%}
+  <path d="M6 8h12l-1 12H7L6 8Z" stroke="#5F8F2B" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 0 1 6 0v2" stroke="#5F8F2B" stroke-width="1.6"/>
+{%- endcapture -%}
+
+<div
+  class="bh bh-cart{% if cart.item_count > 0 %} has-items{% endif %}"
+  data-bh-cart
+  data-section-id="{{ section.id }}"
+  data-count="{{ cart.item_count }}"
+  data-delivery-url="{{ section.settings.delivery_check_url }}"
+  data-delivery-min="{{ section.settings.delivery_days_min }}"
+  data-delivery-max="{{ section.settings.delivery_days_max }}"
+>
+  <form id="bh-cart-checkout" action="{{ routes.cart_url }}" method="post"></form>
+  <div class="bh-cart__wrap">
+
+    <nav class="bh-cart__crumbs" aria-label="Breadcrumb">
+      <a href="{{ routes.root_url }}">Home</a>
+      <span>/</span>
+      <span class="bh-cart__crumb-current">Cart</span>
+    </nav>
+
+    <div class="bh-cart__head">
+      <h1 class="bh-cart__title">
+        Your cart
+        <span data-bh-part="count">({{ cart.item_count }} {% if cart.item_count == 1 %}item{% else %}items{% endif %})</span>
+      </h1>
+      <a href="{{ section.settings.continue_url | default: shop_url }}" class="bh-cart__continue">← Continue shopping</a>
+    </div>
+
+    {%- if cart.item_count > 0 -%}
+      {%- if free_from > 0 -%}
+        <div class="bh-cart__ship" data-bh-part="ship">
+          {%- liquid
+            assign remaining = free_from | minus: cart.total_price
+            assign ship_pct = cart.total_price | times: 100.0 | divided_by: free_from | round
+            if ship_pct > 100
+              assign ship_pct = 100
+            endif
+          -%}
+          <span class="bh-cart__ship-msg">
+            {%- if remaining <= 0 -%}
+              You’ve unlocked free shipping ✓
+            {%- else -%}
+              You’re {% render 'bonsai-money', amount: remaining %} away from free shipping
+            {%- endif -%}
+          </span>
+          <div class="bh-cart__ship-track"><div class="bh-cart__ship-fill" style="width:{{ ship_pct }}%;"></div></div>
+        </div>
+      {%- endif -%}
+
+      <div class="bh-cart__layout">
+        <div class="bh-cart__lines">
+          <div class="bh-cart__cols" aria-hidden="true">
+            <span>Product</span><span>Price</span><span>Quantity</span><span>Total</span><span></span>
+          </div>
+
+          <div class="bh-cart__part" data-bh-part="items">
+            {%- for item in cart.items -%}
+              {%- liquid
+                assign m = item.product.metafields.custom
+                assign subtitle = m.subtitle.value
+                if subtitle == blank
+                  assign light = m.light.value
+                  assign age = m.age.value
+                  if light != blank and age != blank
+                    assign subtitle = light | append: ' · ' | append: age
+                  else
+                    assign subtitle = age | default: light
+                  endif
+                endif
+                assign max_qty = ''
+                assign at_max = false
+                if item.variant.inventory_management == 'shopify' and item.variant.inventory_policy == 'deny'
+                  assign max_qty = item.variant.inventory_quantity
+                  if item.quantity >= max_qty
+                    assign at_max = true
+                  endif
+                endif
+              -%}
+              <div class="bh-cart-line" data-bh-line="{{ item.key }}" data-qty="{{ item.quantity }}" data-max="{{ max_qty }}">
+                <a href="{{ item.url }}" class="bh-cart-line__img" tabindex="-1" aria-hidden="true">
+                  {%- if item.image != blank -%}
+                    {{ item.image | image_url: width: 200 | image_tag: loading: 'lazy', widths: '100, 200', sizes: '(min-width: 820px) 96px, 72px', alt: item.product.title }}
+                  {%- endif -%}
+                </a>
+                <div class="bh-cart-line__info">
+                  <a href="{{ item.url }}" class="bh-cart-line__name">{{ item.product.title }}</a>
+                  {%- if subtitle != blank -%}
+                    <span class="bh-cart-line__sub">{{ subtitle }}</span>
+                  {%- endif -%}
+                  <div class="bh-cart-line__price">
+                    {%- if item.variant.compare_at_price > item.original_price -%}
+                      <span class="bh-cart-line__compare">{% render 'bonsai-money', amount: item.variant.compare_at_price %}</span>
+                      <span class="bh-cart-line__sale">Sale</span>
+                    {%- endif -%}
+                    <span class="bh-cart-line__each-price">{% render 'bonsai-money', amount: item.original_price %}</span>
+                    <span class="bh-cart-line__each">each</span>
+                  </div>
+                  <span class="bh-cart-line__error" data-bh-line-error hidden></span>
+                  <button type="button" class="bh-cart-line__remove" data-bh-remove>Remove</button>
+                </div>
+                <div class="bh-cart-line__right">
+                  <div class="bh-cart-line__qty">
+                    <button type="button" aria-label="Decrease quantity" data-bh-dec>−</button>
+                    <span data-bh-qty>{{ item.quantity }}</span>
+                    <button type="button" aria-label="Increase quantity" data-bh-inc{% if at_max %} disabled{% endif %}>+</button>
+                    <span class="bh-cart-line__spin" aria-hidden="true"></span>
+                  </div>
+                  <span class="bh-cart-line__total">{% render 'bonsai-money', amount: item.original_line_price %}</span>
+                </div>
+              </div>
+            {%- endfor -%}
+          </div>
+        </div>
+
+        <div class="bh-cart__aside">
+          <div class="bh-cart__summary">
+            <span class="bh-cart__summary-title">Order summary</span>
+
+            <div class="bh-cart__part" data-bh-part="totals">
+            <div class="bh-cart__rows">
+              <div class="bh-cart__row">
+                <span>Subtotal</span><span class="bh-cart__row-val">{% render 'bonsai-money', amount: cart.original_total_price %}</span>
+              </div>
+              {%- for discount in cart.discount_applications -%}
+                <div class="bh-cart__row bh-cart__row--discount">
+                  <span class="bh-cart__discount-label">Discount
+                    <span class="bh-cart__discount-pill">
+                      {{- discount.title -}}
+                      {%- if discount.type == 'discount_code' -%}
+                        <button type="button" aria-label="Remove discount code" data-bh-discount-remove="{{ discount.title | escape }}">×</button>
+                      {%- endif -%}
+                    </span>
+                  </span>
+                  <span class="bh-cart__discount-amt">−{% render 'bonsai-money', amount: discount.total_allocated_amount %}</span>
+                </div>
+              {%- endfor -%}
+              <div class="bh-cart__row bh-cart__row--muted">
+                <span>Shipping</span><span>Calculated at checkout</span>
+              </div>
+            </div>
+            <div class="bh-cart__rule"></div>
+            <div class="bh-cart__total">
+              <span class="bh-cart__total-label">Total</span>
+              <span class="bh-cart__total-val">{% render 'bonsai-money', amount: cart.total_price %}</span>
+            </div>
+            {%- if cart.discount_applications.size > 0 -%}<div></div>{%- endif -%}
+            </div>
+
+            <form class="bh-cart__code" data-bh-discount-form novalidate>
+              <div class="bh-cart__code-row">
+                <input type="text" placeholder="Discount code" aria-label="Discount code" autocomplete="off" data-bh-discount-input>
+                <button type="submit">Apply</button>
+              </div>
+              <span class="bh-cart__code-error" data-bh-discount-error hidden></span>
+            </form>
+
+            <div class="bh-cart__pin">
+              <span class="bh-cart__pin-title">Check delivery</span>
+              <form class="bh-cart__pin-form" data-bh-pin-form novalidate>
+                <input type="text" inputmode="numeric" maxlength="6" placeholder="Enter pincode" aria-label="Pincode" data-bh-pin>
+                <button type="submit">Check</button>
+              </form>
+              <span class="bh-cart__pin-msg" data-bh-pin-msg hidden></span>
+            </div>
+
+            <div class="bh-cart__note">
+              <label class="bh-cart__note-title" for="bh-cart-note">Order note (optional)</label>
+              <textarea id="bh-cart-note" name="note" form="bh-cart-checkout" rows="3" placeholder="Add a gift message or delivery instructions" data-bh-note>{{ cart.note }}</textarea>
+            </div>
+
+            <button type="submit" name="checkout" form="bh-cart-checkout" class="bh-cart__checkout" data-bh-part="checkout"><span>Checkout ·</span><span>{% render 'bonsai-money', amount: cart.total_price %}</span></button>
+            <span class="bh-cart__tax">{% if cart.taxes_included %}Taxes included{% else %}Taxes calculated at checkout{% endif %}</span>
+
+            {%- if section.settings.payment_chips != blank -%}
+              <div class="bh-cart__pay">
+                {%- for chip in payment_chips -%}
+                  <span>{{ chip | strip }}</span>
+                {%- endfor -%}
+              </div>
+            {%- endif -%}
+
+            <div class="bh-cart__rule"></div>
+            <div class="bh-cart__trust">
+              {%- for t in trust_items -%}
+                <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12.5L9.5 18L20 6" stroke="#5F8F2B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>{{ t | strip }}</span>
+              {%- endfor -%}
+            </div>
+            <a href="{{ wa_url }}" target="_blank" rel="noopener" class="bh-cart__help">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3a9 9 0 0 0-7.8 13.4L3 21l4.8-1.2A9 9 0 1 0 12 3Z" stroke="#25D366" stroke-width="1.7" stroke-linejoin="round"/></svg>
+              {{ section.settings.whatsapp_label }}
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {%- if section.settings.care_note != blank -%}
+        <div class="bh-cart__care">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3c-4 3-6 6-6 10a6 6 0 0 0 12 0c0-4-2-7-6-10Z" stroke="#2E4716" stroke-width="1.7" stroke-linejoin="round"/></svg>
+          <span>{{ section.settings.care_note }}</span>
+        </div>
+      {%- endif -%}
+
+      <div class="bh-cart__sticky">
+        <div class="bh-cart__sticky-total">
+          <span>Total</span>
+          <strong data-bh-part="sticky">{% render 'bonsai-money', amount: cart.total_price %}</strong>
+        </div>
+        <button type="submit" name="checkout" form="bh-cart-checkout">Checkout</button>
+      </div>
+    {%- else -%}
+      <div class="bh-cart__empty">
+        <div class="bh-cart__empty-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true">{{ icon_bag }}</svg>
+        </div>
+        <h2 class="bh-cart__empty-title">{{ section.settings.empty_title }}</h2>
+        <p class="bh-cart__empty-text">{{ section.settings.empty_text }}</p>
+        <a href="{{ shop_url }}" class="bh-cart__empty-btn">{{ section.settings.empty_button }}</a>
+
+        {%- if chip_links != blank -%}
+          <div class="bh-cart__chips">
+            {%- for link in chip_links -%}
+              {%- comment -%} Menu titles end in "Bonsai" ("Outdoor Bonsai"); the chips drop it. {%- endcomment -%}
+              <a href="{{ link.url }}">{{ link.title | remove: ' Bonsai' }}</a>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+
+        {%- if best != blank and best.products.size > 0 -%}
+          <div class="bh-cart__best">
+            <h3>{{ section.settings.bestsellers_heading }}</h3>
+            <div class="bh-cart__best-grid">
+              {%- for product in best.products limit: 4 -%}
+                {%- liquid
+                  assign m = product.metafields.custom
+                  assign subtitle = m.subtitle.value
+                  if subtitle == blank
+                    assign light = m.light.value
+                    assign age = m.age.value
+                    if light != blank and age != blank
+                      assign subtitle = light | append: ' · ' | append: age
+                    else
+                      assign subtitle = age | default: light
+                    endif
+                  endif
+                -%}
+                <a href="{{ product.url }}" class="bh-cart-card">
+                  <div class="bh-cart-card__img">
+                    {%- if product.featured_media != blank -%}
+                      {{ product.featured_media | image_url: width: 600 | image_tag: loading: 'lazy', widths: '300, 400, 600', sizes: '(min-width: 820px) 260px, 45vw', alt: product.title }}
+                    {%- endif -%}
+                  </div>
+                  <div class="bh-cart-card__info">
+                    <span class="bh-cart-card__name">{{ product.title }}</span>
+                    {%- if subtitle != blank -%}<span class="bh-cart-card__sub">{{ subtitle }}</span>{%- endif -%}
+                    <span class="bh-cart-card__price">{% render 'bonsai-money', amount: product.price %}</span>
+                  </div>
+                </a>
+              {%- endfor -%}
+            </div>
+          </div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Bonsai cart",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    { "type": "paragraph", "content": "The free-shipping bar reads the shop metafield custom.free_shipping_threshold (Settings → Custom data → Shop). Keep it equal to the Free Shipping rate in Settings → Shipping and delivery." },
+    { "type": "url", "id": "continue_url", "label": "Continue shopping link", "info": "Defaults to the menu item below." },
+    { "type": "header", "content": "Delivery check" },
+    { "type": "url", "id": "delivery_check_url", "label": "Courier lookup URL", "info": "Called as URL?pincode=110001. Return JSON {\"deliverable\": true, \"message\": \"…\"}. Leave empty to show an estimate from the days below." },
+    { "type": "range", "id": "delivery_days_min", "label": "Estimate: fastest (days)", "min": 1, "max": 14, "step": 1, "default": 4 },
+    { "type": "range", "id": "delivery_days_max", "label": "Estimate: slowest (days)", "min": 1, "max": 14, "step": 1, "default": 6 },
+    { "type": "header", "content": "Order summary" },
+    { "type": "text", "id": "payment_chips", "label": "Payment methods", "default": "UPI,Visa,Mastercard,COD", "info": "Comma-separated." },
+    { "type": "text", "id": "trust_items", "label": "Trust items", "default": "Arrives healthy,Free replacement,Bonsai care support", "info": "Comma-separated." },
+    { "type": "text", "id": "whatsapp_label", "label": "WhatsApp link label", "default": "Need help? Chat on WhatsApp" },
+    { "type": "text", "id": "care_note", "label": "Note below the cart", "default": "Care guide included with every tree" },
+    { "type": "header", "content": "Empty cart" },
+    { "type": "text", "id": "empty_title", "label": "Heading", "default": "Your cart is empty" },
+    { "type": "text", "id": "empty_text", "label": "Text", "default": "Looks like you haven’t added any bonsai yet. Start with a tree that matches your space." },
+    { "type": "text", "id": "empty_button", "label": "Button label", "default": "Shop bonsai →" },
+    { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" },
+    { "type": "text", "id": "menu_item", "label": "Menu item for button and chips", "default": "Bonsai Plants", "info": "The button links to this menu item; its sub-items become the chips." },
+    { "type": "collection", "id": "bestsellers", "label": "Bestsellers collection", "info": "Defaults to the collection with handle \"bestsellers\"." },
+    { "type": "text", "id": "bestsellers_heading", "label": "Bestsellers heading", "default": "Bestselling Bonsai" }
+  ]
+}
+{% endschema %}

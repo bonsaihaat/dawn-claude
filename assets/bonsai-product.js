@@ -95,6 +95,7 @@
         })
         .then(function (cart) {
           document.querySelectorAll('.bh-badge').forEach(function (b) { b.textContent = cart.item_count; });
+          document.dispatchEvent(new CustomEvent('bh:cart:added'));
         })
         .catch(function (err) {
           setAddLabel(err.message, false);
@@ -137,8 +138,10 @@
       var d = new Date();
       d.setDate(d.getDate() + days);
       var when = d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
-      var free = (state.price * state.qty) / 100 >= freeFrom;
-      setPinMsg('Delivered to ' + pin + ' by ' + when + (free ? ' · Free shipping' : ' · ' + money.format(fee) + ' shipping'));
+      // No threshold and no fee: every order ships free.
+      var free = freeFrom > 0 ? (state.price * state.qty) / 100 >= freeFrom : fee <= 0;
+      var cost = free ? ' · Free shipping' : fee > 0 ? ' · ' + money.format(fee) + ' shipping' : '';
+      setPinMsg('Delivered to ' + pin + ' by ' + when + cost);
     });
 
     // Accordion: one section open at a time

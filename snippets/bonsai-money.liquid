@@ -1,0 +1,7 @@
+{%- comment -%}
+  Prints an amount (in paise) as ₹1,899, dropping ".00".
+  The store's money format is "Rs. {{amount}}", so money filters can't be used directly.
+  Accepts: amount
+{%- endcomment -%}
+{%- assign bh_amount = amount | money_without_currency | remove: '.00' -%}
+₹{{ bh_amount }}

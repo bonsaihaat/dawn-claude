@@ -14,6 +14,7 @@
     {%- if page_description -%}
       <meta name="description" content="{{ page_description | escape }}">
     {%- endif -%}
+    {% render 'meta-tags' %}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -24,6 +25,7 @@
     {% sections 'header-group' %}
     {{ content_for_layout }}
     {% sections 'footer-group' %}
+    <script src="{{ 'standard-actions-override.js' | asset_url }}" defer></script>
     <script src="{{ 'bonsai-theme.js' | asset_url }}" defer></script>
   </body>
 </html>

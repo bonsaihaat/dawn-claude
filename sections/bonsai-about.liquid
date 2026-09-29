@@ -1,0 +1,255 @@
+{{ 'bonsai-about.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign wa_number = settings.whatsapp_number | remove: '+' | remove: ' '
+  assign wa_url = 'https://wa.me/' | append: wa_number
+
+  assign shop_url = routes.all_products_collection_url
+  assign chip_links = blank
+  for link in linklists[section.settings.menu].links
+    if link.title == section.settings.menu_item
+      assign shop_url = link.url
+      assign chip_links = link.links
+      break
+    endif
+  endfor
+
+  assign crafts = section.blocks | where: 'type', 'craft'
+  assign stats = section.blocks | where: 'type', 'stat'
+  assign features = section.blocks | where: 'type', 'feature'
+  assign steps = section.blocks | where: 'type', 'step'
+-%}
+
+<div class="bh bh-about">
+  <div class="bh-about__wrap bh-about__wrap--crumbs">
+    <nav class="bh-about__crumbs" aria-label="Breadcrumb">
+      <a href="{{ routes.root_url }}">Home</a>
+      <span>/</span>
+      <span class="bh-about__crumb-current">{{ page.title | default: 'About Us' }}</span>
+    </nav>
+  </div>
+
+  <div class="bh-about__wrap bh-about__intro">
+    <div class="bh-about__intro-text">
+      <h1 class="bh-about__title">{{ section.settings.heading }}</h1>
+      {%- if section.settings.mission != blank -%}
+        <p class="bh-about__mission">{{ section.settings.mission }}</p>
+      {%- endif -%}
+    </div>
+    <div class="bh-about__hero">
+      {%- if section.settings.hero_image != blank -%}
+        {{ section.settings.hero_image | image_url: width: 2400 | image_tag: widths: '600, 900, 1200, 1800, 2400', sizes: '(min-width: 1180px) 1140px, calc(100vw - 40px)', alt: section.settings.hero_image.alt | default: section.settings.heading }}
+      {%- endif -%}
+    </div>
+  </div>
+
+  <div class="bh-about__wrap bh-about__block">
+    <div class="bh-about__story">
+      <div class="bh-about__story-text">
+        <h2 class="bh-about__h2">{{ section.settings.story_heading }}</h2>
+        <div class="bh-about__prose">{{ section.settings.story_text }}</div>
+      </div>
+      <div class="bh-about__story-img">
+        {%- if section.settings.story_image != blank -%}
+          {{ section.settings.story_image | image_url: width: 1200 | image_tag: loading: 'lazy', widths: '400, 600, 900, 1200', sizes: '(min-width: 820px) 546px, calc(100vw - 40px)', alt: section.settings.story_image.alt | default: section.settings.story_heading }}
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+
+  <div class="bh-about__wrap bh-about__block">
+    <div class="bh-about__artist">
+      <div class="bh-about__person">
+        <div class="bh-about__portrait">
+          {%- if section.settings.artist_image != blank -%}
+            {{ section.settings.artist_image | image_url: width: 360, height: 360, crop: 'center' | image_tag: loading: 'lazy', alt: section.settings.artist_name }}
+          {%- endif -%}
+        </div>
+        <span class="bh-about__name">{{ section.settings.artist_name }}</span>
+        <span class="bh-about__role">{{ section.settings.artist_role }}</span>
+      </div>
+      <div class="bh-about__bio">
+        <h2 class="bh-about__h2">{{ section.settings.artist_heading }}</h2>
+        <div class="bh-about__prose bh-about__prose--wide">{{ section.settings.artist_text }}</div>
+        {%- if crafts.size > 0 -%}
+          <div class="bh-about__skills">
+            <span class="bh-about__skills-label">{{ section.settings.crafts_label }}</span>
+            <div class="bh-about__chips">
+              {%- for block in crafts -%}
+                <span class="bh-about__craft" {{ block.shopify_attributes }}>{{ block.settings.label }}</span>
+              {%- endfor -%}
+            </div>
+          </div>
+        {%- endif -%}
+        {%- if section.settings.artist_quote != blank -%}
+          <p class="bh-about__quote">{{ section.settings.artist_quote }}</p>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+
+  {%- if stats.size > 0 -%}
+    <div class="bh-about__wrap bh-about__block">
+      <div class="bh-about__stats">
+        {%- for block in stats -%}
+          <div class="bh-about__stat" {{ block.shopify_attributes }}>
+            <span class="bh-about__stat-value">{{ block.settings.value }}</span>
+            <span class="bh-about__stat-label">{{ block.settings.label }}</span>
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- endif -%}
+
+  {%- if features.size > 0 -%}
+    <div class="bh-about__wrap bh-about__block">
+      <h2 class="bh-about__h2 bh-about__h2--center">{{ section.settings.features_heading }}</h2>
+      <div class="bh-about__features">
+        {%- for block in features -%}
+          <div class="bh-about__card" {{ block.shopify_attributes }}>
+            <div class="bh-about__icon">
+              {%- case block.settings.icon -%}
+                {%- when 'star' -%}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2.5l3.1 6.6 7.1.9-5.2 5 1.4 7-6.4-3.6-6.4 3.6 1.4-7-5.2-5 7.1-.9L12 2.5Z" fill="#5F8F2B"/></svg>
+                {%- when 'hand' -%}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 12V6a2 2 0 0 1 4 0v5M12 11V5a2 2 0 0 1 4 0v6M16 12V8a2 2 0 0 1 4 0v6a6 6 0 0 1-6 6h-2a6 6 0 0 1-5-2.7L4 13" stroke="#5F8F2B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                {%- when 'heart' -%}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" stroke="#5F8F2B" stroke-width="1.6" stroke-linejoin="round"/></svg>
+                {%- when 'gift' -%}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="9" width="16" height="11" rx="1.5" stroke="#5F8F2B" stroke-width="1.6"/><path d="M4 13h16M12 9v11M12 9C10 5 6 5 6 7.5S9 9 12 9ZM12 9c2-4 6-4 6-1.5S15 9 12 9Z" stroke="#5F8F2B" stroke-width="1.6" stroke-linejoin="round"/></svg>
+                {%- when 'truck' -%}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 7h11v9H3V7Z" stroke="#5F8F2B" stroke-width="1.6" stroke-linejoin="round"/><path d="M14 10h4l3 3v3h-7v-6Z" stroke="#5F8F2B" stroke-width="1.6" stroke-linejoin="round"/><circle cx="7" cy="18" r="1.6" stroke="#5F8F2B" stroke-width="1.6"/><circle cx="17.5" cy="18" r="1.6" stroke="#5F8F2B" stroke-width="1.6"/></svg>
+                {%- when 'shield' -%}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3Z" stroke="#5F8F2B" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="#5F8F2B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              {%- endcase -%}
+            </div>
+            <span class="bh-about__card-title">{{ block.settings.title }}</span>
+            <span class="bh-about__card-text">{{ block.settings.text }}</span>
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- endif -%}
+
+  {%- if steps.size > 0 -%}
+    <div class="bh-about__wrap bh-about__block">
+      <h2 class="bh-about__h2 bh-about__h2--center bh-about__h2--steps">{{ section.settings.steps_heading }}</h2>
+      <div class="bh-about__steps">
+        {%- for block in steps -%}
+          <div class="bh-about__step" {{ block.shopify_attributes }}>
+            <span class="bh-about__step-n">STEP {% if forloop.index < 10 %}0{% endif %}{{ forloop.index }}</span>
+            <span class="bh-about__step-title">{{ block.settings.title }}</span>
+            <span class="bh-about__step-text">{{ block.settings.text }}</span>
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- endif -%}
+
+  {%- if section.settings.bulk_heading != blank -%}
+    <div class="bh-about__wrap bh-about__block">
+      <div class="bh-about__bulk">
+        <span class="bh-about__bulk-title">{{ section.settings.bulk_heading }}</span>
+        <div class="bh-about__bulk-actions">
+          <a href="{{ wa_url }}?text={{ section.settings.bulk_message | url_encode }}" target="_blank" rel="noopener" class="bh-about__wa">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3a9 9 0 0 0-7.8 13.4L3 21l4.8-1.2A9 9 0 1 0 12 3Z" fill="#ffffff"/></svg>
+            WhatsApp us
+          </a>
+          <a href="{{ section.settings.contact_url | default: '/pages/contact' }}" class="bh-about__contact">Contact us</a>
+        </div>
+      </div>
+    </div>
+  {%- endif -%}
+
+  <div class="bh-about__wrap bh-about__closing">
+    <h2 class="bh-about__closing-title">{{ section.settings.closing_heading }}</h2>
+    <a href="{{ shop_url }}" class="bh-about__shop">{{ section.settings.closing_button }}</a>
+    {%- if chip_links != blank -%}
+      <div class="bh-about__closing-chips">
+        {%- for link in chip_links -%}
+          {%- comment -%} Menu titles end in "Bonsai" ("Outdoor Bonsai"); the chips drop it. {%- endcomment -%}
+          <a href="{{ link.url }}">{{ link.title | remove: ' Bonsai' }}</a>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Bonsai About Us",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "About Bonsai Haat" },
+    { "type": "textarea", "id": "mission", "label": "Mission statement", "default": "“Our mission is to make every home in India greener and make India a home for bonsais.”" },
+    { "type": "image_picker", "id": "hero_image", "label": "Hero image" },
+    { "type": "header", "content": "Our story" },
+    { "type": "text", "id": "story_heading", "label": "Heading", "default": "Our story" },
+    { "type": "richtext", "id": "story_text", "label": "Text", "default": "<p>Bonsai Haat is India’s first online store dedicated entirely to bonsai and related products — premium bonsais of various species, ages and styles.</p><p>With space being one of the most valuable resources in Indian homes, bonsai brings gardening and greenery into even the smallest balcony, desk or office.</p>" },
+    { "type": "image_picker", "id": "story_image", "label": "Image" },
+    { "type": "header", "content": "Meet the artist" },
+    { "type": "text", "id": "artist_heading", "label": "Heading", "default": "Meet the artist" },
+    { "type": "image_picker", "id": "artist_image", "label": "Portrait" },
+    { "type": "text", "id": "artist_name", "label": "Name", "default": "Purnima Joshi" },
+    { "type": "text", "id": "artist_role", "label": "Role", "default": "Bonsai artist & trainer" },
+    { "type": "richtext", "id": "artist_text", "label": "Bio", "default": "<p>Purnima holds an MTech in Electronics &amp; Telecommunications and has been practising the art of bonsai for over 10 years. She has designed and sold hundreds of bonsais to customers across India.</p>" },
+    { "type": "text", "id": "crafts_label", "label": "Skills label", "default": "Also skilled in", "info": "Add skills as \"Skill\" blocks." },
+    { "type": "textarea", "id": "artist_quote", "label": "Closing line", "default": "Every plant listed on our store is personally supervised by Purnima, with attention to detail and styling." },
+    { "type": "header", "content": "Sections" },
+    { "type": "text", "id": "features_heading", "label": "Features heading", "default": "Why Bonsai Haat" },
+    { "type": "text", "id": "steps_heading", "label": "Steps heading", "default": "How your bonsai reaches you" },
+    { "type": "header", "content": "Bulk orders" },
+    { "type": "text", "id": "bulk_heading", "label": "Heading", "default": "Planning corporate or festive gifts? We accept bulk orders.", "info": "Leave empty to hide the banner." },
+    { "type": "text", "id": "bulk_message", "label": "WhatsApp message", "default": "Hi! I'd like to ask about bulk / corporate orders." },
+    { "type": "url", "id": "contact_url", "label": "Contact us link", "default": "/pages/contact" },
+    { "type": "header", "content": "Closing" },
+    { "type": "text", "id": "closing_heading", "label": "Heading", "default": "Bring home a living piece of art" },
+    { "type": "text", "id": "closing_button", "label": "Button label", "default": "Shop bonsai →" },
+    { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" },
+    { "type": "text", "id": "menu_item", "label": "Menu item for button and chips", "default": "Bonsai Plants", "info": "The button links to this menu item; its sub-items become the chips." }
+  ],
+  "blocks": [
+    {
+      "type": "craft",
+      "name": "Skill",
+      "settings": [ { "type": "text", "id": "label", "label": "Skill", "default": "Penjing" } ]
+    },
+    {
+      "type": "stat",
+      "name": "Stat",
+      "settings": [
+        { "type": "text", "id": "value", "label": "Value", "default": "10+" },
+        { "type": "text", "id": "label", "label": "Label", "default": "Years of bonsai practice" }
+      ]
+    },
+    {
+      "type": "feature",
+      "name": "Feature",
+      "settings": [
+        {
+          "type": "select", "id": "icon", "label": "Icon", "default": "star",
+          "options": [
+            { "value": "star", "label": "Star" },
+            { "value": "hand", "label": "Hand" },
+            { "value": "heart", "label": "Heart" },
+            { "value": "gift", "label": "Gift" },
+            { "value": "truck", "label": "Truck" },
+            { "value": "shield", "label": "Shield" }
+          ]
+        },
+        { "type": "text", "id": "title", "label": "Title", "default": "Feature" },
+        { "type": "textarea", "id": "text", "label": "Text" }
+      ]
+    },
+    {
+      "type": "step",
+      "name": "Step",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Step" },
+        { "type": "textarea", "id": "text", "label": "Text" }
+      ]
+    }
+  ],
+  "presets": [ { "name": "Bonsai About Us" } ]
+}
+{% endschema %}

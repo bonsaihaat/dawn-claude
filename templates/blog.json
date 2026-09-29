@@ -1,15 +1,14 @@
 {
+  "layout": "bonsai",
   "sections": {
     "main": {
-      "type": "main-blog",
+      "type": "bonsai-blog",
       "settings": {
-        "layout": "collage",
-        "show_image": true,
-        "image_height": "medium",
-        "show_date": true,
-        "show_author": false,
-        "padding_top": 36,
-        "padding_bottom": 36
+        "heading": "Blogs",
+        "subheading": "Care guides, styling tips and tree notes from our growers.",
+        "posts_per_load": 6,
+        "load_more_label": "Load more articles",
+        "empty_text": "No articles yet."
       }
     }
   },

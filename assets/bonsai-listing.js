@@ -118,6 +118,7 @@
         })
         .then(function (cart) {
           document.querySelectorAll('.bh-badge').forEach(function (b) { b.textContent = cart.item_count; });
+          document.dispatchEvent(new CustomEvent('bh:cart:added'));
         })
         .catch(function (err) {
           add.textContent = err.message;

@@ -157,7 +157,7 @@
       <div class="bh-products" data-bh-reveal>
         {%- if row_collection != blank and row_collection.products_count > 0 -%}
           {%- for product in row_collection.products limit: 8 -%}
-            {%- assign product_price = product.price | money_without_trailing_zeros -%}
+            {%- capture product_price -%}{%- render 'bonsai-money', amount: product.price -%}{%- endcapture -%}
             {%- render 'bonsai-product-card',
               url: product.url,
               image: product.featured_media,

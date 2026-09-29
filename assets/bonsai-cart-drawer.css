@@ -6,7 +6,7 @@ html.bh-no-scroll { overflow: hidden; }
 
 /* Backdrop + panel */
 .bh-cd__backdrop { position: fixed; inset: 0; background: #1B1F17; transition: opacity 0.3s ease; z-index: 60; opacity: 0; pointer-events: none; }
-.bh-cd.is-open .bh-cd__backdrop { opacity: 0.55; pointer-events: auto; }
+.bh-cd.is-open .bh-cd__backdrop { opacity: 0.75; pointer-events: auto; }
 .bh-cd__panel { position: fixed; top: 0; right: 0; bottom: 0; width: 100%; max-width: 100%; background: #ffffff; display: flex; flex-direction: column; box-shadow: -24px 0 48px -24px rgba(0, 0, 0, 0.4); transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1); z-index: 61; transform: translateX(100%); visibility: hidden; }
 @media (min-width: 820px) { .bh-cd__panel { width: 420px; } }
 .bh-cd.is-open .bh-cd__panel { transform: translateX(0); visibility: visible; }

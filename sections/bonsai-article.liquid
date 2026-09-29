@@ -1,0 +1,184 @@
+{{ 'bonsai-article.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign words = article.content | replace: '<', ' <' | strip_html | split: ' ' | size
+  assign minutes = words | plus: 199 | divided_by: 200 | at_least: 1
+  assign author = section.settings.author | default: article.author
+  assign share_text = article.title | append: ' ' | append: shop.url | append: article.url
+  assign products = article.metafields.custom.products.value
+-%}
+
+<div class="bh bh-art">
+  <div class="bh-art__wrap">
+    <div class="bh-art__head">
+      <nav class="bh-art__crumbs" aria-label="Breadcrumb">
+        <a href="{{ routes.root_url }}">Home</a>
+        <span>/</span>
+        <a href="{{ blog.url }}">{{ section.settings.blog_label | default: blog.title }}</a>
+      </nav>
+      <h1 class="bh-art__title">{{ article.title | escape }}</h1>
+      {%- if article.excerpt != blank -%}
+        <p class="bh-art__excerpt">{{ article.excerpt | strip_html | strip }}</p>
+      {%- endif -%}
+      <div class="bh-art__meta">
+        <span class="bh-art__byline">
+          {%- if author != blank -%}<strong>{{ author | escape }}</strong> · {% endif -%}
+          {{- article.published_at | date: '%-d %b %Y' }} · {{ minutes }} min read</span>
+        <div class="bh-art__share">
+          <a href="https://wa.me/?text={{ share_text | url_encode }}" target="_blank" rel="noopener" aria-label="Share on WhatsApp" class="bh-art__wa">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3a9 9 0 0 0-7.8 13.4L3 21l4.8-1.2A9 9 0 1 0 12 3Z" stroke="#1B1F17" stroke-width="1.7" stroke-linejoin="round"/></svg>
+          </a>
+          <button type="button" class="bh-art__copy" data-bh-copy data-done="Copied ✓">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" stroke="#1B1F17" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <span data-bh-copy-label>Copy link</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    {%- if article.image -%}
+      <div class="bh-art__cover">
+        {{ article.image | image_url: width: 1960 | image_tag: loading: 'eager', fetchpriority: 'high', widths: '600, 900, 1200, 1600, 1960', sizes: '(min-width: 1020px) 980px, calc(100vw - 40px)', alt: article.image.alt | default: article.title }}
+      </div>
+    {%- endif -%}
+
+    <article class="bh-art__body">
+      <div class="bh-rte" data-bh-rte style="--bh-tip-label: '{{ section.settings.tip_label | escape | replace: "'", "’" }}'">
+        {{ article.content }}
+      </div>
+
+      {%- if products != blank and products.size > 0 -%}
+        <div class="bh-art__shop">
+          <div class="bh-art__shop-head">
+            <span class="bh-art__shop-title">{{ section.settings.products_heading }}</span>
+            <a href="{{ routes.all_products_collection_url }}" class="bh-art__shop-all">Shop all →</a>
+          </div>
+          <div class="bh-art__shop-grid">
+            {%- for product in products limit: 3 -%}
+              <a href="{{ product.url }}" class="bh-art__shop-item">
+                <div class="bh-art__shop-img">
+                  {%- if product.featured_media -%}
+                    {{ product.featured_media | image_url: width: 480 | image_tag: loading: 'lazy', widths: '240, 360, 480', sizes: '(min-width: 760px) 220px, 30vw', alt: product.title }}
+                  {%- endif -%}
+                </div>
+                <span class="bh-art__shop-name">{{ product.title | escape }}</span>
+                <span class="bh-art__shop-price">{% render 'bonsai-money', amount: product.price %}</span>
+              </a>
+            {%- endfor -%}
+          </div>
+        </div>
+      {%- endif -%}
+    </article>
+
+    {%- liquid
+      assign more_count = 0
+      for post in blog.articles limit: 4
+        unless post.id == article.id
+          assign more_count = more_count | plus: 1
+        endunless
+      endfor
+    -%}
+    {%- if more_count > 0 -%}
+      <div class="bh-art__more">
+        <div class="bh-art__more-head">
+          <h2 class="bh-art__more-title">{{ section.settings.more_heading }}</h2>
+          <a href="{{ blog.url }}" class="bh-art__more-all">View all →</a>
+        </div>
+        <div class="bh-art__grid">
+          {%- assign shown = 0 -%}
+          {%- for post in blog.articles limit: 4 -%}
+            {%- if post.id == article.id or shown >= 3 -%}{%- continue -%}{%- endif -%}
+            {%- liquid
+              assign shown = shown | plus: 1
+              assign post_words = post.content | replace: '<', ' <' | strip_html | split: ' ' | size
+              assign post_minutes = post_words | plus: 199 | divided_by: 200 | at_least: 1
+            -%}
+            <a href="{{ post.url }}" class="bh-art__card">
+              <div class="bh-art__card-img">
+                {%- if post.image -%}
+                  {{ post.image | image_url: width: 800 | image_tag: loading: 'lazy', widths: '400, 600, 800', sizes: '(min-width: 1180px) 380px, (min-width: 640px) 50vw, 100vw', alt: post.image.alt | default: post.title }}
+                {%- endif -%}
+              </div>
+              <div class="bh-art__card-body">
+                <span class="bh-art__card-title">{{ post.title | escape }}</span>
+                <span class="bh-art__card-meta">{{ post.published_at | date: '%-d %b %Y' }} · {{ post_minutes }} min read</span>
+              </div>
+            </a>
+          {%- endfor -%}
+        </div>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+<script>
+  (function () {
+    var root = document.currentScript.previousElementSibling;
+    var rte = root.querySelector('[data-bh-rte]');
+
+    // Photos that sit on their own line become captioned figures; the caption is the image's alt text.
+    Array.prototype.slice.call(rte.querySelectorAll('img')).forEach(function (img) {
+      var block = img;
+      while (block.parentNode !== rte) block = block.parentNode;
+      if (block.querySelectorAll('img').length !== 1 || block.textContent.trim()) return;
+      var figure = document.createElement('figure');
+      var frame = document.createElement('div');
+      figure.className = 'bh-rte__figure';
+      frame.className = 'bh-rte__img';
+      img.loading = 'lazy';
+      frame.appendChild(img);
+      figure.appendChild(frame);
+      var alt = (img.getAttribute('alt') || '').trim();
+      if (alt) {
+        var caption = document.createElement('figcaption');
+        caption.textContent = alt;
+        figure.appendChild(caption);
+      }
+      rte.replaceChild(figure, block);
+    });
+
+    var copy = root.querySelector('[data-bh-copy]');
+    var label = copy.querySelector('[data-bh-copy-label]');
+    var original = label.textContent;
+    var timer;
+    copy.addEventListener('click', function () {
+      try { navigator.clipboard && navigator.clipboard.writeText(window.location.href.split('#')[0]); } catch (e) {}
+      label.textContent = copy.dataset.done;
+      clearTimeout(timer);
+      timer = setTimeout(function () { label.textContent = original; }, 1800);
+    });
+  })();
+</script>
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": {{ article.title | json }},
+    "datePublished": {{ article.published_at | date: '%Y-%m-%dT%H:%M:%S%z' | json }},
+    "dateModified": {{ article.updated_at | date: '%Y-%m-%dT%H:%M:%S%z' | json }},
+    {%- if article.image %}
+    "image": [{{ article.image | image_url: width: 1920 | prepend: 'https:' | json }}],
+    {%- endif %}
+    {%- if article.excerpt != blank %}
+    "description": {{ article.excerpt | strip_html | strip | json }},
+    {%- endif %}
+    "author": { "@type": "Organization", "name": {{ author | default: shop.name | json }} },
+    "publisher": { "@type": "Organization", "name": {{ shop.name | json }} },
+    "mainEntityOfPage": {{ shop.url | append: article.url | json }}
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Bonsai Article",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "blog_label", "label": "Breadcrumb blog label", "default": "Blogs", "info": "Leave blank to use the blog title." },
+    { "type": "text", "id": "author", "label": "Author name", "default": "Bonsai Haat", "info": "Leave blank to use each article's author." },
+    { "type": "text", "id": "tip_label", "label": "Quote box label", "default": "Grower’s tip", "info": "Text formatted as a Quote in the article editor shows as this box." },
+    { "type": "text", "id": "products_heading", "label": "Linked products heading", "default": "Trees in this guide", "info": "Pick products per article in the \"Products\" metafield." },
+    { "type": "text", "id": "more_heading", "label": "More articles heading", "default": "More articles" }
+  ]
+}
+{% endschema %}

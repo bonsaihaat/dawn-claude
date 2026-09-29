@@ -13,7 +13,7 @@
         {{- child.title | escape -}}‡{{- child.url -}}
         {%- unless forloop.last -%}†{%- endunless -%}
       {%- endfor -%}
-      §{%- if link.current or link.child_active -%}1{%- endif -%}
+      §{%- if link.current or link.child_active -%}1{%- elsif template.name == 'article' and link.url == blog.url -%}1{%- endif -%}
       {%- unless forloop.last -%}¶{%- endunless -%}
     {%- endfor -%}
   {%- else -%}

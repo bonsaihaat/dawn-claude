@@ -175,4 +175,99 @@
       tick();
     }
   });
+
+  // Header search panel: the search pill opens it, results come from Shopify's predictive search
+  // rendered through sections/bonsai-predictive-search.liquid. No backdrop; a click outside closes it.
+  document.querySelectorAll('[data-bh-ps]').forEach(function (panel) {
+    var root = panel.closest('.bh--header') || panel.parentNode;
+    var input = panel.querySelector('[data-bh-ps-input]');
+    var results = panel.querySelector('[data-bh-ps-results]');
+    var pills = root.querySelectorAll('[data-bh-ps-open]');
+    var desktop = window.matchMedia('(min-width: 820px)');
+    var baseUrl = panel.getAttribute('data-bh-ps-url') || '/search/suggest';
+    var openerPill = null;
+    var timer, controller, lastTerm = '';
+
+    function place() {
+      if (!desktop.matches || !openerPill) { panel.style.top = panel.style.left = ''; return; }
+      var r = openerPill.getBoundingClientRect();
+      var rootRect = root.getBoundingClientRect();
+      var width = panel.offsetWidth;
+      var left = r.left + r.width / 2 - width / 2 - rootRect.left;
+      left = Math.max(16, Math.min(left, rootRect.width - width - 16));
+      panel.style.top = (r.bottom - rootRect.top + 8) + 'px';
+      panel.style.left = left + 'px';
+    }
+    function open(pill) {
+      openerPill = pill;
+      panel.hidden = false;
+      pills.forEach(function (p) { p.setAttribute('aria-expanded', 'true'); });
+      if (!desktop.matches) document.documentElement.style.overflow = 'hidden';
+      place();
+      input.focus();
+    }
+    function close() {
+      if (panel.hidden) return;
+      panel.hidden = true;
+      pills.forEach(function (p) { p.setAttribute('aria-expanded', 'false'); });
+      document.documentElement.style.overflow = '';
+      if (openerPill && desktop.matches) openerPill.focus();
+    }
+    function render(html, term) {
+      var doc = new DOMParser().parseFromString(html, 'text/html');
+      var content = doc.querySelector('[data-bh-ps-content]');
+      results.innerHTML = content ? content.innerHTML : '';
+      panel.classList.toggle('no-results', !!results.querySelector('.bh-ps__none'));
+      lastTerm = term;
+    }
+    function search() {
+      var term = input.value.trim();
+      panel.classList.toggle('has-query', term.length > 0);
+      if (!term) {
+        if (controller) controller.abort();
+        results.innerHTML = '';
+        panel.classList.remove('is-loading', 'no-results');
+        lastTerm = '';
+        return;
+      }
+      if (term === lastTerm) return;
+      if (controller) controller.abort();
+      controller = new AbortController();
+      panel.classList.add('is-loading');
+      var url = baseUrl + '?q=' + encodeURIComponent(term) +
+        '&resources[type]=query,product,collection,page&resources[limit]=6&resources[limit_scope]=each' +
+        '&resources[options][prefix]=last&section_id=bonsai-predictive-search';
+      fetch(url, { signal: controller.signal })
+        .then(function (res) { return res.ok ? res.text() : Promise.reject(res.status); })
+        .then(function (html) { render(html, term); panel.classList.remove('is-loading'); })
+        .catch(function (err) { if (!err || err.name !== 'AbortError') panel.classList.remove('is-loading'); });
+    }
+
+    pills.forEach(function (pill) {
+      pill.addEventListener('click', function (e) {
+        e.preventDefault();
+        open(pill);
+      });
+    });
+    input.addEventListener('input', function () {
+      clearTimeout(timer);
+      timer = setTimeout(search, 200);
+    });
+    panel.querySelectorAll('[data-bh-ps-close]').forEach(function (el) {
+      el.addEventListener('click', close);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') close();
+    });
+    document.addEventListener('click', function (e) {
+      if (panel.hidden || panel.contains(e.target)) return;
+      if (e.target.closest && e.target.closest('[data-bh-ps-open]')) return;
+      close();
+    });
+    window.addEventListener('resize', function () {
+      if (panel.hidden) return;
+      document.documentElement.style.overflow = desktop.matches ? '' : 'hidden';
+      place();
+    });
+  });
 })();

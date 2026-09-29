@@ -3,55 +3,9 @@
   "sections": {
     "main": {
       "type": "bonsai-404",
-      "blocks": {
-        "cat_indoor": {
-          "type": "category",
-          "settings": {
-            "label": "Indoor Bonsai"
-          }
-        },
-        "cat_outdoor": {
-          "type": "category",
-          "settings": {
-            "label": "Outdoor Bonsai"
-          }
-        },
-        "cat_prebonsai": {
-          "type": "category",
-          "settings": {
-            "label": "Pre-Bonsai"
-          }
-        },
-        "cat_pots": {
-          "type": "category",
-          "settings": {
-            "label": "Pots & Planters",
-            "collection": "pots-and-accessories"
-          }
-        },
-        "cat_tools": {
-          "type": "category",
-          "settings": {
-            "label": "Tools & Care"
-          }
-        },
-        "cat_gifting": {
-          "type": "category",
-          "settings": {
-            "label": "Gifting"
-          }
-        }
-      },
-      "block_order": [
-        "cat_indoor",
-        "cat_outdoor",
-        "cat_prebonsai",
-        "cat_pots",
-        "cat_tools",
-        "cat_gifting"
-      ],
       "settings": {
-        "products_collection": "bestsellers"
+        "products_collection": "bestsellers",
+        "extra_collection": "pots-and-accessories"
       }
     }
   },

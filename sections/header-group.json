@@ -13,6 +13,7 @@
       "settings": {
         "menu": "main-menu",
         "search_phrases": "Bonsai Plants,Bonsai Pots,Fertilizers,Care Tools",
+        "search_popular": "Ficus,Jade,Juniper,Indoor bonsai,Ceramic pots,Pruning shears",
         "show_marquee": true
       }
     },

@@ -106,7 +106,9 @@
     function setQty(line, qty) {
       var key = line.getAttribute('data-bh-line');
       var max = parseInt(line.getAttribute('data-max'), 10);
-      if (!isNaN(max)) qty = Math.min(qty, max);
+      var current = currentQty(line);
+      // Stock caps increases only; lowering or removing a line always goes through.
+      if (!isNaN(max) && qty > current) qty = Math.min(qty, Math.max(max, current));
       qty = Math.max(0, qty);
       line.classList.add('is-updating');
       var err = line.querySelector('[data-bh-line-error]');

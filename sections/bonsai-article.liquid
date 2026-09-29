@@ -43,7 +43,7 @@
     {%- endif -%}
 
     <article class="bh-art__body">
-      <div class="bh-rte" data-bh-rte style="--bh-tip-label: '{{ section.settings.tip_label | escape | replace: "'", "’" }}'">
+      <div class="bh-rte" data-bh-rte style="--bh-tip-label: '{{ section.settings.tip_label | replace: "'", "’" | escape }}'">
         {{ article.content }}
       </div>
 

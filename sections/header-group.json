@@ -5,7 +5,7 @@
     "header": {
       "type": "bonsai-header",
       "blocks": {
-        "m1": { "type": "marquee", "settings": { "text": "Free shipping on orders above ₹1999" } },
+        "m1": { "type": "marquee", "settings": { "text": "Free shipping across India" } },
         "m2": { "type": "marquee", "settings": { "text": "Use code BONSAI10 for 10% off your first order" } },
         "m3": { "type": "marquee", "settings": { "text": "Pan-India delivery in 3–5 days" } }
       },

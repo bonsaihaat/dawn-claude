@@ -138,7 +138,8 @@
       var d = new Date();
       d.setDate(d.getDate() + days);
       var when = d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
-      var free = freeFrom > 0 && (state.price * state.qty) / 100 >= freeFrom;
+      // No threshold and no fee: every order ships free.
+      var free = freeFrom > 0 ? (state.price * state.qty) / 100 >= freeFrom : fee <= 0;
       var cost = free ? ' · Free shipping' : fee > 0 ? ' · ' + money.format(fee) + ' shipping' : '';
       setPinMsg('Delivered to ' + pin + ' by ' + when + cost);
     });

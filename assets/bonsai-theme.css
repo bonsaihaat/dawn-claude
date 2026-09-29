@@ -19,6 +19,10 @@ body.bh-body { background: #faf7f1; }
 .bh-marquee__track { display: flex; width: max-content; animation: bh-marquee 22s linear infinite; }
 .bh-marquee__group { display: flex; align-items: center; gap: 36px; padding-right: 36px; }
 .bh-marquee__item { font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #f4f7ea; white-space: nowrap; }
+a.bh-marquee__item { text-decoration: underline; text-decoration-color: rgba(244, 247, 234, 0.35); text-underline-offset: 3px; -webkit-tap-highlight-color: transparent; }
+a.bh-marquee__item:hover { text-decoration-color: currentColor; }
+/* Hold the bar still while a pointer or keyboard is on it, so links are easy to hit */
+.bh-marquee:hover .bh-marquee__track, .bh-marquee:focus-within .bh-marquee__track { animation-play-state: paused; }
 
 /* Header visibility (design switches layouts at 820px) */
 .bh-header--desktop { display: none; }

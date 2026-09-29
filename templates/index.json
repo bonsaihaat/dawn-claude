@@ -45,6 +45,7 @@
       ],
       "settings": {
         "bestsellers_collection": "bestsellers",
+        "bestsellers_button_collection": "bonsai-plants",
         "accessories_collection": "pots-and-accessories"
       }
     }

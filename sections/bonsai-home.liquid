@@ -129,12 +129,14 @@
         {%- assign row_heading = section.settings.bestsellers_heading -%}
         {%- assign row_collection = section.settings.bestsellers_collection -%}
         {%- assign row_button = section.settings.bestsellers_button -%}
+        {%- assign row_button_collection = section.settings.bestsellers_button_collection -%}
         {%- assign row_blocks = section.blocks | where: 'type', 'product' -%}
         {%- assign row_btn_class = 'bh-btn--dark' -%}
       {%- else -%}
         {%- assign row_heading = section.settings.accessories_heading -%}
         {%- assign row_collection = section.settings.accessories_collection -%}
         {%- assign row_button = section.settings.accessories_button -%}
+        {%- assign row_button_collection = section.settings.accessories_button_collection -%}
         {%- assign row_blocks = section.blocks | where: 'type', 'accessory' -%}
         {%- assign row_btn_class = 'bh-btn--outline' -%}
       {%- endif -%}
@@ -143,10 +145,13 @@
       {%- else -%}
         {%- assign row_url = all_url -%}
       {%- endif -%}
+      {%- comment -%} The button can lead somewhere wider than the row, e.g. bestsellers row → all bonsai plants {%- endcomment -%}
+      {%- if row_button_collection != blank -%}
+        {%- assign row_url = row_button_collection.url -%}
+      {%- endif -%}
 
       <div class="bh-head">
         <div><h2 class="bh-h2">{{ row_heading }}</h2></div>
-        <a href="{{ row_url }}" class="bh-head__link">View all →</a>
       </div>
 
       <div class="bh-products" data-bh-reveal>
@@ -280,10 +285,12 @@
     { "type": "text", "id": "bestsellers_heading", "label": "Heading", "default": "Bestselling Bonsai" },
     { "type": "collection", "id": "bestsellers_collection", "label": "Collection", "info": "When set, shows this collection's products instead of the 'Product' blocks." },
     { "type": "text", "id": "bestsellers_button", "label": "Button label", "default": "View All Bonsai Plants →" },
+    { "type": "collection", "id": "bestsellers_button_collection", "label": "Button link", "info": "Collection the button opens. Leave empty to use the row's collection." },
     { "type": "header", "content": "Accessories row" },
     { "type": "text", "id": "accessories_heading", "label": "Heading", "default": "Pots & Accessories" },
     { "type": "collection", "id": "accessories_collection", "label": "Collection", "info": "When set, shows this collection's products instead of the 'Accessory' blocks." },
     { "type": "text", "id": "accessories_button", "label": "Button label", "default": "View All Pots & Accessories →" },
+    { "type": "collection", "id": "accessories_button_collection", "label": "Button link", "info": "Collection the button opens. Leave empty to use the row's collection." },
     { "type": "header", "content": "Other headings" },
     { "type": "text", "id": "categories_heading", "label": "Categories heading", "default": "Shop by Category" },
     { "type": "text", "id": "testimonials_heading", "label": "Testimonials heading", "default": "Loved by bonsai parents across India" }

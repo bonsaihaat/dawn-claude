@@ -228,10 +228,19 @@
       assign review_blocks = section.blocks | where: 'type', 'testimonial'
     -%}
     {%- if review_keys.size > 0 or review_blocks.size > 0 -%}
-      <div style="margin:8px 0 18px;">
+      <div class="bh-head">
         <h2 class="bh-h2">{{ section.settings.testimonials_heading }}</h2>
+        {%- comment -%} Desktop only, shown by JS when the row overflows {%- endcomment -%}
+        <div class="bh-scroll-arrows" data-bh-scroll-arrows hidden>
+          <button type="button" class="bh-scroll-arrow" data-bh-scroll-prev aria-label="Previous reviews">
+            <svg width="8" height="13" viewBox="0 0 8 13" fill="none" aria-hidden="true"><path d="M7 1L1 6.5L7 12" stroke="#1B1F17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button type="button" class="bh-scroll-arrow" data-bh-scroll-next aria-label="Next reviews">
+            <svg width="8" height="13" viewBox="0 0 8 13" fill="none" aria-hidden="true"><path d="M1 1L7 6.5L1 12" stroke="#1B1F17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
       </div>
-      <div class="bh-reviews" data-bh-reveal>
+      <div class="bh-reviews" data-bh-reveal data-bh-scroller>
         {%- if review_keys.size > 0 -%}
           {%- for key in review_keys -%}
             {%- assign entry_index = key | split: '-' | last | minus: 10000 -%}

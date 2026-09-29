@@ -1,0 +1,88 @@
+{%- comment -%}
+  Results for the header search panel. Not placed on any page: bonsai-theme.js fetches it from
+  routes.predictive_search_url with section_id=bonsai-predictive-search as the customer types.
+{%- endcomment -%}
+{%- liquid
+  assign ps = predictive_search
+  assign res = ps.resources
+  assign total = res.queries.size | plus: res.products.size | plus: res.collections.size | plus: res.pages.size
+  assign terms_param = ps.terms | url_encode
+  assign search_all_url = routes.search_url | append: '?q=' | append: terms_param | append: '&options%5Bprefix%5D=last'
+-%}
+<div data-bh-ps-content>
+  {%- if ps.performed -%}
+    {%- if total > 0 -%}
+      <div class="bh-ps__groups">
+        {%- if res.queries.size > 0 or res.collections.size > 0 or res.pages.size > 0 -%}
+          <div class="bh-ps__side">
+            {%- if res.queries.size > 0 -%}
+              <div class="bh-ps__group">
+                <div class="bh-ps__label">Suggestions</div>
+                {%- for query in res.queries limit: 4 -%}
+                  <a href="{{ query.url }}" class="bh-ps__query">{{ query.styled_text }}</a>
+                {%- endfor -%}
+              </div>
+            {%- endif -%}
+            {%- if res.collections.size > 0 -%}
+              <div class="bh-ps__group">
+                <div class="bh-ps__label">Categories</div>
+                <div class="bh-ps__chips">
+                  {%- for collection in res.collections limit: 3 -%}
+                    <a href="{{ collection.url }}" class="bh-ps__chip">{{ collection.title | escape }}</a>
+                  {%- endfor -%}
+                </div>
+              </div>
+            {%- endif -%}
+            {%- if res.pages.size > 0 -%}
+              <div class="bh-ps__group">
+                <div class="bh-ps__label">Pages</div>
+                {%- for page in res.pages limit: 2 -%}
+                  <a href="{{ page.url }}" class="bh-ps__query">{{ page.title | escape }}</a>
+                {%- endfor -%}
+              </div>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        {%- if res.products.size > 0 -%}
+          <div class="bh-ps__group bh-ps__main">
+            <div class="bh-ps__label">Products</div>
+            {%- for product in res.products limit: 5 -%}
+              <a href="{{ product.url }}" class="bh-ps__product">
+                <span class="bh-ps__thumb">
+                  {%- if product.featured_image != blank -%}
+                    {{ product.featured_image | image_url: width: 120 | image_tag: loading: 'lazy', alt: '' }}
+                  {%- endif -%}
+                </span>
+                <span class="bh-ps__info">
+                  <span class="bh-ps__name">{{ product.title | escape }}</span>
+                  <span class="bh-ps__price">
+                    {%- render 'bonsai-money', amount: product.price -%}
+                    {%- if product.compare_at_price > product.price -%}
+                      <s>{%- render 'bonsai-money', amount: product.compare_at_price -%}</s>
+                    {%- endif -%}
+                    {%- unless product.available -%}<span class="bh-ps__soldout">Sold out</span>{%- endunless -%}
+                  </span>
+                </span>
+              </a>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+      <a href="{{ search_all_url }}" class="bh-ps__all">View all results for “{{ ps.terms | escape }}” →</a>
+    {%- else -%}
+      <div class="bh-ps__none">
+        <strong>No results for “{{ ps.terms | escape }}”</strong>
+        <span>Check the spelling or try a broader term.</span>
+      </div>
+    {%- endif -%}
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Bonsai search results",
+  "tag": "div",
+  "settings": []
+}
+{% endschema %}

@@ -100,7 +100,7 @@ body.bh-body { background: #faf7f1; }
 .bh .bh-nav__dropdown a:focus-visible { background: #eef4e0; color: #2E4716; }
 
 /* WhatsApp */
-.bh-whatsapp { position: fixed; right: 20px; bottom: 20px; width: 56px; height: 56px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.4); z-index: 50; text-decoration: none; }
+.bh-whatsapp { position: fixed; right: 20px; bottom: 20px; width: 56px; height: 56px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.4); z-index: 50; text-decoration: none; -webkit-tap-highlight-color: transparent; }
 
 /* Main */
 .bh-main { padding: 22px 20px 0; max-width: 1180px; margin: 0 auto; box-sizing: border-box; }

@@ -1,43 +1,82 @@
 {%- assign all_url = routes.all_products_collection_url -%}
 
+{%- unless request.design_mode -%}
+  <script>
+    if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.documentElement.classList.add('bh-anim');
+    }
+  </script>
+{%- endunless -%}
+
 <div class="bh" data-bh>
   <div class="bh-main">
 
-    {%- assign slide_blocks = section.blocks | where: 'type', 'slide' -%}
-    {%- if slide_blocks.size > 0 -%}
+    {%- comment -%}
+      Slides come from Shopify admin → Content → Metaobjects → Hero slides, ordered by
+      Position (entries without one go last, oldest first). The theme editor's Hero slide
+      blocks are only a fallback while no entries are shown.
+    {%- endcomment -%}
+    {%- liquid
+      assign slide_entries = shop.metaobjects.hero_slide.values
+      assign slide_keys = ''
+      for entry in slide_entries
+        if entry.show_on_homepage.value == false or entry.image.value == blank or entry.headline.value == blank
+          continue
+        endif
+        assign sort_position = entry.position.value | default: 9999 | at_least: 0 | at_most: 9999 | plus: 10000
+        assign sort_index = forloop.index0 | plus: 10000
+        assign slide_keys = slide_keys | append: sort_position | append: '-' | append: sort_index | append: ','
+      endfor
+      assign slide_keys = slide_keys | split: ',' | sort
+      assign slide_blocks = section.blocks | where: 'type', 'slide'
+      if slide_keys.size > 0
+        assign slide_count = slide_keys.size
+      else
+        assign slide_count = slide_blocks.size
+      endif
+    -%}
+    {%- if slide_count > 0 -%}
       <div class="bh-hero">
-        {%- for block in slide_blocks -%}
-          <div class="bh-slide{% if forloop.first %} is-active{% endif %}" data-bh-slide {{ block.shopify_attributes }}>
-            {%- if block.settings.image != blank -%}
-              {%- if forloop.first -%}
-                {%- assign slide_loading = 'eager' -%}
-              {%- else -%}
-                {%- assign slide_loading = 'lazy' -%}
+        {%- if slide_keys.size > 0 -%}
+          {%- for key in slide_keys -%}
+            {%- assign entry_index = key | split: '-' | last | minus: 10000 -%}
+            {%- assign slide_first = forloop.first -%}
+            {%- for entry in slide_entries -%}
+              {%- if forloop.index0 == entry_index -%}
+                {%- if entry.link_product.value != blank -%}
+                  {%- assign slide_url = entry.link_product.value.url -%}
+                {%- elsif entry.link_collection.value != blank -%}
+                  {%- assign slide_url = entry.link_collection.value.url -%}
+                {%- elsif entry.link_page.value != blank -%}
+                  {%- assign slide_url = entry.link_page.value.url -%}
+                {%- else -%}
+                  {%- assign slide_url = '' -%}
+                {%- endif -%}
+                {%- render 'bonsai-hero-slide',
+                  image: entry.image.value,
+                  mobile_image: entry.mobile_image.value,
+                  headline: entry.headline.value,
+                  caption: entry.caption.value,
+                  url: slide_url,
+                  first: slide_first
+                -%}
+                {%- break -%}
               {%- endif -%}
-              {{
-                block.settings.image
-                | image_url: width: 2400
-                | image_tag:
-                  class: 'bh-slide__img',
-                  widths: '600, 900, 1200, 1600, 2000, 2400',
-                  sizes: '(min-width: 1180px) 1140px, calc(100vw - 40px)',
-                  loading: slide_loading,
-                  alt: block.settings.headline
-              }}
-            {%- endif -%}
-            <div class="bh-slide__shade"></div>
-            <div class="bh-slide__top">
-              <h1 class="bh-slide__title">{{ block.settings.headline }}</h1>
-            </div>
-            {%- if block.settings.subline != blank -%}
-              <div class="bh-slide__bottom">
-                <span class="bh-slide__chip">{{ block.settings.subline }}</span>
-              </div>
-            {%- endif -%}
-          </div>
-        {%- endfor -%}
+            {%- endfor -%}
+          {%- endfor -%}
+        {%- else -%}
+          {%- for block in slide_blocks -%}
+            {%- render 'bonsai-hero-slide',
+              image: block.settings.image,
+              headline: block.settings.headline,
+              caption: block.settings.subline,
+              first: forloop.first,
+              attributes: block.shopify_attributes
+            -%}
+          {%- endfor -%}
+        {%- endif -%}
 
-        {%- if slide_blocks.size > 1 -%}
+        {%- if slide_count > 1 -%}
           <button type="button" class="bh-hero__arrow bh-hero__arrow--prev" data-bh-prev aria-label="Previous slide">
             <svg width="8" height="13" viewBox="0 0 8 13" fill="none" aria-hidden="true"><path d="M7 1L1 6.5L7 12" stroke="#1B1F17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
@@ -45,7 +84,7 @@
             <svg width="8" height="13" viewBox="0 0 8 13" fill="none" aria-hidden="true"><path d="M1 1L7 6.5L1 12" stroke="#1B1F17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
           <div class="bh-hero__dots">
-            {%- for block in slide_blocks -%}
+            {%- for i in (1..slide_count) -%}
               <button type="button" class="bh-hero__dot{% if forloop.first %} is-active{% endif %}" data-bh-dot aria-label="Go to slide {{ forloop.index }}"></button>
             {%- endfor -%}
           </div>
@@ -68,13 +107,20 @@
 
     {%- assign trust_blocks = section.blocks | where: 'type', 'trust' -%}
     {%- if trust_blocks.size > 0 -%}
-      <div class="bh-trust">
-        {%- for block in trust_blocks -%}
-          <div class="bh-trust__item" {{ block.shopify_attributes }}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12.5L9.5 18L20 6" stroke="#5F8F2B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span class="bh-trust__label">{{ block.settings.label }}</span>
-          </div>
-        {%- endfor -%}
+      <div class="bh-trust" data-bh-reveal="group">
+        <div class="bh-trust__track">
+          {%- comment -%} Second copy only shows on mobile, where the strip loops as a marquee {%- endcomment -%}
+          {%- for copy in (1..2) -%}
+            <div class="bh-trust__set{% if copy == 2 %} bh-trust__set--clone{% endif %}"{% if copy == 2 %} aria-hidden="true"{% endif %}>
+              {%- for block in trust_blocks -%}
+                <div class="bh-trust__item" data-bh-reveal-item{% if copy == 1 %} {{ block.shopify_attributes }}{% endif %}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12.5L9.5 18L20 6" stroke="#5F8F2B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span class="bh-trust__label">{{ block.settings.label }}</span>
+                </div>
+              {%- endfor -%}
+            </div>
+          {%- endfor -%}
+        </div>
       </div>
     {%- endif -%}
 
@@ -83,12 +129,14 @@
         {%- assign row_heading = section.settings.bestsellers_heading -%}
         {%- assign row_collection = section.settings.bestsellers_collection -%}
         {%- assign row_button = section.settings.bestsellers_button -%}
+        {%- assign row_button_collection = section.settings.bestsellers_button_collection -%}
         {%- assign row_blocks = section.blocks | where: 'type', 'product' -%}
         {%- assign row_btn_class = 'bh-btn--dark' -%}
       {%- else -%}
         {%- assign row_heading = section.settings.accessories_heading -%}
         {%- assign row_collection = section.settings.accessories_collection -%}
         {%- assign row_button = section.settings.accessories_button -%}
+        {%- assign row_button_collection = section.settings.accessories_button_collection -%}
         {%- assign row_blocks = section.blocks | where: 'type', 'accessory' -%}
         {%- assign row_btn_class = 'bh-btn--outline' -%}
       {%- endif -%}
@@ -97,13 +145,16 @@
       {%- else -%}
         {%- assign row_url = all_url -%}
       {%- endif -%}
+      {%- comment -%} The button can lead somewhere wider than the row, e.g. bestsellers row → all bonsai plants {%- endcomment -%}
+      {%- if row_button_collection != blank -%}
+        {%- assign row_url = row_button_collection.url -%}
+      {%- endif -%}
 
       <div class="bh-head">
         <div><h2 class="bh-h2">{{ row_heading }}</h2></div>
-        <a href="{{ row_url }}" class="bh-head__link">View all →</a>
       </div>
 
-      <div class="bh-products">
+      <div class="bh-products" data-bh-reveal>
         {%- if row_collection != blank and row_collection.products_count > 0 -%}
           {%- for product in row_collection.products limit: 8 -%}
             {%- capture product_price -%}{%- render 'bonsai-money', amount: product.price -%}{%- endcapture -%}
@@ -140,7 +191,7 @@
       <div style="margin:8px 0 18px;">
         <h2 class="bh-h2">{{ section.settings.categories_heading }}</h2>
       </div>
-      <div class="bh-cats">
+      <div class="bh-cats" data-bh-reveal>
         {%- for block in category_blocks -%}
           <a href="{{ block.settings.link | default: all_url }}" class="bh-cat" {{ block.shopify_attributes }}>
             {%- if block.settings.image != blank -%}
@@ -157,35 +208,58 @@
       </div>
     {%- endif -%}
 
-    {%- assign review_blocks = section.blocks | where: 'type', 'testimonial' -%}
-    {%- if review_blocks.size > 0 -%}
+    {%- comment -%}
+      Reviews come from Shopify admin → Content → Metaobjects → Testimonials, ordered by
+      Position (entries without one go last, oldest first). The theme editor's Testimonial
+      blocks are only a fallback while no entries are shown.
+    {%- endcomment -%}
+    {%- liquid
+      assign review_entries = shop.metaobjects.testimonial.values
+      assign review_keys = ''
+      for entry in review_entries
+        if entry.show_on_homepage.value == false or entry.quote.value == blank
+          continue
+        endif
+        assign sort_position = entry.position.value | default: 9999 | at_least: 0 | at_most: 9999 | plus: 10000
+        assign sort_index = forloop.index0 | plus: 10000
+        assign review_keys = review_keys | append: sort_position | append: '-' | append: sort_index | append: ','
+      endfor
+      assign review_keys = review_keys | split: ',' | sort
+      assign review_blocks = section.blocks | where: 'type', 'testimonial'
+    -%}
+    {%- if review_keys.size > 0 or review_blocks.size > 0 -%}
       <div style="margin:8px 0 18px;">
         <h2 class="bh-h2">{{ section.settings.testimonials_heading }}</h2>
       </div>
-      <div class="bh-reviews">
-        {%- for block in review_blocks -%}
-          <div class="bh-review" {{ block.shopify_attributes }}>
-            <div class="bh-review__stars">
-              {%- for s in (1..block.settings.rating) -%}
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="#5F8F2B" aria-hidden="true"><path d="M12 2.5l3.1 6.6 7.1.9-5.2 5 1.4 7-6.4-3.6-6.4 3.6 1.4-7-5.2-5 7.1-.9L12 2.5Z"/></svg>
-              {%- endfor -%}
-            </div>
-            <p class="bh-review__quote">“{{ block.settings.quote }}”</p>
-            <div class="bh-review__foot">
-              <div class="bh-review__avatar">
-                {%- if block.settings.avatar != blank -%}
-                  {{ block.settings.avatar | image_url: width: 96, height: 96 | image_tag: loading: 'lazy', alt: block.settings.name }}
-                {%- else -%}
-                  +
-                {%- endif -%}
-              </div>
-              <div class="bh-review__who">
-                <div class="bh-review__name">{{ block.settings.name }}</div>
-                <div class="bh-review__loc">{{ block.settings.location }}</div>
-              </div>
-            </div>
-          </div>
-        {%- endfor -%}
+      <div class="bh-reviews" data-bh-reveal>
+        {%- if review_keys.size > 0 -%}
+          {%- for key in review_keys -%}
+            {%- assign entry_index = key | split: '-' | last | minus: 10000 -%}
+            {%- for entry in review_entries -%}
+              {%- if forloop.index0 == entry_index -%}
+                {%- render 'bonsai-review',
+                  quote: entry.quote.value,
+                  name: entry.name.value,
+                  location: entry.location.value,
+                  rating: entry.rating.value,
+                  photo: entry.photo.value
+                -%}
+                {%- break -%}
+              {%- endif -%}
+            {%- endfor -%}
+          {%- endfor -%}
+        {%- else -%}
+          {%- for block in review_blocks -%}
+            {%- render 'bonsai-review',
+              quote: block.settings.quote,
+              name: block.settings.name,
+              location: block.settings.location,
+              rating: block.settings.rating,
+              photo: block.settings.avatar,
+              attributes: block.shopify_attributes
+            -%}
+          {%- endfor -%}
+        {%- endif -%}
       </div>
     {%- endif -%}
 
@@ -211,10 +285,12 @@
     { "type": "text", "id": "bestsellers_heading", "label": "Heading", "default": "Bestselling Bonsai" },
     { "type": "collection", "id": "bestsellers_collection", "label": "Collection", "info": "When set, shows this collection's products instead of the 'Product' blocks." },
     { "type": "text", "id": "bestsellers_button", "label": "Button label", "default": "View All Bonsai Plants →" },
+    { "type": "collection", "id": "bestsellers_button_collection", "label": "Button link", "info": "Collection the button opens. Leave empty to use the row's collection." },
     { "type": "header", "content": "Accessories row" },
     { "type": "text", "id": "accessories_heading", "label": "Heading", "default": "Pots & Accessories" },
     { "type": "collection", "id": "accessories_collection", "label": "Collection", "info": "When set, shows this collection's products instead of the 'Accessory' blocks." },
     { "type": "text", "id": "accessories_button", "label": "Button label", "default": "View All Pots & Accessories →" },
+    { "type": "collection", "id": "accessories_button_collection", "label": "Button link", "info": "Collection the button opens. Leave empty to use the row's collection." },
     { "type": "header", "content": "Other headings" },
     { "type": "text", "id": "categories_heading", "label": "Categories heading", "default": "Shop by Category" },
     { "type": "text", "id": "testimonials_heading", "label": "Testimonials heading", "default": "Loved by bonsai parents across India" }

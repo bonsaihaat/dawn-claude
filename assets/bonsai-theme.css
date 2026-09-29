@@ -3,8 +3,13 @@ body.bh-body { background: #faf7f1; }
 
 @keyframes bh-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @keyframes bh-caret { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+@keyframes bh-rise { from { opacity: 0; transform: translateY(0.45em); } to { opacity: 1; transform: none; } }
+@keyframes bh-dot-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 
 .bh { font-family: 'Archivo', Helvetica, Arial, sans-serif; background: #faf7f1; }
+/* Pin inherited metrics so header/footer render the same under theme.liquid (Dawn globals) as under bonsai.liquid */
+.bh { line-height: normal; letter-spacing: normal; }
+.bh, .bh *, .bh *::before, .bh *::after { box-sizing: content-box; }
 .bh a { color: #1B1F17; }
 .bh button { font-family: inherit; }
 .bh img { max-width: none; }
@@ -14,6 +19,9 @@ body.bh-body { background: #faf7f1; }
 .bh-marquee__track { display: flex; width: max-content; animation: bh-marquee 22s linear infinite; }
 .bh-marquee__group { display: flex; align-items: center; gap: 36px; padding-right: 36px; }
 .bh-marquee__item { font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: #f4f7ea; white-space: nowrap; }
+.bh a.bh-marquee__item { color: #f4f7ea; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+/* Hold the bar still while a pointer or keyboard is on it, so links are easy to hit */
+.bh-marquee:hover .bh-marquee__track, .bh-marquee:focus-within .bh-marquee__track { animation-play-state: paused; }
 
 /* Header visibility (design switches layouts at 820px) */
 .bh-header--desktop { display: none; }
@@ -82,12 +90,14 @@ body.bh-body { background: #faf7f1; }
 
 .bh-nav { display: flex; align-items: center; justify-content: center; gap: clamp(16px, 3vw, 40px); padding: 0 24px 10px; border-bottom: 1px solid #eee7d8; }
 .bh-nav__item { position: relative; }
-.bh .bh-nav__link { display: flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #1B1F17; text-decoration: none; padding-bottom: 6px; white-space: nowrap; flex-shrink: 0; }
+.bh .bh-nav__link { display: flex; align-items: center; gap: 5px; font-size: 14.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: capitalize; color: #1B1F17; text-decoration: none; padding-bottom: 6px; white-space: nowrap; flex-shrink: 0; }
 .bh .bh-nav__link.is-active { border-bottom: 2px solid #5F8F2B; }
 .bh-nav__dropdown { position: absolute; top: 100%; left: 50%; transform: translateX(-50%) translateY(-4px); min-width: 200px; background: #ffffff; border-radius: 14px; box-shadow: 0 18px 40px -14px rgba(20, 26, 15, 0.28); padding: 8px; display: flex; flex-direction: column; gap: 1px; z-index: 5; opacity: 0; visibility: hidden; transition: opacity 0.16s ease, transform 0.16s ease; }
 .bh-nav__item:hover .bh-nav__dropdown,
 .bh-nav__item:focus-within .bh-nav__dropdown { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
-.bh .bh-nav__dropdown a { padding: 10px 12px; border-radius: 8px; font-size: 13px; font-weight: 500; text-transform: none; letter-spacing: normal; color: #20241b; text-decoration: none; }
+.bh .bh-nav__dropdown a { padding: 10px 12px; border-radius: 8px; font-size: 13px; font-weight: 500; text-transform: none; letter-spacing: normal; color: #20241b; text-decoration: none; transition: background-color 0.15s ease, color 0.15s ease; }
+.bh .bh-nav__dropdown a:hover,
+.bh .bh-nav__dropdown a:focus-visible { background: #eef4e0; color: #2E4716; }
 
 /* WhatsApp */
 .bh-whatsapp { position: fixed; right: 20px; bottom: 20px; width: 56px; height: 56px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.4); z-index: 50; text-decoration: none; }
@@ -101,6 +111,8 @@ body.bh-body { background: #faf7f1; }
 .bh-slide { position: absolute; inset: 0; transition: opacity 0.6s ease; opacity: 0; pointer-events: none; }
 .bh-slide.is-active { opacity: 1; pointer-events: auto; }
 .bh-slide__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.bh-slide__link { position: absolute; inset: 0; z-index: 2; -webkit-tap-highlight-color: transparent; }
+.bh-word { display: inline-block; }
 .bh-slide__shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(27, 31, 23, 0.4) 0%, rgba(27, 31, 23, 0) 34%, rgba(27, 31, 23, 0) 60%, rgba(27, 31, 23, 0.55) 100%); pointer-events: none; }
 .bh-slide__top { position: absolute; left: 0; right: 0; top: 0; padding: clamp(20px, 4vw, 40px); display: flex; flex-direction: column; gap: 12px; pointer-events: none; }
 .bh-slide__title { margin: 0; font-weight: 700; font-size: clamp(28px, 4.6vw, 52px); line-height: 1.08; color: #ffffff; max-width: 13ch; }
@@ -110,8 +122,20 @@ body.bh-body { background: #faf7f1; }
 .bh-hero__arrow--prev { left: 14px; }
 .bh-hero__arrow--next { right: 14px; }
 .bh-hero__dots { position: absolute; left: 0; right: 0; bottom: 14px; display: flex; justify-content: center; gap: 7px; z-index: 3; }
-.bh-hero__dot { width: 6px; height: 6px; border-radius: 999px; border: none; cursor: pointer; padding: 0; background: #faf7f1cc; }
-.bh-hero__dot.is-active { width: 22px; background: #5F8F2B; }
+.bh-hero__dot { position: relative; overflow: hidden; width: 6px; height: 6px; border-radius: 999px; border: none; cursor: pointer; padding: 0; background: #faf7f1cc; transition: width 0.35s ease; }
+.bh-hero__dot.is-active { width: 22px; }
+.bh-hero__dot.is-active::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: #5F8F2B; transform-origin: left; }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Slow push-in on the active slide; the leaving slide resets only after its 0.6s fade */
+  .bh-slide__img { transition: transform 0s linear 0.6s; }
+  .bh-slide.is-zoomed .bh-slide__img { transform: scale(1.08); transition: transform 6s cubic-bezier(0.25, 0.6, 0.3, 1); }
+  /* Headline words, then the chip, rise in each time a slide becomes active */
+  .bh-slide.is-active .bh-word { animation: bh-rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(0.15s + var(--w, 0) * 70ms); }
+  .bh-slide.is-active .bh-slide__chip { animation: bh-rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(0.3s + var(--words, 0) * 70ms); }
+  /* Active dot fills over the autoplay interval (5s, matches bonsai-theme.js) */
+  .bh-hero__dot.is-active::after { animation: bh-dot-fill 5s linear both; }
+}
 
 /* Promo cards */
 .bh-promos { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 16px; }
@@ -129,17 +153,28 @@ body.bh-body { background: #faf7f1; }
 .bh .bh-promo--light .bh-promo__btn { background: none; border: 1.5px solid #1B1F17; padding: 11px 21px; }
 
 /* Trust badges */
-.bh-trust { display: flex; flex-wrap: wrap; gap: 12px; margin: 22px 0 30px; }
+.bh-trust { margin: 22px 0 30px; }
+.bh-trust__set { display: flex; flex-wrap: wrap; gap: 12px; }
+.bh-trust__set--clone { display: none; }
 .bh-trust__item { flex: 1 1 200px; display: flex; align-items: center; justify-content: center; gap: 8px; background: #ffffff; border: 1px solid #eee7d8; border-radius: 999px; padding: 10px 16px; box-sizing: border-box; }
 .bh-trust__label { font-size: 12.5px; font-weight: 500; color: #20241b; white-space: nowrap; }
+
+/* Trust strip loops as a marquee on mobile instead of wrapping */
+@media (max-width: 819.98px) and (prefers-reduced-motion: no-preference) {
+  .bh-trust { margin-left: -20px; margin-right: -20px; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%); }
+  .bh-trust__track { display: flex; width: max-content; animation: bh-marquee 24s linear infinite; }
+  .bh-trust:active .bh-trust__track { animation-play-state: paused; }
+  .bh-trust__set { flex-wrap: nowrap; gap: 10px; padding-right: 10px; }
+  .bh-trust__set--clone { display: flex; }
+  .bh-trust__item { flex: 0 0 auto; }
+}
 
 /* Section headings */
 .bh-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin: 8px 0 18px; }
 .bh-h2 { margin: 0; font-size: clamp(24px, 2.6vw, 30px); line-height: 1.15; font-weight: 800; color: #1B1F17; text-wrap: balance; }
-.bh .bh-head__link { flex-shrink: 0; font-size: 13px; font-weight: 600; color: #1B1F17; text-decoration: none; white-space: nowrap; }
 
 /* Product rows */
-.bh-products { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 -20px 34px; padding: 0 20px 6px; scroll-padding: 0 20px; scrollbar-width: none; }
+.bh-products { display: flex; gap: 12px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; margin: 0 -20px 34px; padding: 0 20px 6px; scroll-padding: 0 20px; scrollbar-width: none; }
 .bh-products::-webkit-scrollbar { display: none; }
 .bh-card { display: flex; flex-direction: column; text-decoration: none; flex: 0 0 40%; scroll-snap-align: start; }
 @media (min-width: 820px) {
@@ -149,10 +184,10 @@ body.bh-body { background: #faf7f1; }
 .bh-card__media { position: relative; border-radius: 18px; overflow: hidden; aspect-ratio: 1 / 1; background: #eef4e0; }
 .bh-card__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 .bh-card__badge { position: absolute; top: 10px; left: 10px; background: #2E4716; color: #faf7f1; font-size: 10.5px; font-weight: 600; letter-spacing: 0.03em; padding: 5px 10px; border-radius: 999px; }
-.bh-card__info { padding-top: 12px; display: flex; flex-direction: column; gap: 3px; }
-.bh-card__name { font-size: 14px; font-weight: 600; color: #1B1F17; }
+.bh-card__info { flex: 1; padding-top: 12px; display: flex; flex-direction: column; gap: 3px; }
+.bh-card__name { font-size: 14px; font-weight: 600; color: #1B1F17; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; }
 .bh-card__sub { font-size: 12px; color: #767d6c; }
-.bh-card__price { font-size: 14px; font-weight: 700; color: #1B1F17; margin-top: 3px; }
+.bh-card__price { font-size: 14px; font-weight: 700; color: #1B1F17; margin-top: auto; padding-top: 3px; }
 
 .bh-center { display: flex; justify-content: center; margin-bottom: 34px; }
 .bh .bh-btn { font-size: 14px; font-weight: 600; border-radius: 999px; text-decoration: none; }
@@ -167,7 +202,7 @@ body.bh-body { background: #faf7f1; }
 .bh-cat__label { position: absolute; left: 14px; bottom: 14px; right: 14px; font-size: 15px; font-weight: 600; color: #ffffff; }
 
 /* Testimonials */
-.bh-reviews { display: flex; gap: 14px; margin: 0 -20px 40px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 20px 18px; scrollbar-width: none; }
+.bh-reviews { display: flex; gap: 14px; margin: 0 -20px 40px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; padding: 4px 20px 18px; scrollbar-width: none; }
 .bh-reviews::-webkit-scrollbar { display: none; }
 .bh-review { flex: 0 0 84%; scroll-snap-align: center; background: #ffffff; border-radius: 22px; padding: 24px 22px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 16px 36px -20px rgba(20, 26, 15, 0.18); box-sizing: border-box; }
 @media (min-width: 820px) {
@@ -182,6 +217,22 @@ body.bh-body { background: #faf7f1; }
 .bh-review__who { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .bh-review__name { font-size: 13.5px; font-weight: 600; color: #1B1F17; }
 .bh-review__loc { font-size: 12px; color: #767d6c; }
+
+/* Scroll reveals: .bh-anim is set on <html> by the homepage only when motion is allowed */
+.bh-anim [data-bh-reveal]:not([data-bh-reveal="group"]) > *, .bh-anim [data-bh-reveal-item] { opacity: 0; transform: translateY(48px); }
+.bh-anim [data-bh-reveal] .is-revealed { --bh-d: calc(var(--bh-i, 0) * 200ms); opacity: 1; transform: none; transition: opacity 1.4s ease var(--bh-d), transform 1.8s cubic-bezier(0.22, 0.61, 0.36, 1) var(--bh-d), scale 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+/* Sideways-swiping rows on mobile: a quick fade in place, so cards never slide, get clipped or lag behind a swipe */
+@media (max-width: 819.98px) {
+  .bh-anim .bh-products[data-bh-reveal] > *, .bh-anim .bh-reviews[data-bh-reveal] > * { transform: none; }
+  .bh-anim .bh-products[data-bh-reveal] > .is-revealed, .bh-anim .bh-reviews[data-bh-reveal] > .is-revealed { transition: opacity 0.4s ease, scale 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+}
+
+/* Press feedback: tappables sink slightly and spring back (uses `scale`, so it never fights reveal transforms) */
+@media (prefers-reduced-motion: no-preference) {
+  .bh-card, .bh-cat, .bh .bh-btn, .bh .bh-promo__btn, .bh-hero__arrow { -webkit-tap-highlight-color: transparent; transition: scale 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .bh-card:active, .bh-cat:active, .bh .bh-btn:active, .bh .bh-promo__btn:active { scale: 0.97; }
+  .bh-hero__arrow:active { scale: 0.9; }
+}
 
 /* Footer */
 .bh-footer { background: linear-gradient(180deg, #1B1F17 0%, #22301a 100%); padding: 36px 20px 24px; margin-top: 8px; }

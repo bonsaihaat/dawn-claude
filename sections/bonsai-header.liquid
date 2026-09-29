@@ -1,5 +1,5 @@
 {%- liquid
-  assign wa_number = section.settings.whatsapp_number | remove: '+' | remove: ' '
+  assign wa_number = settings.whatsapp_number | remove: '+' | remove: ' '
   assign wa_url = 'https://wa.me/' | append: wa_number
   assign phrases = section.settings.search_phrases | split: ','
   assign all_url = routes.all_products_collection_url
@@ -47,17 +47,67 @@
 
 <div class="bh" data-bh data-bh-phrases="{{ phrases | json | escape }}">
 
-  {%- assign marquee_blocks = section.blocks | where: 'type', 'marquee' -%}
-  {%- if section.settings.show_marquee and marquee_blocks.size > 0 -%}
+  {%- comment -%}
+    Messages come from Shopify admin → Content → Metaobjects → Announcements, ordered by
+    Position (entries without one go last, oldest first). The theme editor's Marquee message
+    blocks are only a fallback while no entries are shown.
+  {%- endcomment -%}
+  {%- liquid
+    assign marquee_entries = shop.metaobjects.announcement.values
+    assign marquee_keys = ''
+    for entry in marquee_entries
+      if entry.show_in_bar.value == false or entry.message.value == blank
+        continue
+      endif
+      assign sort_position = entry.position.value | default: 9999 | at_least: 0 | at_most: 9999 | plus: 10000
+      assign sort_index = forloop.index0 | plus: 10000
+      assign marquee_keys = marquee_keys | append: sort_position | append: '-' | append: sort_index | append: ','
+    endfor
+    assign marquee_keys = marquee_keys | split: ',' | sort
+    assign marquee_blocks = section.blocks | where: 'type', 'marquee'
+  -%}
+  {%- capture marquee_items -%}
+    {%- if marquee_keys.size > 0 -%}
+      {%- for key in marquee_keys -%}
+        {%- assign entry_index = key | split: '-' | last | minus: 10000 -%}
+        {%- for entry in marquee_entries -%}
+          {%- if forloop.index0 == entry_index -%}
+            {%- if entry.link_product.value != blank -%}
+              {%- assign item_url = entry.link_product.value.url -%}
+            {%- elsif entry.link_collection.value != blank -%}
+              {%- assign item_url = entry.link_collection.value.url -%}
+            {%- elsif entry.link_page.value != blank -%}
+              {%- assign item_url = entry.link_page.value.url -%}
+            {%- else -%}
+              {%- assign item_url = entry.link_url.value | default: '' -%}
+            {%- endif -%}
+            {%- if item_url != blank -%}
+              <a href="{{ item_url | escape }}" class="bh-marquee__item">{{ entry.message.value | escape }}</a>
+            {%- else -%}
+              <span class="bh-marquee__item">{{ entry.message.value | escape }}</span>
+            {%- endif -%}
+            {%- break -%}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endfor -%}
+    {%- else -%}
+      {%- for block in marquee_blocks -%}
+        {%- if block.settings.link != blank -%}
+          <a href="{{ block.settings.link }}" class="bh-marquee__item" {{ block.shopify_attributes }}>{{ block.settings.text }}</a>
+        {%- else -%}
+          <span class="bh-marquee__item" {{ block.shopify_attributes }}>{{ block.settings.text }}</span>
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endif -%}
+  {%- endcapture -%}
+  {%- if section.settings.show_marquee and marquee_items != blank -%}
     <div class="bh-marquee">
       <div class="bh-marquee__track">
-        {%- for i in (1..2) -%}
-          <div class="bh-marquee__group"{% if i == 2 %} aria-hidden="true"{% endif %}>
-            {%- for block in marquee_blocks -%}
-              <span class="bh-marquee__item" {% if i == 1 %}{{ block.shopify_attributes }}{% endif %}>{{ block.settings.text }}</span>
-            {%- endfor -%}
-          </div>
-        {%- endfor -%}
+        <div class="bh-marquee__group">{{ marquee_items }}</div>
+        {%- comment -%} Second copy makes the loop seamless; it's hidden from screen readers and keyboard {%- endcomment -%}
+        <div class="bh-marquee__group" aria-hidden="true">
+          {{- marquee_items | replace: '<a ', '<a tabindex="-1" ' | replace: 'data-shopify-editor-block=', 'data-bh-copy=' -}}
+        </div>
       </div>
     </div>
   {%- endif -%}
@@ -187,14 +237,16 @@
     { "type": "link_list", "id": "menu", "label": "Menu", "info": "Leave empty to use the design's default navigation." },
     { "type": "url", "id": "wishlist_url", "label": "Wishlist link" },
     { "type": "text", "id": "search_phrases", "label": "Search bar phrases", "default": "Bonsai Plants,Bonsai Pots,Fertilizers,Care Tools", "info": "Comma-separated, typed out one after another." },
-    { "type": "checkbox", "id": "show_marquee", "label": "Show announcement marquee", "default": true },
-    { "type": "text", "id": "whatsapp_number", "label": "WhatsApp number", "default": "919999999999", "info": "Country code + number, digits only." }
+    { "type": "checkbox", "id": "show_marquee", "label": "Show announcement marquee", "default": true, "info": "Messages are managed in Content → Metaobjects → Announcement. The Marquee message blocks below are only used when there are none." }
   ],
   "blocks": [
     {
       "type": "marquee",
       "name": "Marquee message",
-      "settings": [{ "type": "text", "id": "text", "label": "Text", "default": "Free shipping across India" }]
+      "settings": [
+        { "type": "text", "id": "text", "label": "Text", "default": "Free shipping across India" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
     }
   ]
 }

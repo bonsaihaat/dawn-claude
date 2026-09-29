@@ -2,7 +2,7 @@
 <script src="{{ 'bonsai-cart.js' | asset_url }}" defer></script>
 
 {%- liquid
-  assign wa_number = section.settings.whatsapp_number | remove: '+' | remove: ' '
+  assign wa_number = settings.whatsapp_number | remove: '+' | remove: ' '
   assign wa_url = 'https://wa.me/' | append: wa_number
   assign free_from = shop.metafields.custom.free_shipping_threshold.value | times: 100
   assign payment_chips = section.settings.payment_chips | split: ','
@@ -304,7 +304,6 @@
     { "type": "header", "content": "Order summary" },
     { "type": "text", "id": "payment_chips", "label": "Payment methods", "default": "UPI,Visa,Mastercard,COD", "info": "Comma-separated." },
     { "type": "text", "id": "trust_items", "label": "Trust items", "default": "Arrives healthy,Free replacement,Bonsai care support", "info": "Comma-separated." },
-    { "type": "text", "id": "whatsapp_number", "label": "WhatsApp number", "default": "919999999999", "info": "Country code + number, digits only." },
     { "type": "text", "id": "whatsapp_label", "label": "WhatsApp link label", "default": "Need help? Chat on WhatsApp" },
     { "type": "text", "id": "care_note", "label": "Note below the cart", "default": "Care guide included with every tree" },
     { "type": "header", "content": "Empty cart" },

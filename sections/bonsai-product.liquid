@@ -3,7 +3,7 @@
 
 {%- liquid
   assign current_variant = product.selected_or_first_available_variant
-  assign wa_number = section.settings.whatsapp_number | remove: '+' | remove: ' '
+  assign wa_number = settings.whatsapp_number | remove: '+' | remove: ' '
   assign wa_text = 'Hi! I have a question about the ' | append: product.title | append: '.' | url_encode | replace: '+', '%20'
   assign wa_url = 'https://wa.me/' | append: wa_number | append: '?text=' | append: wa_text
 
@@ -269,6 +269,22 @@
           price: related_price
         -%}
       {%- endfor -%}
+      {%- if related_count < 4 and related_source != collections.all -%}
+        {%- for p in collections.all.products -%}
+          {%- if p.id == product.id -%}{%- continue -%}{%- endif -%}
+          {%- if related_source.products contains p -%}{%- continue -%}{%- endif -%}
+          {%- if related_count >= 4 -%}{%- break -%}{%- endif -%}
+          {%- assign related_count = related_count | plus: 1 -%}
+          {%- assign related_price = p.price | money_without_trailing_zeros -%}
+          {%- render 'bonsai-product-card',
+            url: p.url,
+            image: p.featured_media,
+            title: p.title,
+            subtitle: p.metafields.custom.subtitle,
+            price: related_price
+          -%}
+        {%- endfor -%}
+      {%- endif -%}
     {%- endcapture -%}
     {%- if related_count > 0 -%}
       <div class="bh-pdp__related">
@@ -301,7 +317,6 @@
     { "type": "text", "id": "photo_badge", "label": "Photo badge", "default": "Real photo · this tree ships" },
     { "type": "text", "id": "tax_note", "label": "Price note", "default": "Inclusive of all taxes" },
     { "type": "header", "content": "WhatsApp" },
-    { "type": "text", "id": "whatsapp_number", "label": "WhatsApp number", "default": "919999999999", "info": "Country code + number, digits only." },
     { "type": "text", "id": "whatsapp_label", "label": "Button label", "default": "Ask about this tree on WhatsApp" },
     { "type": "header", "content": "Delivery check", "info": "Free-shipping threshold and fee come from the shop metafields custom.free_shipping_threshold and custom.standard_shipping_fee (Settings → Custom data → Shop)." },
     { "type": "range", "id": "delivery_days", "label": "Estimated delivery (days)", "min": 1, "max": 14, "step": 1, "default": 4 },

@@ -8,7 +8,7 @@
 <script src="{{ 'bonsai-cart.js' | asset_url }}" defer></script>
 
 {%- liquid
-  assign wa_number = section.settings.whatsapp_number | remove: '+' | remove: ' '
+  assign wa_number = settings.whatsapp_number | remove: '+' | remove: ' '
   assign free_from = shop.metafields.custom.free_shipping_threshold.value | times: 100
   assign trust_items = section.settings.trust_items | split: ','
 
@@ -186,7 +186,6 @@
     { "type": "paragraph", "content": "Opens from the header cart icon and after Add to cart. The free-shipping bar reads the shop metafield custom.free_shipping_threshold." },
     { "type": "text", "id": "note_label", "label": "Order note toggle", "default": "Add order note / gift message" },
     { "type": "text", "id": "trust_items", "label": "Trust items", "default": "Arrives healthy,Free replacement,Bonsai care support", "info": "Comma-separated." },
-    { "type": "text", "id": "whatsapp_number", "label": "WhatsApp number", "default": "919999999999", "info": "Country code + number, digits only." },
     { "type": "text", "id": "whatsapp_label", "label": "WhatsApp link label", "default": "Need help choosing? Chat on WhatsApp" },
     { "type": "header", "content": "Empty cart" },
     { "type": "text", "id": "empty_title", "label": "Heading", "default": "Your cart is empty" },

@@ -98,7 +98,7 @@ body:has(.bh-cart) .bh-mh__search { display: none; }
 .bh-cart__note textarea { font-family: inherit; resize: vertical; background: #faf7f1; border: 1px solid #e3dccb; border-radius: 14px; padding: 12px 14px; font-size: 13px; color: #1B1F17; box-sizing: border-box; margin: 0; }
 
 /* Checkout */
-.bh-cart__checkout { width: 100%; font-family: inherit; background: #5F8F2B; border: none; color: #ffffff; border-radius: 999px; padding: 16px; font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.bh-cart__checkout { width: 100%; max-width: 100%; box-sizing: border-box; font-family: inherit; background: #5F8F2B; border: none; color: #ffffff; border-radius: 999px; padding: 16px; font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
 .bh-cart__tax { text-align: center; font-size: 11.5px; color: #767d6c; }
 .bh-cart__pay { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
 .bh-cart__pay span { background: #f1f6e6; color: #2E4716; font-size: 10.5px; font-weight: 700; letter-spacing: 0.02em; padding: 6px 10px; border-radius: 8px; }

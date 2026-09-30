@@ -1,0 +1,11 @@
+{%- comment -%}
+  Single source for the favicon on every layout.
+  Uses the Favicon theme setting when set, otherwise the bundled Bonsai icon.
+{%- endcomment -%}
+{%- if settings.favicon != blank -%}
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
+  <link rel="apple-touch-icon" href="{{ settings.favicon | image_url: width: 180, height: 180 }}">
+{%- else -%}
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ 'bonsai-favicon-32.png' | asset_url }}">
+  <link rel="apple-touch-icon" href="{{ 'bonsai-apple-touch-icon.png' | asset_url }}">
+{%- endif -%}

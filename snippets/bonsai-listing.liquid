@@ -338,9 +338,23 @@
               {%- render 'bonsai-listing-card', product: item -%}
             {%- endfor -%}
           </div>
-          {%- if paginate.next -%}
-            <div class="bh-plp__more-wrap">
-              <a href="{{ paginate.next.url }}" class="bh-plp__more" data-bh-more>Load more</a>
+          {%- if paginate.pages > 1 -%}
+            {%- assign shown_to = paginate.current_offset | plus: paginate.page_size -%}
+            {%- if shown_to > paginate.items -%}{%- assign shown_to = paginate.items -%}{%- endif -%}
+            <div class="bh-plp__more-wrap" data-bh-more-wrap>
+              <p class="bh-plp__more-count" aria-live="polite">
+                <span data-bh-range data-start="{{ paginate.current_offset | plus: 1 }}" data-total="{{ paginate.items }}">
+                  {%- if paginate.previous -%}
+                    Showing {{ paginate.current_offset | plus: 1 }}–{{ shown_to }} of {{ paginate.items }}
+                  {%- else -%}
+                    Showing {{ shown_to }} of {{ paginate.items }}
+                  {%- endif -%}
+                </span>
+                {%- if paginate.previous %} · <a href="{{ paginate.parts.first.url }}" data-bh-nav>View from the start</a>{%- endif -%}
+              </p>
+              {%- if paginate.next -%}
+                <a href="{{ paginate.next.url }}" class="bh-plp__more" data-bh-more>Load more</a>
+              {%- endif -%}
             </div>
           {%- endif -%}
         {%- elsif is_search == false or terms != blank -%}

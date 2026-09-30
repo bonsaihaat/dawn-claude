@@ -66,17 +66,42 @@
     var more = e.target.closest('[data-bh-more]');
     if (more) {
       e.preventDefault();
+      if (more.getAttribute('aria-busy') === 'true') return;
+      more.setAttribute('aria-busy', 'true');
       more.textContent = 'Loading…';
-      fetchSection(more.href).then(function (fresh) {
-        var grid = root.querySelector('[data-bh-grid]');
-        var freshGrid = fresh && fresh.querySelector('[data-bh-grid]');
-        if (!grid || !freshGrid) { window.location.href = more.href; return; }
-        while (freshGrid.firstElementChild) grid.appendChild(freshGrid.firstElementChild);
-        syncWishlist(grid);
-        var wrap = more.parentElement;
-        var next = fresh.querySelector('[data-bh-more]');
-        if (next) { more.href = next.href; more.textContent = 'Load more'; } else { wrap.remove(); }
-      });
+      fetchSection(more.href)
+        .then(function (fresh) {
+          var grid = root.querySelector('[data-bh-grid]');
+          var freshGrid = fresh && fresh.querySelector('[data-bh-grid]');
+          if (!grid || !freshGrid) { window.location.href = more.href; return; }
+          var firstNew = freshGrid.firstElementChild;
+          while (freshGrid.firstElementChild) grid.appendChild(freshGrid.firstElementChild);
+          syncWishlist(grid);
+          var wrap = more.closest('[data-bh-more-wrap]');
+          var freshWrap = fresh.querySelector('[data-bh-more-wrap]');
+          var range = wrap.querySelector('[data-bh-range]');
+          if (range) {
+            var start = Number(range.getAttribute('data-start'));
+            var end = start - 1 + grid.children.length;
+            var total = range.getAttribute('data-total');
+            range.textContent = start > 1 ? 'Showing ' + start + '–' + end + ' of ' + total : 'Showing ' + end + ' of ' + total;
+          }
+          var next = freshWrap && freshWrap.querySelector('[data-bh-more]');
+          if (next) {
+            more.href = next.href;
+            more.textContent = 'Load more';
+            more.removeAttribute('aria-busy');
+          } else {
+            more.remove();
+          }
+          var link = firstNew && firstNew.querySelector('.bh-plp-card__info');
+          if (link) link.focus({ preventScroll: true });
+        })
+        .catch(function (err) {
+          if (err.name === 'AbortError') return;
+          more.removeAttribute('aria-busy');
+          more.textContent = 'Couldn’t load — try again';
+        });
       return;
     }
 

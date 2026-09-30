@@ -4,6 +4,7 @@
   assign phrases = section.settings.search_phrases | split: ','
   assign popular_searches = section.settings.search_popular | split: ','
   assign all_url = routes.all_products_collection_url
+  assign account_link = section.settings.account_url | default: routes.account_url
 -%}
 
 {%- capture nav_data -%}
@@ -153,8 +154,8 @@
           {%- endfor -%}
           <div class="bh-drawer__sep"></div>
           <div class="bh-drawer__minor">
-            <a href="{{ routes.account_url }}">Account</a>
-            <a href="{{ section.settings.wishlist_url | default: routes.account_url }}">Wishlist</a>
+            <a href="{{ account_link }}">Account</a>
+            <a href="{{ section.settings.wishlist_url | default: account_link }}">Wishlist</a>
           </div>
           <div class="bh-drawer__copy">© {{ shop.name }}</div>
         </div>
@@ -187,7 +188,7 @@
       <a href="{{ routes.root_url }}" class="bh-dh__logo">{{ logo_markup }}</a>
       {{ search_pill }}
       <div class="bh-dh__icons">
-        <a href="{{ routes.account_url }}" aria-label="Account">
+        <a href="{{ account_link }}" aria-label="Account">
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="4" stroke="#1B1F17" stroke-width="1.6"/><path d="M4 20c1.5-4 4.7-6 8-6s6.5 2 8 6" stroke="#1B1F17" stroke-width="1.6" stroke-linecap="round"/></svg>
         </a>
         <a href="{{ routes.cart_url }}" class="bh-dh__cart" aria-label="Cart">
@@ -263,6 +264,7 @@
   "settings": [
     { "type": "image_picker", "id": "logo", "label": "Logo" },
     { "type": "link_list", "id": "menu", "label": "Menu", "info": "Leave empty to use the design's default navigation." },
+    { "type": "url", "id": "account_url", "label": "Account link", "info": "Leave empty to use Shopify's default account link." },
     { "type": "url", "id": "wishlist_url", "label": "Wishlist link" },
     { "type": "text", "id": "search_phrases", "label": "Search bar phrases", "default": "Bonsai Plants,Bonsai Pots,Fertilizers,Care Tools", "info": "Comma-separated, typed out one after another." },
     { "type": "text", "id": "search_popular", "label": "Popular searches", "default": "Ficus,Jade,Juniper,Indoor bonsai,Ceramic pots,Pruning shears", "info": "Comma-separated. Shown when the search panel opens, before the customer types." },

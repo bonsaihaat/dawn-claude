@@ -84,7 +84,10 @@
 .bh .bh-plp-card__cart:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* Load more */
-.bh-plp__more-wrap { display: flex; justify-content: center; margin-top: 14px; }
+.bh-plp__more-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; margin-top: 24px; }
+.bh-plp__more-count { margin: 0; font-size: 13px; color: #767d6c; }
+.bh .bh-plp__more-count a { color: #1B1F17; text-underline-offset: 3px; }
+.bh .bh-plp__more[aria-busy="true"] { opacity: 0.6; cursor: progress; }
 .bh .bh-plp__more { font-size: 14px; font-weight: 600; border-radius: 999px; text-decoration: none; background: none; border: 1.5px solid #1B1F17; color: #1B1F17; padding: 13.5px 36px; }
 
 /* Empty state */

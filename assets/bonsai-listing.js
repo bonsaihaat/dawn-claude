@@ -4,6 +4,10 @@
   var sectionId = root.getAttribute('data-section-id');
   var shopRoot = window.Shopify && Shopify.routes ? Shopify.routes.root : '/';
   var pending;
+  // Set once "Load more" has added products, so leaving the page saves them for Back.
+  var extended = false;
+  var SNAPSHOT_KEY = 'bh-plp-snapshot';
+  var SNAPSHOT_MAX_AGE = 30 * 60 * 1000;
 
   function sectionUrl(url) {
     var u = new URL(url, window.location.href);
@@ -49,6 +53,7 @@
         if (body) body.scrollTop = sheetScroll;
         syncWishlist(root);
         revealActiveChip();
+        extended = false;
         if (push) window.history.pushState({ bhPlp: true }, '', url);
       })
       .catch(function (err) { if (err.name !== 'AbortError') window.location.href = url; })
@@ -66,17 +71,43 @@
     var more = e.target.closest('[data-bh-more]');
     if (more) {
       e.preventDefault();
+      if (more.getAttribute('aria-busy') === 'true') return;
+      more.setAttribute('aria-busy', 'true');
       more.textContent = 'Loading…';
-      fetchSection(more.href).then(function (fresh) {
-        var grid = root.querySelector('[data-bh-grid]');
-        var freshGrid = fresh && fresh.querySelector('[data-bh-grid]');
-        if (!grid || !freshGrid) { window.location.href = more.href; return; }
-        while (freshGrid.firstElementChild) grid.appendChild(freshGrid.firstElementChild);
-        syncWishlist(grid);
-        var wrap = more.parentElement;
-        var next = fresh.querySelector('[data-bh-more]');
-        if (next) { more.href = next.href; more.textContent = 'Load more'; } else { wrap.remove(); }
-      });
+      fetchSection(more.href)
+        .then(function (fresh) {
+          var grid = root.querySelector('[data-bh-grid]');
+          var freshGrid = fresh && fresh.querySelector('[data-bh-grid]');
+          if (!grid || !freshGrid) { window.location.href = more.href; return; }
+          var firstNew = freshGrid.firstElementChild;
+          while (freshGrid.firstElementChild) grid.appendChild(freshGrid.firstElementChild);
+          syncWishlist(grid);
+          extended = true;
+          var wrap = more.closest('[data-bh-more-wrap]');
+          var freshWrap = fresh.querySelector('[data-bh-more-wrap]');
+          var range = wrap.querySelector('[data-bh-range]');
+          if (range) {
+            var start = Number(range.getAttribute('data-start'));
+            var end = start - 1 + grid.children.length;
+            var total = range.getAttribute('data-total');
+            range.textContent = start > 1 ? 'Showing ' + start + '–' + end + ' of ' + total : 'Showing ' + end + ' of ' + total;
+          }
+          var next = freshWrap && freshWrap.querySelector('[data-bh-more]');
+          if (next) {
+            more.href = next.href;
+            more.textContent = 'Load more';
+            more.removeAttribute('aria-busy');
+          } else {
+            more.remove();
+          }
+          var link = firstNew && firstNew.querySelector('.bh-plp-card__info');
+          if (link) link.focus({ preventScroll: true });
+        })
+        .catch(function (err) {
+          if (err.name === 'AbortError') return;
+          more.removeAttribute('aria-busy');
+          more.textContent = 'Couldn’t load — try again';
+        });
       return;
     }
 
@@ -145,6 +176,54 @@
     render(window.location.href, false);
   });
 
+  function pageKey() {
+    return window.location.pathname + window.location.search;
+  }
+
+  function saveSnapshot() {
+    try {
+      if (!extended) { sessionStorage.removeItem(SNAPSHOT_KEY); return; }
+      var grid = root.querySelector('[data-bh-grid]');
+      var wrap = root.querySelector('[data-bh-more-wrap]');
+      if (!grid) return;
+      var copy = grid.cloneNode(true);
+      copy.querySelectorAll('.bh-plp-card__cart.is-added').forEach(function (b) {
+        b.classList.remove('is-added');
+        b.textContent = 'Add to cart';
+      });
+      sessionStorage.setItem(SNAPSHOT_KEY, JSON.stringify({
+        key: pageKey(),
+        time: Date.now(),
+        grid: copy.innerHTML,
+        wrap: wrap ? wrap.outerHTML : '',
+        scrollY: window.scrollY,
+      }));
+    } catch (e) {}
+  }
+
+  // Coming back with the browser's Back button: put back the products that
+  // "Load more" had added and the scroll position. Pages restored whole from
+  // the back/forward cache never re-run this script and need nothing.
+  function restoreSnapshot() {
+    var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+    if (!nav || nav.type !== 'back_forward') return;
+    var snap;
+    try { snap = JSON.parse(sessionStorage.getItem(SNAPSHOT_KEY)); } catch (e) { return; }
+    if (!snap || snap.key !== pageKey() || Date.now() - snap.time > SNAPSHOT_MAX_AGE) return;
+    var grid = root.querySelector('[data-bh-grid]');
+    if (!grid) return;
+    grid.innerHTML = snap.grid;
+    var wrap = root.querySelector('[data-bh-more-wrap]');
+    if (wrap && snap.wrap) wrap.outerHTML = snap.wrap;
+    else if (wrap) wrap.remove();
+    extended = true;
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    window.scrollTo(0, snap.scrollY);
+  }
+
+  window.addEventListener('pagehide', saveSnapshot);
+
+  restoreSnapshot();
   syncWishlist(root);
   revealActiveChip();
 })();

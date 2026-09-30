@@ -49,10 +49,7 @@
 
       {%- if products != blank and products.size > 0 -%}
         <div class="bh-art__shop">
-          <div class="bh-art__shop-head">
-            <span class="bh-art__shop-title">{{ section.settings.products_heading }}</span>
-            <a href="{{ routes.all_products_collection_url }}" class="bh-art__shop-all">Shop all →</a>
-          </div>
+          <span class="bh-art__shop-title">{{ section.settings.products_heading }}</span>
           <div class="bh-art__shop-grid">
             {%- for product in products limit: 3 -%}
               <a href="{{ product.url }}" class="bh-art__shop-item">
@@ -66,6 +63,7 @@
               </a>
             {%- endfor -%}
           </div>
+          <a href="{{ section.settings.shop_all_link | default: routes.all_products_collection_url }}" class="bh-art__shop-btn">{{ section.settings.shop_all_label | escape }} →</a>
         </div>
       {%- endif -%}
     </article>
@@ -177,7 +175,9 @@
     { "type": "text", "id": "blog_label", "label": "Breadcrumb blog label", "default": "Blogs", "info": "Leave blank to use the blog title." },
     { "type": "text", "id": "author", "label": "Author name", "default": "Bonsai Haat", "info": "Leave blank to use each article's author." },
     { "type": "text", "id": "tip_label", "label": "Quote box label", "default": "Grower’s tip", "info": "Text formatted as a Quote in the article editor shows as this box." },
-    { "type": "text", "id": "products_heading", "label": "Linked products heading", "default": "Trees in this guide", "info": "Pick products per article in the \"Products\" metafield." },
+    { "type": "text", "id": "products_heading", "label": "Linked products heading", "default": "Bring one home", "info": "Pick products per article in the \"Products\" metafield." },
+    { "type": "text", "id": "shop_all_label", "label": "Linked products button label", "default": "See all bonsai" },
+    { "type": "url", "id": "shop_all_link", "label": "Linked products button link", "info": "Leave blank to link to all products." },
     { "type": "text", "id": "more_heading", "label": "More articles heading", "default": "More articles" }
   ]
 }

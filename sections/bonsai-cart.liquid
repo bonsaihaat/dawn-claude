@@ -17,7 +17,7 @@
       break
     endif
   endfor
-  assign best = section.settings.bestsellers | default: collections['bestsellers']
+  assign best = section.settings.bestsellers | default: collections['bestselling-bonsai-plants']
 -%}
 
 {%- capture icon_bag -%}
@@ -312,7 +312,7 @@
     { "type": "text", "id": "empty_button", "label": "Button label", "default": "Shop bonsai →" },
     { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" },
     { "type": "text", "id": "menu_item", "label": "Menu item for button and chips", "default": "Bonsai Plants", "info": "The button links to this menu item; its sub-items become the chips." },
-    { "type": "collection", "id": "bestsellers", "label": "Bestsellers collection", "info": "Defaults to the collection with handle \"bestsellers\"." },
+    { "type": "collection", "id": "bestsellers", "label": "Bestsellers collection", "info": "Defaults to the collection with handle \"bestselling-bonsai-plants\"." },
     { "type": "text", "id": "bestsellers_heading", "label": "Bestsellers heading", "default": "Bestselling Bonsai" }
   ]
 }

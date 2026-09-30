@@ -17,7 +17,7 @@
     endif
   endfor
   assign extra = section.settings.extra_collection
-  assign favourites = section.settings.products_collection | default: collections['bestsellers']
+  assign favourites = section.settings.products_collection | default: collections['bestselling-bonsai-plants']
 -%}
 
 <div class="bh bh-nf">
@@ -143,7 +143,7 @@
     { "type": "collection", "id": "extra_collection", "label": "Extra tile", "info": "One more collection shown after the menu tiles, e.g. Pots & Accessories." },
     { "type": "header", "content": "Products" },
     { "type": "text", "id": "products_heading", "label": "Heading", "default": "Customer favourites" },
-    { "type": "collection", "id": "products_collection", "label": "Collection", "info": "Shows its first 4 products. Defaults to the collection with handle \"bestsellers\"." },
+    { "type": "collection", "id": "products_collection", "label": "Collection", "info": "Shows its first 4 products. Defaults to the collection with handle \"bestselling-bonsai-plants\"." },
     { "type": "header", "content": "Help strip" },
     { "type": "checkbox", "id": "show_help", "label": "Show help strip", "default": true },
     { "type": "text", "id": "help_heading", "label": "Heading", "default": "Can't find what you were looking for?" },

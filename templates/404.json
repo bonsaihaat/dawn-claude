@@ -4,7 +4,7 @@
     "main": {
       "type": "bonsai-404",
       "settings": {
-        "products_collection": "bestsellers",
+        "products_collection": "bestselling-bonsai-plants",
         "extra_collection": "pots-and-accessories"
       }
     }

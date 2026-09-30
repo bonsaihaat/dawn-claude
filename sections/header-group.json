@@ -12,6 +12,7 @@
       "block_order": ["m1", "m2", "m3"],
       "settings": {
         "menu": "main-menu",
+        "account_url": "https://shopify.com/74381066417/account",
         "search_phrases": "Bonsai Plants,Bonsai Pots,Fertilizers,Care Tools",
         "search_popular": "Ficus,Jade,Juniper,Indoor bonsai,Ceramic pots,Pruning shears",
         "show_marquee": true

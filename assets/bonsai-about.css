@@ -63,7 +63,7 @@
 .bh-about__bulk { background: linear-gradient(160deg, #1B1F17 0%, #2E4716 100%); border-radius: 24px; padding: clamp(28px, 4vw, 44px); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; }
 .bh-about__bulk-title { font-size: clamp(20px, 2.4vw, 26px); font-weight: 800; color: #faf7f1; max-width: 32ch; }
 .bh-about__bulk-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 8px; }
-.bh .bh-about__wa { display: flex; align-items: center; gap: 8px; background: #25D366; color: #ffffff; font-size: 14px; font-weight: 700; padding: 13px 26px; border-radius: 999px; text-decoration: none; }
+.bh .bh-about__wa { display: flex; align-items: center; gap: 8px; background: #ffffff; border: 1.5px solid #25D366; color: #1B1F17; font-size: 14px; font-weight: 700; padding: 11px 24px; border-radius: 999px; text-decoration: none; }
 .bh .bh-about__contact { display: flex; align-items: center; background: none; border: 1.5px solid #faf7f1; color: #faf7f1; font-size: 14px; font-weight: 700; padding: 12px 26px; border-radius: 999px; text-decoration: none; }
 
 /* Closing */

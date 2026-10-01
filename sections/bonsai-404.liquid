@@ -110,7 +110,7 @@
         <span class="bh-nf__help-title">{{ section.settings.help_heading }}</span>
         <div class="bh-nf__help-actions">
           {%- if wa_number != blank -%}
-            <a href="{{ wa_url }}" target="_blank" rel="noopener" class="bh-nf__help-wa">{{ section.settings.whatsapp_label }}</a>
+            <a href="{{ wa_url }}" target="_blank" rel="noopener" class="bh-nf__help-wa"><img src="{{ 'whatsapp-logo.png' | asset_url }}" width="22" height="22" alt="" loading="lazy" aria-hidden="true">{{ section.settings.whatsapp_label }}</a>
           {%- endif -%}
           <a href="{{ section.settings.contact_link | default: '/pages/contact' }}" class="bh-nf__help-contact">{{ section.settings.contact_label }}</a>
         </div>

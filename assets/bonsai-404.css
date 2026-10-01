@@ -42,5 +42,5 @@
 .bh-nf__help { margin-top: 52px; background: linear-gradient(135deg, #1B1F17 0%, #2E4716 100%); border-radius: 20px; padding: 26px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
 .bh-nf__help-title { font-size: 16px; font-weight: 700; color: #ffffff; }
 .bh-nf__help-actions { display: flex; flex-wrap: wrap; gap: 12px; }
-.bh .bh-nf__help-wa { text-decoration: none; background: #25D366; color: #ffffff; font-size: 13.5px; font-weight: 700; padding: 13px 22px; border-radius: 999px; min-height: 44px; display: flex; align-items: center; }
+.bh .bh-nf__help-wa { text-decoration: none; background: #ffffff; border: 1.5px solid #25D366; color: #1B1F17; font-size: 13.5px; font-weight: 700; padding: 11px 20px; border-radius: 999px; min-height: 44px; display: flex; align-items: center; gap: 8px; }
 .bh .bh-nf__help-contact { text-decoration: none; background: none; border: 1.5px solid #ffffff; color: #ffffff; font-size: 13.5px; font-weight: 700; padding: 12px 22px; border-radius: 999px; min-height: 44px; display: flex; align-items: center; }

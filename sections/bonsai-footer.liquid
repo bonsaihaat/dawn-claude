@@ -54,7 +54,7 @@
               <a href="/pages/faq">FAQs</a>
             {%- endif -%}
             {%- if wa_number != blank -%}
-              <a href="{{ wa_url }}" target="_blank" rel="noopener">Chat on WhatsApp</a>
+              <a href="{{ wa_url }}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px"><img src="{{ 'whatsapp-logo.png' | asset_url }}" width="18" height="18" alt="" loading="lazy" aria-hidden="true">Chat on WhatsApp</a>
             {%- endif -%}
           </div>
         </div>

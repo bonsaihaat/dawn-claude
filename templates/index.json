@@ -44,6 +44,8 @@
         "r1", "r2", "r3"
       ],
       "settings": {
+        "promo1_url": "/collections/bonsai-plants?filter.v.price.lte=998.99",
+        "promo2_title": "Explore Pots & Other Accessories",
         "bestsellers_collection": "bestselling-bonsai-plants",
         "bestsellers_button_collection": "bonsai-plants",
         "accessories_collection": "bestselling-pots-accessories",

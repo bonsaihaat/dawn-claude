@@ -78,4 +78,4 @@ html.bh-no-scroll { overflow: hidden; }
 .bh-cd__rule { height: 1px; background: #eee7d8; }
 .bh-cd__trust { display: flex; flex-wrap: wrap; gap: 6px 14px; justify-content: center; }
 .bh-cd__trust span { display: flex; align-items: center; gap: 5px; font-size: 11.5px; color: #20241b; }
-.bh-cd .bh-cd__help { text-align: center; font-size: 12px; font-weight: 600; color: #1B1F17; text-decoration: none; }
+.bh-cd .bh-cd__help { display: flex; align-items: center; justify-content: center; gap: 8px; text-align: center; font-size: 12px; font-weight: 600; color: #1B1F17; text-decoration: none; }

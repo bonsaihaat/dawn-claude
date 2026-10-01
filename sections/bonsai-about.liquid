@@ -152,7 +152,7 @@
         <span class="bh-about__bulk-title">{{ section.settings.bulk_heading }}</span>
         <div class="bh-about__bulk-actions">
           <a href="{{ wa_url }}?text={{ section.settings.bulk_message | url_encode }}" target="_blank" rel="noopener" class="bh-about__wa">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3a9 9 0 0 0-7.8 13.4L3 21l4.8-1.2A9 9 0 1 0 12 3Z" fill="#ffffff"/></svg>
+            <img src="{{ 'whatsapp-logo.png' | asset_url }}" width="22" height="22" alt="" loading="lazy" aria-hidden="true">
             WhatsApp us
           </a>
           <a href="{{ section.settings.contact_url | default: '/pages/contact' }}" class="bh-about__contact">Contact us</a>

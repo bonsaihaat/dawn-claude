@@ -235,9 +235,16 @@
       return 'Arrives ' + window.bhDelivery.arrival(state);
     }
 
-    function setShipValue(text) {
+    // Shows the delivery fee in the Shipping row and adds it to every total
+    // (summary, checkout button, mobile sticky bar); no text resets them.
+    function setShipValue(text, feePaise) {
       var el = root.querySelector('[data-bh-ship-value]');
       if (el) el.textContent = text || 'Calculated at checkout';
+      root.querySelectorAll('[data-bh-grand]').forEach(function (t) {
+        var paise = (parseInt(t.getAttribute('data-bh-grand'), 10) || 0) + (text ? feePaise || 0 : 0);
+        var rupees = paise / 100;
+        t.textContent = '₹' + rupees.toLocaleString('en-IN', { minimumFractionDigits: paise % 100 ? 2 : 0, maximumFractionDigits: 2 });
+      });
     }
 
     function courierCheck(pin) {
@@ -275,7 +282,7 @@
             if (!list.length) { setPinMsg('Sorry, we don’t deliver to ' + label + ' yet.'); return; }
             var fee = parseFloat(list[0].price) || 0;
             var feeText = fee > 0 ? '₹' + fee.toLocaleString('en-IN', { maximumFractionDigits: 2 }) : 'Free';
-            setShipValue(feeText);
+            setShipValue(feeText, Math.round(fee * 100));
             setPinMsg(label + ' · ' + (fee > 0 ? 'Delivery ' + feeText : 'Free delivery') + ' · ' + estimate(where.state));
           });
         });

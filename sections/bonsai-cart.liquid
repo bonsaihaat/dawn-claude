@@ -163,7 +163,7 @@
             <div class="bh-cart__rule"></div>
             <div class="bh-cart__total">
               <span class="bh-cart__total-label">Total</span>
-              <span class="bh-cart__total-val">{% render 'bonsai-money', amount: cart.total_price %}</span>
+              <span class="bh-cart__total-val" data-bh-grand="{{ cart.total_price }}">{% render 'bonsai-money', amount: cart.total_price %}</span>
             </div>
             {%- if cart.discount_applications.size > 0 -%}<div></div>{%- endif -%}
             </div>
@@ -190,7 +190,7 @@
               <textarea id="bh-cart-note" name="note" form="bh-cart-checkout" rows="3" placeholder="Add a gift message or delivery instructions" data-bh-note>{{ cart.note }}</textarea>
             </div>
 
-            <button type="submit" name="checkout" form="bh-cart-checkout" class="bh-cart__checkout" data-bh-part="checkout"><span>Checkout ·</span><span>{% render 'bonsai-money', amount: cart.total_price %}</span></button>
+            <button type="submit" name="checkout" form="bh-cart-checkout" class="bh-cart__checkout" data-bh-part="checkout"><span>Checkout ·</span><span data-bh-grand="{{ cart.total_price }}">{% render 'bonsai-money', amount: cart.total_price %}</span></button>
             <span class="bh-cart__tax">{% if cart.taxes_included %}Taxes included{% else %}Taxes calculated at checkout{% endif %}</span>
 
             {%- if section.settings.payment_chips != blank -%}
@@ -225,7 +225,7 @@
       <div class="bh-cart__sticky">
         <div class="bh-cart__sticky-total">
           <span>Total</span>
-          <strong data-bh-part="sticky">{% render 'bonsai-money', amount: cart.total_price %}</strong>
+          <strong data-bh-part="sticky" data-bh-grand="{{ cart.total_price }}">{% render 'bonsai-money', amount: cart.total_price %}</strong>
         </div>
         <button type="submit" name="checkout" form="bh-cart-checkout">Checkout</button>
       </div>

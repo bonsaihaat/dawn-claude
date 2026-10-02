@@ -137,6 +137,10 @@
 
         <div class="bh-pdp__price-row">
           <span class="bh-pdp__price" data-bh-total>{%- render 'bonsai-money', amount: current_variant.price -%}</span>
+          <s class="bh-price__compare bh-pdp__compare" data-bh-compare{% unless current_variant.compare_at_price > current_variant.price %} hidden{% endunless %}>
+            {%- render 'bonsai-money', amount: current_variant.compare_at_price -%}
+          </s>
+          <span class="bh-price__sale" data-bh-sale-tag{% unless current_variant.compare_at_price > current_variant.price %} hidden{% endunless %}>Sale</span>
           <span class="bh-pdp__tax">{{ section.settings.tax_note }}</span>
         </div>
 
@@ -166,13 +170,18 @@
             <legend class="bh-pdp__spec-label">{{ product.options | join: ' / ' }}</legend>
             {%- for variant in product.variants -%}
               <label class="bh-pdp__option{% if variant.id == current_variant.id %} is-selected{% endif %}{% unless variant.available %} is-unavailable{% endunless %}">
-                <input type="radio" name="bh-variant" value="{{ variant.id }}" data-price="{{ variant.price }}" data-available="{{ variant.available }}" data-media-id="{{ variant.featured_media.id }}"{% if variant.id == current_variant.id %} checked{% endif %}>
+                <input type="radio" name="bh-variant" value="{{ variant.id }}" data-price="{{ variant.price }}" data-compare-price="{{ variant.compare_at_price | default: 0 }}" data-available="{{ variant.available }}" data-media-id="{{ variant.featured_media.id }}"{% if variant.id == current_variant.id %} checked{% endif %}>
                 <span class="bh-pdp__radio"></span>
                 <span class="bh-pdp__option-text">
                   <span class="bh-pdp__option-label">{{ variant.title }}</span>
                   {%- unless variant.available -%}<span class="bh-pdp__option-note">Sold out</span>{%- endunless -%}
                 </span>
-                <span class="bh-pdp__option-price">{%- render 'bonsai-money', amount: variant.price -%}</span>
+                <span class="bh-pdp__option-price">
+                  {%- render 'bonsai-money', amount: variant.price -%}
+                  {%- if variant.compare_at_price > variant.price -%}
+                    <s class="bh-price__compare">{%- render 'bonsai-money', amount: variant.compare_at_price -%}</s>
+                  {%- endif -%}
+                </span>
               </label>
             {%- endfor -%}
           </fieldset>
@@ -184,7 +193,7 @@
             <span data-bh-qty-value>1</span>
             <button type="button" data-bh-qty="1" aria-label="Increase quantity">+</button>
           </div>
-          <button type="button" class="bh-pdp__add" data-bh-add data-variant-id="{{ current_variant.id }}" data-price="{{ current_variant.price }}"{% unless current_variant.available %} disabled{% endunless %}>
+          <button type="button" class="bh-pdp__add" data-bh-add data-variant-id="{{ current_variant.id }}" data-price="{{ current_variant.price }}" data-compare-price="{{ current_variant.compare_at_price | default: 0 }}"{% unless current_variant.available %} disabled{% endunless %}>
             {%- if current_variant.available -%}Add to cart{%- else -%}Sold out{%- endif -%}
           </button>
           <button type="button" class="bh-pdp__wish" data-bh-wish aria-label="Add to wishlist" aria-pressed="false">
@@ -260,7 +269,7 @@
         {%- if p.id == product.id -%}{%- continue -%}{%- endif -%}
         {%- if related_count >= 4 -%}{%- break -%}{%- endif -%}
         {%- assign related_count = related_count | plus: 1 -%}
-        {%- capture related_price -%}{%- render 'bonsai-money', amount: p.price -%}{%- endcapture -%}
+        {%- capture related_price -%}{%- render 'bonsai-price', product: p -%}{%- endcapture -%}
         {%- render 'bonsai-product-card',
           url: p.url,
           image: p.featured_media,
@@ -275,7 +284,7 @@
           {%- if related_source.products contains p -%}{%- continue -%}{%- endif -%}
           {%- if related_count >= 4 -%}{%- break -%}{%- endif -%}
           {%- assign related_count = related_count | plus: 1 -%}
-          {%- assign related_price = p.price | money_without_trailing_zeros -%}
+          {%- capture related_price -%}{%- render 'bonsai-price', product: p -%}{%- endcapture -%}
           {%- render 'bonsai-product-card',
             url: p.url,
             image: p.featured_media,
@@ -300,7 +309,12 @@
   <div class="bh-pdp__sticky" data-bh-sticky>
     <div class="bh-pdp__sticky-info">
       <span class="bh-pdp__sticky-name">{{ product.title }}</span>
-      <span class="bh-pdp__sticky-price" data-bh-total>{%- render 'bonsai-money', amount: current_variant.price -%}</span>
+      <span class="bh-pdp__sticky-prices">
+        <span class="bh-pdp__sticky-price" data-bh-total>{%- render 'bonsai-money', amount: current_variant.price -%}</span>
+        <s class="bh-price__compare" data-bh-compare{% unless current_variant.compare_at_price > current_variant.price %} hidden{% endunless %}>
+          {%- render 'bonsai-money', amount: current_variant.compare_at_price -%}
+        </s>
+      </span>
     </div>
     <button type="button" class="bh-pdp__add" data-bh-add-proxy{% unless current_variant.available %} disabled{% endunless %}>
       {%- if current_variant.available -%}Add to cart{%- else -%}Sold out{%- endif -%}

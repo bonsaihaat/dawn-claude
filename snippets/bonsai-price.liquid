@@ -1,0 +1,20 @@
+{%- comment -%}
+  Prints a price; when the compare-at price is higher it also prints that price struck
+  through and a "Sale" tag.
+  Accepts: product (uses its cheapest variant), or price and compare_at_price (in paise)
+{%- endcomment -%}
+{%- liquid
+  if product != blank
+    assign bh_variant = product.variants | sort: 'price' | first
+    assign bh_price = bh_variant.price
+    assign bh_compare = bh_variant.compare_at_price
+  else
+    assign bh_price = price
+    assign bh_compare = compare_at_price
+  endif
+-%}
+{%- render 'bonsai-money', amount: bh_price -%}
+{%- if bh_compare > bh_price -%}
+  <s class="bh-price__compare">{%- render 'bonsai-money', amount: bh_compare -%}</s>
+  <span class="bh-price__sale">Sale</span>
+{%- endif -%}

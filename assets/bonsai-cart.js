@@ -239,7 +239,7 @@
     // (summary, checkout button, mobile sticky bar); no text resets them.
     function setShipValue(text, feePaise) {
       var el = root.querySelector('[data-bh-ship-value]');
-      if (el) el.textContent = text || 'Calculated at checkout';
+      if (el) el.textContent = text || 'Free for most of India · enter pincode to check';
       root.querySelectorAll('[data-bh-grand]').forEach(function (t) {
         var paise = (parseInt(t.getAttribute('data-bh-grand'), 10) || 0) + (text ? feePaise || 0 : 0);
         var rupees = paise / 100;

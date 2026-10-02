@@ -1,0 +1,188 @@
+{{ 'bonsai-faq.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  FAQ page (template page.faq). Questions come from Shopify admin → Content →
+  Metaobjects → FAQ, grouped by their Topic in the order of this section's
+  Topics setting; within a topic, older entries show first. Entries whose
+  topic isn't listed go in a final "More questions" group. Also outputs
+  FAQPage structured data so search engines can show the answers.
+{%- endcomment -%}
+{%- liquid
+  assign wa_number = settings.whatsapp_number | remove: '+' | remove: ' '
+  assign topics = section.settings.topics | newline_to_br | split: '<br />'
+  assign entries = shop.metaobjects.faq_item.values
+
+  # Oldest first: entry IDs only grow, padded so text sorting matches number order.
+  assign keys = ''
+  for entry in entries
+    if entry.show_on_page.value == false or entry.question.value == blank
+      continue
+    endif
+    assign sort_id = entry.system.id | plus: 1000000000000000
+    assign sort_index = forloop.index0 | plus: 10000
+    assign keys = keys | append: sort_id | append: '-' | append: sort_index | append: ','
+  endfor
+  assign keys = keys | split: ',' | sort
+
+  assign listed = ''
+  for topic in topics
+    assign t = topic | strip
+    assign listed = listed | append: '|' | append: t | append: '|'
+  endfor
+-%}
+
+<div class="bh bh-faq" data-bh-faq>
+  <div class="bh-faq__wrap">
+    <nav class="bh-faq__crumbs" aria-label="Breadcrumb">
+      <a href="{{ routes.root_url }}">Home</a>
+      <span>/</span>
+      <span class="bh-faq__crumb-current">{{ section.settings.heading | default: page.title }}</span>
+    </nav>
+
+    <h1 class="bh-faq__title">{{ section.settings.heading | default: page.title }}</h1>
+    {%- if section.settings.intro != blank -%}
+      <p class="bh-faq__intro">{{ section.settings.intro }}</p>
+    {%- endif -%}
+
+    {%- if keys.size > 0 -%}
+      <div class="bh-faq__tools">
+        <label class="bh-faq__search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="#767d6c" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="#767d6c" stroke-width="2" stroke-linecap="round"/></svg>
+          <input type="search" placeholder="Search questions, e.g. delivery, COD, gift" aria-label="Search questions" data-bh-faq-search>
+        </label>
+        <nav class="bh-faq__topics" aria-label="Topics">
+          {%- for topic in topics -%}
+            {%- assign t = topic | strip -%}
+            {%- if t == blank -%}{%- continue -%}{%- endif -%}
+            {%- assign has = false -%}
+            {%- for entry in entries -%}
+              {%- if entry.topic.value == t and entry.show_on_page.value != false -%}{%- assign has = true -%}{%- break -%}{%- endif -%}
+            {%- endfor -%}
+            {%- if has -%}<a href="#faq-{{ t | handleize }}" data-bh-faq-chip>{{ t }}</a>{%- endif -%}
+          {%- endfor -%}
+        </nav>
+      </div>
+
+      {%- capture other -%}
+        {%- for key in keys -%}
+          {%- assign i = key | split: '-' | last | minus: 10000 -%}
+          {%- for entry in entries -%}
+            {%- if forloop.index0 == i -%}
+              {%- assign marker = '|' | append: entry.topic.value | append: '|' -%}
+              {%- unless listed contains marker -%}{%- render 'bonsai-faq-item', entry: entry -%}{%- endunless -%}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endfor -%}
+      {%- endcapture -%}
+
+      {%- for topic in topics -%}
+        {%- assign t = topic | strip -%}
+        {%- if t == blank -%}{%- continue -%}{%- endif -%}
+        {%- capture items -%}
+          {%- for key in keys -%}
+            {%- assign i = key | split: '-' | last | minus: 10000 -%}
+            {%- for entry in entries -%}
+              {%- if forloop.index0 == i and entry.topic.value == t -%}{%- render 'bonsai-faq-item', entry: entry -%}{%- endif -%}
+            {%- endfor -%}
+          {%- endfor -%}
+        {%- endcapture -%}
+        {%- if items contains 'bh-faq__item' -%}
+          <section class="bh-faq__group" id="faq-{{ t | handleize }}" data-bh-faq-group>
+            <h2 class="bh-faq__h2">{{ t }}</h2>
+            {{ items }}
+          </section>
+        {%- endif -%}
+      {%- endfor -%}
+      {%- if other contains 'bh-faq__item' -%}
+        <section class="bh-faq__group" id="faq-more" data-bh-faq-group>
+          <h2 class="bh-faq__h2">More questions</h2>
+          {{ other }}
+        </section>
+      {%- endif -%}
+      <p class="bh-faq__none" data-bh-faq-none hidden>No questions match your search. Try another word, or ask us directly below.</p>
+    {%- endif -%}
+
+    <div class="bh-faq__help">
+      <div>
+        <h2 class="bh-faq__help-title">{{ section.settings.help_heading }}</h2>
+        <p>{{ section.settings.help_text }}</p>
+      </div>
+      <div class="bh-faq__help-actions">
+        {%- if wa_number != blank -%}
+          <a href="https://wa.me/{{ wa_number }}?text={{ section.settings.whatsapp_message | url_encode | replace: '+', '%20' }}" target="_blank" rel="noopener" class="bh-faq__wa">
+            <img src="{{ 'whatsapp-logo.png' | asset_url }}" width="20" height="20" alt="" loading="lazy" aria-hidden="true">
+            WhatsApp us
+          </a>
+        {%- endif -%}
+        <a href="/pages/contact" class="bh-faq__contact">Contact form</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{%- if keys.size > 0 -%}
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {%- for key in keys -%}
+          {%- assign i = key | split: '-' | last | minus: 10000 -%}
+          {%- for entry in entries -%}
+            {%- if forloop.index0 == i -%}
+              {"@type": "Question", "name": {{ entry.question.value | json }}, "acceptedAnswer": {"@type": "Answer", "text": {{ entry.answer | metafield_text | json }}}}
+            {%- endif -%}
+          {%- endfor -%}
+          {%- unless forloop.last -%},{%- endunless -%}
+        {%- endfor -%}
+      ]
+    }
+  </script>
+{%- endif -%}
+
+<script>
+  // Search: shows questions whose question or answer contains every typed word.
+  (function () {
+    var root = document.currentScript.previousElementSibling;
+    while (root && !root.hasAttribute('data-bh-faq')) root = root.previousElementSibling;
+    if (!root) return;
+    var input = root.querySelector('[data-bh-faq-search]');
+    var none = root.querySelector('[data-bh-faq-none]');
+    if (!input) return;
+    var items = Array.prototype.slice.call(root.querySelectorAll('.bh-faq__item'));
+    var groups = Array.prototype.slice.call(root.querySelectorAll('[data-bh-faq-group]'));
+    var chips = root.querySelector('.bh-faq__topics');
+    input.addEventListener('input', function () {
+      var words = input.value.toLowerCase().trim().split(/\s+/).filter(Boolean).map(function (w) {
+        // Match from the start of a word, so "cod" finds COD but not "pincode".
+        return new RegExp('(^|[^a-z0-9])' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+      });
+      var any = false;
+      items.forEach(function (item) {
+        var text = item.textContent.toLowerCase();
+        var match = words.every(function (w) { return w.test(text); });
+        item.hidden = !match;
+        item.open = words.length > 0 && match;
+        if (match) any = true;
+      });
+      groups.forEach(function (g) { g.hidden = !g.querySelector('.bh-faq__item:not([hidden])'); });
+      if (chips) chips.hidden = words.length > 0;
+      none.hidden = any;
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Bonsai FAQ",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Frequently asked questions" },
+    { "type": "textarea", "id": "intro", "label": "Intro", "default": "Quick answers about ordering, delivery, returns and caring for your bonsai." },
+    { "type": "textarea", "id": "topics", "label": "Topics, in order", "default": "Orders & payment\nDelivery\nReturns & damage\nPlants & care\nGifting & bulk orders", "info": "One per line, spelled exactly as in the FAQ entries' Topic field (Content → Metaobjects → FAQ)." },
+    { "type": "header", "content": "Help box" },
+    { "type": "text", "id": "help_heading", "label": "Heading", "default": "Still have a question?" },
+    { "type": "text", "id": "help_text", "label": "Text", "default": "We're here Monday to Saturday, 10 AM – 6 PM, and reply within 48 working hours." },
+    { "type": "text", "id": "whatsapp_message", "label": "WhatsApp pre-filled message", "default": "Hi Bonsai Haat! I have a question." }
+  ]
+}
+{% endschema %}

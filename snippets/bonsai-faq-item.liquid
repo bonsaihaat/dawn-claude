@@ -1,0 +1,11 @@
+{%- comment -%}
+  One question on the FAQ page, opening to show its answer.
+  Accepts: entry (FAQ metaobject)
+{%- endcomment -%}
+<details class="bh-faq__item">
+  <summary>
+    <span>{{ entry.question.value }}</span>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="#1B1F17" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </summary>
+  <div class="bh-faq__answer">{{ entry.answer | metafield_tag }}</div>
+</details>

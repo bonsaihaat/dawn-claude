@@ -1,0 +1,12 @@
+{
+  "layout": "bonsai",
+  "sections": {
+    "main": {
+      "type": "bonsai-faq",
+      "settings": {}
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

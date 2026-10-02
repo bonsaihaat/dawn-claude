@@ -1,11 +1,43 @@
 {{ 'bonsai-gallery.css' | asset_url | stylesheet_tag }}
 
 {%- comment -%}
-  Photo gallery for the Gallery page (template page.gallery). Photos are the
-  section's Photo blocks; tapping one opens it full size. The page's own
-  content in Shopify admin → Online Store → Pages shows as the intro.
+  Photo gallery for the Gallery page (template page.gallery). Photos come from
+  Shopify admin → Content → Metaobjects → Gallery photo, ordered by Position
+  (entries without one go last, oldest first); tapping one opens it full size.
+  The theme editor's Photo blocks are only a fallback while no entries are
+  shown. The page's own content (Online Store → Pages) shows as the intro.
 {%- endcomment -%}
-{%- assign photos = section.blocks | where: 'type', 'photo' -%}
+{%- liquid
+  assign photo_entries = shop.metaobjects.gallery_photo.values
+  assign photo_keys = ''
+  for entry in photo_entries
+    if entry.show_in_gallery.value == false or entry.image.value == blank
+      continue
+    endif
+    assign sort_position = entry.position.value | default: 9999 | at_least: 0 | at_most: 9999 | plus: 10000
+    assign sort_index = forloop.index0 | plus: 10000
+    assign photo_keys = photo_keys | append: sort_position | append: '-' | append: sort_index | append: ','
+  endfor
+  assign photo_keys = photo_keys | split: ',' | sort
+  assign photo_blocks = section.blocks | where: 'type', 'photo'
+-%}
+
+{%- capture photo_items -%}
+  {%- if photo_keys.size > 0 -%}
+    {%- for key in photo_keys -%}
+      {%- assign entry_index = key | split: '-' | last | minus: 10000 -%}
+      {%- for entry in photo_entries -%}
+        {%- if forloop.index0 == entry_index -%}
+          {%- render 'bonsai-gallery-photo', image: entry.image.value, caption: entry.caption.value -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endfor -%}
+  {%- else -%}
+    {%- for block in photo_blocks -%}
+      {%- render 'bonsai-gallery-photo', image: block.settings.image, caption: block.settings.caption, attributes: block.shopify_attributes -%}
+    {%- endfor -%}
+  {%- endif -%}
+{%- endcapture -%}
 
 <div class="bh bh-gallery" data-bh-gallery>
   <div class="bh-gallery__wrap">
@@ -20,25 +52,7 @@
       <div class="bh-gallery__intro">{{ page.content }}</div>
     {%- endif -%}
 
-    <div class="bh-gallery__grid">
-      {%- for block in photos -%}
-        {%- if block.settings.image != blank -%}
-          {%- assign alt = block.settings.caption | default: block.settings.image.alt -%}
-          <figure class="bh-gallery__item" {{ block.shopify_attributes }}>
-            <button type="button" class="bh-gallery__open" data-bh-gallery-open="{{ block.settings.image | image_url: width: 1800 }}" data-alt="{{ alt | escape }}" aria-label="View larger: {{ alt | escape }}">
-              {{
-                block.settings.image
-                | image_url: width: 900
-                | image_tag: loading: 'lazy', widths: '400, 600, 900', sizes: '(min-width: 1000px) 380px, (min-width: 640px) 45vw, 92vw', alt: alt
-              }}
-            </button>
-            {%- if block.settings.caption != blank -%}
-              <figcaption>{{ block.settings.caption }}</figcaption>
-            {%- endif -%}
-          </figure>
-        {%- endif -%}
-      {%- endfor -%}
-    </div>
+    <div class="bh-gallery__grid">{{ photo_items }}</div>
 
     {%- if section.settings.cta_text != blank -%}
       <div class="bh-gallery__cta">
@@ -98,8 +112,9 @@
   "blocks": [
     {
       "type": "photo",
-      "name": "Photo",
+      "name": "Photo (fallback)",
       "settings": [
+        { "type": "paragraph", "content": "Only used while Content → Metaobjects → Gallery photo has no entries." },
         { "type": "image_picker", "id": "image", "label": "Photo" },
         { "type": "text", "id": "caption", "label": "Caption", "info": "Optional. Shown under the photo; the photo's alt text is used for screen readers when empty." }
       ]

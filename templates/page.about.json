@@ -104,8 +104,8 @@
           "type": "feature",
           "settings": {
             "icon": "truck",
-            "title": "Free shipping across India",
-            "text": "Subject to courier serviceability at your pincode."
+            "title": "Free delivery across most of India",
+            "text": "A small delivery charge applies only for a few remote regions."
           }
         },
         "feature_6": {
@@ -143,6 +143,34 @@
             "title": "Care support after delivery",
             "text": "Our team is on WhatsApp if you have questions once it arrives."
           }
+        },
+        "moment_1": {
+          "type": "moment",
+          "settings": {
+            "image": "shopify://shop_images/bonsai-haat-gallery-04.jpg",
+            "caption": "Bonsai display during an exhibition"
+          }
+        },
+        "moment_2": {
+          "type": "moment",
+          "settings": {
+            "image": "shopify://shop_images/bonsai-haat-gallery-06.jpg",
+            "caption": "Young bonsai lover admiring landscapes"
+          }
+        },
+        "moment_3": {
+          "type": "moment",
+          "settings": {
+            "image": "shopify://shop_images/bonsai-haat-gallery-07.jpg",
+            "caption": "Visitors at our exhibition"
+          }
+        },
+        "moment_4": {
+          "type": "moment",
+          "settings": {
+            "image": "shopify://shop_images/bonsai-haat-gallery-08.jpg",
+            "caption": "Center of attraction in the exhibition"
+          }
         }
       },
       "block_order": [
@@ -156,6 +184,10 @@
         "stat_2",
         "stat_3",
         "stat_4",
+        "moment_1",
+        "moment_2",
+        "moment_3",
+        "moment_4",
         "feature_1",
         "feature_2",
         "feature_3",
@@ -167,7 +199,13 @@
         "step_3",
         "step_4"
       ],
-      "settings": {}
+      "settings": {
+        "hero_image": "shopify://shop_images/bonsai-haat-gallery-02.jpg",
+        "story_image": "shopify://shop_images/bonsai-haat-gallery-05.jpg",
+        "artist_image": "shopify://shop_images/bonsai-haat-gallery-01.jpg",
+        "press_video": "https://youtu.be/QakgHsdjGsg",
+        "press_title": "Bonsai Haat Featured in Dainik Bhaskar"
+      }
     }
   },
   "order": [

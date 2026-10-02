@@ -81,3 +81,21 @@
   .bh-about__portrait { width: 180px; height: 180px; }
   .bh-about__steps { gap: 20px; }
 }
+
+/* In the news: text beside the video, which plays in place */
+.bh-about__press { display: grid; gap: 22px; align-items: center; }
+@media (min-width: 820px) { .bh-about__press { grid-template-columns: 1fr 1.3fr; gap: 40px; } }
+.bh-about__press .bh-gallery__video { max-width: none; }
+.bh-about__press-frame { display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: 14px; background: #000; }
+
+/* From our exhibitions: four square photos linking to the gallery */
+.bh-about__moments-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+.bh .bh-about__moments-link { font-size: 14px; font-weight: 700; color: #2E4716; text-decoration: none; white-space: nowrap; }
+.bh-about__moments { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+@media (min-width: 820px) { .bh-about__moments { grid-template-columns: repeat(4, 1fr); gap: 16px; } }
+.bh .bh-about__moment { display: flex; flex-direction: column; gap: 8px; text-decoration: none; color: #1B1F17; }
+.bh-about__moment img { display: block; width: 100%; height: auto; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 16px; }
+.bh-about__moment span { font-size: 13px; font-weight: 600; line-height: 1.35; }
+
+/* Reviews reuse the homepage cards */
+.bh-about__reviews { margin-bottom: 0; }

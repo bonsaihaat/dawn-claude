@@ -30,26 +30,6 @@
   assign spec_height = m.height.value
   assign spec_care = m.care_level.value
 
-  case light
-    when 'Full sun'
-      assign default_light = '4–6 hours of direct sun, outdoors on a balcony or terrace.'
-      assign default_water = 'Daily in summer, every 2–3 days in winter. Never let the soil dry out fully.'
-    when 'Bright indirect'
-      assign default_light = 'Near a bright window, away from harsh afternoon sun and AC vents.'
-      assign default_water = 'When the top 1 cm of soil feels dry — usually every 3–4 days.'
-    when 'Low light'
-      assign default_light = 'Tolerates low light; a few hours near a window each day keeps it lush.'
-      assign default_water = 'Every 5–7 days. Let the soil dry between waterings.'
-    else
-      assign default_light = ''
-      assign default_water = ''
-  endcase
-  assign care_light = m.care_light.value | default: default_light
-  assign care_water = m.care_water.value | default: default_water
-  assign care_soil = m.care_soil.value | default: section.settings.care_soil
-  assign in_box = m.whats_in_box.value | default: section.settings.in_box
-  assign shipping_text = m.shipping.value | default: section.settings.shipping_text
-
   assign rating = product.metafields.reviews.rating.value
   assign rating_count = product.metafields.reviews.rating_count.value | default: 0
   assign trust_items = section.settings.trust_items | split: ','
@@ -220,40 +200,6 @@
             </div>
           {%- endif -%}
         </div>
-
-        <div class="bh-pdp__accordion">
-          {%- if care_light != blank or care_water != blank or care_soil != blank -%}
-            <div class="bh-pdp__acc is-open" data-bh-acc>
-              <button type="button" class="bh-pdp__acc-btn" aria-expanded="true">
-                <span>Care guide</span>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6l6-6" stroke="#1B1F17" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </button>
-              <div class="bh-pdp__acc-body">
-                {%- if care_light != blank -%}<div class="bh-pdp__acc-row"><span class="bh-pdp__acc-label">Light</span><span class="bh-pdp__acc-text">{{ care_light }}</span></div>{%- endif -%}
-                {%- if care_water != blank -%}<div class="bh-pdp__acc-row"><span class="bh-pdp__acc-label">Water</span><span class="bh-pdp__acc-text">{{ care_water }}</span></div>{%- endif -%}
-                {%- if care_soil != blank -%}<div class="bh-pdp__acc-row"><span class="bh-pdp__acc-label">Soil &amp; repotting</span><span class="bh-pdp__acc-text">{{ care_soil }}</span></div>{%- endif -%}
-              </div>
-            </div>
-          {%- endif -%}
-          {%- if in_box != blank -%}
-            <div class="bh-pdp__acc" data-bh-acc>
-              <button type="button" class="bh-pdp__acc-btn" aria-expanded="false">
-                <span>What’s in the box</span>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6l6-6" stroke="#1B1F17" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </button>
-              <div class="bh-pdp__acc-body"><div class="bh-pdp__acc-row"><span class="bh-pdp__acc-text">{{ in_box }}</span></div></div>
-            </div>
-          {%- endif -%}
-          {%- if shipping_text != blank -%}
-            <div class="bh-pdp__acc" data-bh-acc>
-              <button type="button" class="bh-pdp__acc-btn" aria-expanded="false">
-                <span>Shipping &amp; replacement</span>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6l6-6" stroke="#1B1F17" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </button>
-              <div class="bh-pdp__acc-body"><div class="bh-pdp__acc-row"><span class="bh-pdp__acc-text">{{ shipping_text }}</span></div></div>
-            </div>
-          {%- endif -%}
-        </div>
       </div>
     </div>
 
@@ -335,10 +281,6 @@
     { "type": "header", "content": "Delivery check", "info": "Free-shipping threshold and fee come from the shop metafields custom.free_shipping_threshold and custom.standard_shipping_fee (Settings → Custom data → Shop)." },
     { "type": "range", "id": "delivery_days", "label": "Estimated delivery (days)", "min": 1, "max": 14, "step": 1, "default": 4 },
     { "type": "text", "id": "trust_items", "label": "Trust items", "default": "Arrives healthy,Free replacement,Care support", "info": "Comma-separated." },
-    { "type": "header", "content": "Accordion defaults", "info": "Per-product metafields (custom.care_light, custom.care_water, custom.care_soil, custom.whats_in_box, custom.shipping) override these." },
-    { "type": "textarea", "id": "care_soil", "label": "Soil & repotting", "default": "Well-draining bonsai mix. Repot every 2–3 years in early spring." },
-    { "type": "textarea", "id": "in_box", "label": "What’s in the box", "default": "The exact tree in the photos, your chosen pot, a printed care card and a moisture-safe travel wrap." },
-    { "type": "textarea", "id": "shipping_text", "label": "Shipping & replacement", "default": "Pan-India delivery in 3–5 days. If your tree arrives damaged, share a photo within 48 hours and we’ll replace it free." },
     { "type": "header", "content": "Related products" },
     { "type": "text", "id": "related_heading", "label": "Heading", "default": "You may also like" }
   ]

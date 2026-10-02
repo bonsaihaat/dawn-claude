@@ -155,21 +155,6 @@
       setPinMsg('Delivered to ' + pin + ' by ' + when + cost);
     });
 
-    // Accordion: one section open at a time
-    var accs = root.querySelectorAll('[data-bh-acc]');
-    accs.forEach(function (acc) {
-      var btn = acc.querySelector('.bh-pdp__acc-btn');
-      btn.addEventListener('click', function () {
-        var open = !acc.classList.contains('is-open');
-        accs.forEach(function (a) {
-          a.classList.remove('is-open');
-          a.querySelector('.bh-pdp__acc-btn').setAttribute('aria-expanded', 'false');
-        });
-        acc.classList.toggle('is-open', open);
-        btn.setAttribute('aria-expanded', String(open));
-      });
-    });
-
     // Mobile sticky bar
     var sticky = root.querySelector('[data-bh-sticky]');
     var onScroll = function () { sticky.classList.toggle('is-visible', window.scrollY > 520); };

@@ -89,7 +89,7 @@ body.bh-body { background: #faf7f1; }
 .bh-mh__logo { justify-self: center; display: block; line-height: 0; text-decoration: none; }
 .bh-mh__logo img { height: 46px; width: auto; display: block; }
 .bh-mh__cart { position: relative; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; text-decoration: none; }
-.bh-mh__search { padding: 0 16px 14px; }
+.bh-mh__search { padding: 6px 16px 14px; }
 
 .bh-badge { position: absolute; background: #5F8F2B; color: #fff; font-size: 9px; font-weight: 700; width: 15px; height: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 .bh-mh__cart .bh-badge { top: 6px; right: 4px; }
@@ -158,6 +158,8 @@ body.bh-body { background: #faf7f1; }
 
 /* Main */
 .bh-main { padding: 22px 20px 0; max-width: 1180px; margin: 0 auto; box-sizing: border-box; }
+/* Mobile: the header search already leaves 14px below it, so keep the gap to the hero at ~24px */
+@media (max-width: 819.98px) { .bh-main { padding-top: 10px; } }
 
 /* Hero */
 .bh-hero { position: relative; border-radius: 26px; overflow: hidden; background: #e7e2d3; aspect-ratio: 4 / 5; }

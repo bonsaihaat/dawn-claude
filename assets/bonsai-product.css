@@ -33,8 +33,11 @@
 .bh-pdp__rating strong { color: #1B1F17; }
 .bh-pdp__rating-count { text-decoration: underline; }
 
-.bh-pdp__price-row { display: flex; align-items: baseline; gap: 10px; }
+.bh-pdp__price-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
 .bh-pdp__price { font-size: 28px; font-weight: 800; color: #1B1F17; }
+.bh-pdp__price-row .bh-price__compare,
+.bh-pdp__price-row .bh-price__sale { margin-left: 0; }
+.bh-pdp__compare { font-size: 17px; }
 .bh-pdp__tax { font-size: 12.5px; color: #767d6c; }
 
 .bh-pdp__desc { margin: 0; font-size: 14.5px; line-height: 1.65; color: #20241b; max-width: 52ch; text-wrap: pretty; }
@@ -118,4 +121,5 @@
 }
 .bh-pdp__sticky-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
 .bh-pdp__sticky-name { font-size: 12px; color: #767d6c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bh-pdp__sticky-prices { display: flex; align-items: baseline; }
 .bh-pdp__sticky-price { font-size: 17px; font-weight: 800; color: #1B1F17; }

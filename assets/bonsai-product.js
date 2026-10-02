@@ -20,9 +20,12 @@
     var proxyBtn = root.querySelector('[data-bh-add-proxy]');
     var qtyEl = root.querySelector('[data-bh-qty-value]');
     var totals = root.querySelectorAll('[data-bh-total]');
+    var compares = root.querySelectorAll('[data-bh-compare]');
+    var saleTags = root.querySelectorAll('[data-bh-sale-tag]');
     var state = {
       qty: 1,
       price: parseInt(addBtn.getAttribute('data-price'), 10) || 0,
+      compare: parseInt(addBtn.getAttribute('data-compare-price'), 10) || 0,
       variantId: addBtn.getAttribute('data-variant-id'),
       available: !addBtn.disabled,
     };
@@ -42,6 +45,13 @@
       qtyEl.textContent = state.qty;
       var label = fmt(state.price * state.qty);
       totals.forEach(function (t) { t.textContent = label; });
+      var onSale = state.compare > state.price;
+      var compareLabel = fmt(state.compare * state.qty);
+      compares.forEach(function (c) {
+        c.hidden = !onSale;
+        if (onSale) c.textContent = compareLabel;
+      });
+      saleTags.forEach(function (s) { s.hidden = !onSale; });
     }
 
     root.querySelectorAll('[data-bh-qty]').forEach(function (b) {
@@ -60,6 +70,7 @@
         });
         state.variantId = input.value;
         state.price = parseInt(input.getAttribute('data-price'), 10) || 0;
+        state.compare = parseInt(input.getAttribute('data-compare-price'), 10) || 0;
         state.available = input.getAttribute('data-available') === 'true';
         var mediaId = input.getAttribute('data-media-id');
         if (mediaId) {

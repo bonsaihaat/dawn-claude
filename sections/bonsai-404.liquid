@@ -91,7 +91,7 @@
         <h2 class="bh-nf__h2">{{ section.settings.products_heading }}</h2>
         <div class="bh-nf__products">
           {%- for product in favourites.products limit: 4 -%}
-            {%- capture product_price -%}{%- render 'bonsai-money', amount: product.price -%}{%- endcapture -%}
+            {%- capture product_price -%}{%- render 'bonsai-price', product: product -%}{%- endcapture -%}
             {%- render 'bonsai-product-card',
               url: product.url,
               image: product.featured_media,

@@ -1,0 +1,184 @@
+{{ 'bonsai-contact.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  Contact page (template page.contact): quick contact cards, hours, reply
+  promise and a contact form. Form messages are emailed by Shopify to the
+  store's contact email (Settings → Store details); they are not kept in the
+  admin. Picking a cancellation or return topic makes Order number required.
+{%- endcomment -%}
+{%- liquid
+  assign wa_number = settings.whatsapp_number | remove: '+' | remove: ' '
+  assign phone_digits = section.settings.phone | remove: ' ' | remove: '-'
+  assign contact_email = section.settings.email | default: shop.email
+  assign topics = section.settings.topics | newline_to_br | split: '<br />'
+-%}
+
+<div class="bh bh-contact">
+  <div class="bh-contact__wrap">
+    <nav class="bh-contact__crumbs" aria-label="Breadcrumb">
+      <a href="{{ routes.root_url }}">Home</a>
+      <span>/</span>
+      <span class="bh-contact__crumb-current">{{ section.settings.heading | default: page.title }}</span>
+    </nav>
+
+    <h1 class="bh-contact__title">{{ section.settings.heading | default: page.title }}</h1>
+    {%- if section.settings.intro != blank -%}
+      <p class="bh-contact__intro">{{ section.settings.intro }}</p>
+    {%- endif -%}
+
+    <div class="bh-contact__cards">
+      {%- if wa_number != blank -%}
+        <a href="https://wa.me/{{ wa_number }}?text={{ section.settings.whatsapp_message | url_encode | replace: '+', '%20' }}" target="_blank" rel="noopener" class="bh-contact__card bh-contact__card--wa">
+          <img src="{{ 'whatsapp-logo.png' | asset_url }}" width="26" height="26" alt="" loading="lazy" aria-hidden="true">
+          <span class="bh-contact__card-label">WhatsApp</span>
+          <span class="bh-contact__card-value">{{ section.settings.phone }}</span>
+          <span class="bh-contact__card-note">Quickest reply</span>
+        </a>
+      {%- endif -%}
+      {%- if phone_digits != blank -%}
+        <a href="tel:{{ phone_digits }}" class="bh-contact__card">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" stroke="#5F8F2B" stroke-width="1.7" stroke-linejoin="round"/></svg>
+          <span class="bh-contact__card-label">Call us</span>
+          <span class="bh-contact__card-value">{{ section.settings.phone }}</span>
+          <span class="bh-contact__card-note">{{ section.settings.hours }}</span>
+        </a>
+      {%- endif -%}
+      {%- if contact_email != blank -%}
+        <a href="mailto:{{ contact_email }}" class="bh-contact__card bh-contact__card--wide">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5" stroke="#5F8F2B" stroke-width="1.7"/><path d="M4 7l8 6 8-6" stroke="#5F8F2B" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="bh-contact__card-label">Email</span>
+          <span class="bh-contact__card-value">{{ contact_email }}</span>
+          <span class="bh-contact__card-note">{{ section.settings.reply_promise }}</span>
+        </a>
+      {%- endif -%}
+      {%- if section.settings.address != blank -%}
+        <a href="https://www.google.com/maps/search/?api=1&amp;query={{ section.settings.address | url_encode }}" target="_blank" rel="noopener" class="bh-contact__card bh-contact__card--wide">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21Z" stroke="#5F8F2B" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="9.5" r="2.5" stroke="#5F8F2B" stroke-width="1.7"/></svg>
+          <span class="bh-contact__card-label">Find us</span>
+          <span class="bh-contact__card-value bh-contact__card-value--address">{{ section.settings.address }}</span>
+          <span class="bh-contact__card-note">Open in Google Maps</span>
+        </a>
+      {%- endif -%}
+    </div>
+
+    <div class="bh-contact__main">
+      <div class="bh-contact__aside">
+        <h2 class="bh-contact__h2">{{ section.settings.form_heading }}</h2>
+        {%- if section.settings.form_text != blank -%}
+          <div class="bh-contact__prose">{{ section.settings.form_text }}</div>
+        {%- endif -%}
+        <dl class="bh-contact__facts">
+          {%- if section.settings.hours != blank -%}
+            <div><dt>Working hours</dt><dd>{{ section.settings.hours }}</dd></div>
+          {%- endif -%}
+          {%- if section.settings.reply_promise != blank -%}
+            <div><dt>Reply time</dt><dd>{{ section.settings.reply_promise }}</dd></div>
+          {%- endif -%}
+        </dl>
+        <div class="bh-contact__links">
+          <a href="/apps/track-order">Track your order →</a>
+          {%- if shop.refund_policy != blank -%}
+            <a href="{{ shop.refund_policy.url }}">Returns &amp; refunds →</a>
+          {%- endif -%}
+          {%- if shop.shipping_policy != blank -%}
+            <a href="{{ shop.shipping_policy.url }}">Shipping &amp; delivery →</a>
+          {%- endif -%}
+        </div>
+      </div>
+
+      <div class="bh-contact__form-card">
+        {%- form 'contact', id: 'BhContactForm', class: 'bh-contact__form' -%}
+          {%- if form.posted_successfully? -%}
+            <div class="bh-contact__status bh-contact__status--ok" role="status" tabindex="-1" autofocus>
+              <strong>Thank you! Your message has been sent.</strong>
+              <span>{{ section.settings.reply_promise }}. For anything urgent, WhatsApp us.</span>
+            </div>
+          {%- elsif form.errors -%}
+            <div class="bh-contact__status bh-contact__status--error" role="alert" tabindex="-1" autofocus>
+              <strong>Please check the form.</strong>
+              {%- for field in form.errors -%}
+                <span>{% if field == 'form' %}{{ form.errors.messages[field] }}{% else %}{{ form.errors.translated_fields[field] | capitalize }} {{ form.errors.messages[field] }}{% endif %}</span>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+
+          <div class="bh-contact__row">
+            <label class="bh-contact__field">
+              <span>Name <em>*</em></span>
+              <input type="text" name="contact[Name]" autocomplete="name" required value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}">
+            </label>
+            <label class="bh-contact__field">
+              <span>Email <em>*</em></span>
+              <input type="email" name="contact[email]" autocomplete="email" autocapitalize="off" spellcheck="false" required value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}">
+            </label>
+          </div>
+          <div class="bh-contact__row">
+            <label class="bh-contact__field">
+              <span>Phone number</span>
+              <input type="tel" name="contact[Phone]" autocomplete="tel" inputmode="tel" value="{{ form.phone }}">
+            </label>
+            <label class="bh-contact__field">
+              <span>What is it about? <em>*</em></span>
+              <select name="contact[Topic]" required data-bh-contact-topic>
+                <option value="" disabled selected>Choose a topic</option>
+                {%- for topic in topics -%}
+                  {%- assign t = topic | strip -%}
+                  {%- if t != blank -%}<option value="{{ t | escape }}">{{ t }}</option>{%- endif -%}
+                {%- endfor -%}
+              </select>
+            </label>
+          </div>
+          <label class="bh-contact__field" data-bh-contact-order>
+            <span>Order number <em data-bh-contact-order-mark hidden>*</em></span>
+            <input type="text" name="contact[Order number]" placeholder="e.g. #1012" data-bh-contact-order-input>
+            <small>Needed for cancellations and returns. You'll find it in your order confirmation email.</small>
+          </label>
+          <label class="bh-contact__field">
+            <span>Message <em>*</em></span>
+            <textarea name="contact[body]" rows="5" required>{{ form.body }}</textarea>
+          </label>
+          <button type="submit" class="bh-contact__submit">Send message</button>
+        {%- endform -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Cancellation and return requests need an order number.
+  (function () {
+    var form = document.getElementById('BhContactForm');
+    if (!form) return;
+    var topic = form.querySelector('[data-bh-contact-topic]');
+    var input = form.querySelector('[data-bh-contact-order-input]');
+    var mark = form.querySelector('[data-bh-contact-order-mark]');
+    function sync() {
+      var needed = /cancel|return/i.test(topic.value);
+      input.required = needed;
+      mark.hidden = !needed;
+    }
+    topic.addEventListener('change', sync);
+    sync();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Bonsai Contact",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Contact Us" },
+    { "type": "textarea", "id": "intro", "label": "Intro", "default": "We'd love to hear from you. For the quickest reply, message us on WhatsApp." },
+    { "type": "header", "content": "Contact details" },
+    { "type": "text", "id": "phone", "label": "Phone (for Call and WhatsApp)", "default": "+91 93409 57839", "info": "The WhatsApp button uses the number in Theme settings → Contact." },
+    { "type": "text", "id": "whatsapp_message", "label": "WhatsApp pre-filled message", "default": "Hi Bonsai Haat! I have a question." },
+    { "type": "text", "id": "email", "label": "Email", "info": "Defaults to the store's contact email." },
+    { "type": "text", "id": "address", "label": "Address", "default": "Jora Pirda Road, Near Zora Mall, Raipur, Chhattisgarh 492002", "info": "Leave empty to hide the Find us card." },
+    { "type": "text", "id": "hours", "label": "Working hours", "default": "Mon–Fri, 10 AM – 6 PM" },
+    { "type": "text", "id": "reply_promise", "label": "Reply promise", "default": "We reply within 48 working hours" },
+    { "type": "header", "content": "Form" },
+    { "type": "text", "id": "form_heading", "label": "Heading", "default": "Send us a message" },
+    { "type": "richtext", "id": "form_text", "label": "Text", "default": "<p>Questions about an order, a plant, or bulk gifting? Fill in the form and we'll get back to you by email.</p>" },
+    { "type": "textarea", "id": "topics", "label": "Topics", "default": "Help with an order\nRequest a cancellation\nRequest a return\nPlant care question\nBulk or corporate gifting\nSomething else", "info": "One per line. Topics containing \"cancel\" or \"return\" make Order number required." }
+  ]
+}
+{% endschema %}

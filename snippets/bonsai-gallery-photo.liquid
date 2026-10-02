@@ -5,7 +5,7 @@
 {%- if image != blank -%}
   {%- assign alt = caption | default: image.alt -%}
   <figure class="bh-gallery__item" {{ attributes }}>
-    <button type="button" class="bh-gallery__open" data-bh-gallery-open="{{ image | image_url: width: 1800 }}" data-alt="{{ alt | escape }}" aria-label="View larger: {{ alt | escape }}">
+    <button type="button" class="bh-gallery__open" data-bh-gallery-item data-src="{{ image | image_url: width: 1800 }}" data-alt="{{ alt | escape }}" aria-label="View larger: {{ alt | escape }}">
       {{
         image
         | image_url: width: 900

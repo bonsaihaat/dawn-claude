@@ -1,0 +1,39 @@
+{%- comment -%}
+  One YouTube video in the gallery: YouTube's thumbnail with a play button,
+  playing in the gallery viewer when tapped. Works out the video ID from any
+  usual link: youtu.be/ID, youtube.com/watch?v=ID, /shorts/ID (shown
+  portrait), /live/ID and /embed/ID, with or without extras like ?si= or &t=.
+  Accepts: url, title (optional)
+{%- endcomment -%}
+{%- liquid
+  assign yt = url | append: '' | strip
+  assign yt_id = ''
+  assign yt_short = false
+  if yt contains '/shorts/'
+    assign yt_id = yt | split: '/shorts/' | last
+    assign yt_short = true
+  elsif yt contains 'youtu.be/'
+    assign yt_id = yt | split: 'youtu.be/' | last
+  elsif yt contains '/live/'
+    assign yt_id = yt | split: '/live/' | last
+  elsif yt contains '/embed/'
+    assign yt_id = yt | split: '/embed/' | last
+  elsif yt contains 'v='
+    assign yt_id = yt | split: 'v=' | last
+  endif
+  if yt_id != blank
+    assign yt_id = yt_id | split: '?' | first | split: '&' | first | split: '#' | first | split: '/' | first | strip
+  endif
+  assign label = title | default: 'YouTube video'
+-%}
+{%- if yt_id.size == 11 -%}
+  <figure class="bh-gallery__video{% if yt_short %} is-short{% endif %}">
+    <button type="button" class="bh-gallery__open bh-gallery__thumb" data-bh-gallery-item data-video="{{ yt_id }}"{% if yt_short %} data-short{% endif %} data-alt="{{ label | escape }}" aria-label="Play video: {{ label | escape }}">
+      <img src="https://i.ytimg.com/vi/{{ yt_id }}/hqdefault.jpg" alt="" loading="lazy" width="480" height="360">
+      <span class="bh-gallery__play" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5-11-6.5Z" fill="currentColor"/></svg></span>
+    </button>
+    {%- if title != blank -%}
+      <figcaption>{{ title }}</figcaption>
+    {%- endif -%}
+  </figure>
+{%- endif -%}

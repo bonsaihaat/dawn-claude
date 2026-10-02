@@ -1,10 +1,12 @@
 {{ 'bonsai-gallery.css' | asset_url | stylesheet_tag }}
 
 {%- comment -%}
-  Photo gallery for the Gallery page (template page.gallery). Photos come from
-  Shopify admin → Content → Metaobjects → Gallery photo, ordered by Position
-  (entries without one go last, oldest first); tapping one opens it full size.
-  The theme editor's Photo blocks are only a fallback while no entries are
+  Gallery page (template page.gallery) with Photos and Videos tabs. Entries come
+  from Shopify admin → Content → Metaobjects → Gallery photo / Gallery video,
+  ordered by Position (entries without one go last, oldest first); tapping one
+  opens it full size, videos playing from YouTube. The tabs only show when
+  both have entries, and #videos in the address opens the Videos tab. The
+  theme editor's Photo blocks are only a fallback while no photo entries are
   shown. The page's own content (Online Store → Pages) shows as the intro.
 {%- endcomment -%}
 {%- liquid
@@ -20,6 +22,18 @@
   endfor
   assign photo_keys = photo_keys | split: ',' | sort
   assign photo_blocks = section.blocks | where: 'type', 'photo'
+
+  assign video_entries = shop.metaobjects.gallery_video.values
+  assign video_keys = ''
+  for entry in video_entries
+    if entry.show_in_gallery.value == false or entry.youtube_url.value == blank
+      continue
+    endif
+    assign sort_position = entry.position.value | default: 9999 | at_least: 0 | at_most: 9999 | plus: 10000
+    assign sort_index = forloop.index0 | plus: 10000
+    assign video_keys = video_keys | append: sort_position | append: '-' | append: sort_index | append: ','
+  endfor
+  assign video_keys = video_keys | split: ',' | sort
 -%}
 
 {%- capture photo_items -%}
@@ -39,6 +53,21 @@
   {%- endif -%}
 {%- endcapture -%}
 
+{%- capture video_items -%}
+  {%- for key in video_keys -%}
+    {%- assign entry_index = key | split: '-' | last | minus: 10000 -%}
+    {%- for entry in video_entries -%}
+      {%- if forloop.index0 == entry_index -%}
+        {%- render 'bonsai-gallery-video', url: entry.youtube_url.value, title: entry.title.value -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endfor -%}
+{%- endcapture -%}
+{%- assign has_photos = false -%}
+{%- if photo_items contains 'data-bh-gallery-item' -%}{%- assign has_photos = true -%}{%- endif -%}
+{%- assign has_videos = false -%}
+{%- if video_items contains 'data-bh-gallery-item' -%}{%- assign has_videos = true -%}{%- endif -%}
+
 <div class="bh bh-gallery" data-bh-gallery>
   <div class="bh-gallery__wrap">
     <nav class="bh-gallery__crumbs" aria-label="Breadcrumb">
@@ -52,7 +81,19 @@
       <div class="bh-gallery__intro">{{ page.content }}</div>
     {%- endif -%}
 
-    <div class="bh-gallery__grid">{{ photo_items }}</div>
+    {%- if has_photos and has_videos -%}
+      <div class="bh-gallery__tabs" role="tablist" aria-label="Gallery">
+        <button type="button" role="tab" id="bh-gallery-tab-photos" aria-controls="bh-gallery-photos" aria-selected="true" data-bh-gallery-tab="photos">Photos</button>
+        <button type="button" role="tab" id="bh-gallery-tab-videos" aria-controls="bh-gallery-videos" aria-selected="false" tabindex="-1" data-bh-gallery-tab="videos">Videos</button>
+      </div>
+    {%- endif -%}
+
+    {%- if has_photos -%}
+      <div class="bh-gallery__grid" id="bh-gallery-photos" data-bh-gallery-panel="photos"{% if has_videos %} role="tabpanel" aria-labelledby="bh-gallery-tab-photos"{% endif %}>{{ photo_items }}</div>
+    {%- endif -%}
+    {%- if has_videos -%}
+      <div class="bh-gallery__videos" id="bh-gallery-videos" data-bh-gallery-panel="videos"{% if has_photos %} role="tabpanel" aria-labelledby="bh-gallery-tab-videos" hidden{% endif %}>{{ video_items }}</div>
+    {%- endif -%}
 
     {%- if section.settings.cta_text != blank -%}
       <div class="bh-gallery__cta">
@@ -62,10 +103,11 @@
     {%- endif -%}
   </div>
 
-  <dialog class="bh-gallery__dialog" data-bh-gallery-dialog aria-label="Photo">
-    <button type="button" class="bh-gallery__nav bh-gallery__nav--prev" data-bh-gallery-step="-1" aria-label="Previous photo">‹</button>
+  <dialog class="bh-gallery__dialog" data-bh-gallery-dialog aria-label="Gallery viewer">
+    <button type="button" class="bh-gallery__nav bh-gallery__nav--prev" data-bh-gallery-step="-1" aria-label="Previous">‹</button>
     <img alt="" data-bh-gallery-img>
-    <button type="button" class="bh-gallery__nav bh-gallery__nav--next" data-bh-gallery-step="1" aria-label="Next photo">›</button>
+    <div class="bh-gallery__player" data-bh-gallery-player hidden></div>
+    <button type="button" class="bh-gallery__nav bh-gallery__nav--next" data-bh-gallery-step="1" aria-label="Next">›</button>
     <button type="button" class="bh-gallery__close" data-bh-gallery-close aria-label="Close">×</button>
   </dialog>
 </div>
@@ -75,23 +117,78 @@
     var root = document.currentScript.previousElementSibling;
     var dialog = root.querySelector('[data-bh-gallery-dialog]');
     var img = root.querySelector('[data-bh-gallery-img]');
-    var items = Array.prototype.slice.call(root.querySelectorAll('[data-bh-gallery-open]'));
-    if (!dialog || !dialog.showModal || !items.length) return;
+    var player = root.querySelector('[data-bh-gallery-player]');
+    var steps = root.querySelectorAll('[data-bh-gallery-step]');
+
+    // Tabs: Photos / Videos, remembered in the address as #videos.
+    var tabs = root.querySelectorAll('[data-bh-gallery-tab]');
+    function setTab(name) {
+      tabs.forEach(function (t) {
+        var on = t.getAttribute('data-bh-gallery-tab') === name;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+      });
+      root.querySelectorAll('[data-bh-gallery-panel]').forEach(function (p) {
+        p.hidden = p.getAttribute('data-bh-gallery-panel') !== name;
+      });
+    }
+    tabs.forEach(function (t) {
+      t.addEventListener('click', function () {
+        var name = t.getAttribute('data-bh-gallery-tab');
+        setTab(name);
+        history.replaceState(null, '', name === 'videos' ? '#videos' : window.location.pathname + window.location.search);
+      });
+      t.addEventListener('keydown', function (e) {
+        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+        var other = root.querySelector('[data-bh-gallery-tab]:not([aria-selected="true"])');
+        if (other) { other.click(); other.focus(); }
+      });
+    });
+    if (tabs.length && window.location.hash === '#videos') setTab('videos');
+
+    // Viewer: photos full size, videos as a YouTube player that stops on close.
+    if (!dialog || !dialog.showModal) return;
+    var items = [];
     var current = 0;
     function show(i) {
       current = (i + items.length) % items.length;
-      img.src = items[current].getAttribute('data-bh-gallery-open');
-      img.alt = items[current].getAttribute('data-alt');
+      var el = items[current];
+      var video = el.getAttribute('data-video');
+      player.innerHTML = '';
+      img.hidden = !!video;
+      player.hidden = !video;
+      if (video) {
+        img.removeAttribute('src');
+        player.classList.toggle('is-short', el.hasAttribute('data-short'));
+        var frame = document.createElement('iframe');
+        frame.src = 'https://www.youtube-nocookie.com/embed/' + video + '?autoplay=1&rel=0&playsinline=1';
+        frame.title = el.getAttribute('data-alt') || 'YouTube video';
+        frame.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+        frame.allowFullscreen = true;
+        player.appendChild(frame);
+      } else {
+        img.src = el.getAttribute('data-src');
+        img.alt = el.getAttribute('data-alt');
+      }
+      steps.forEach(function (b) { b.hidden = items.length < 2; });
     }
-    items.forEach(function (btn, i) {
-      btn.addEventListener('click', function () { show(i); dialog.showModal(); });
+    root.addEventListener('click', function (e) {
+      var el = e.target.closest('[data-bh-gallery-item]');
+      if (!el || !root.contains(el)) return;
+      var panel = el.closest('[data-bh-gallery-panel]');
+      items = Array.prototype.slice.call(panel.querySelectorAll('[data-bh-gallery-item]'));
+      show(items.indexOf(el));
+      dialog.showModal();
     });
-    root.querySelectorAll('[data-bh-gallery-step]').forEach(function (b) {
+    steps.forEach(function (b) {
       b.addEventListener('click', function () { show(current + Number(b.getAttribute('data-bh-gallery-step'))); });
     });
-    root.querySelector('[data-bh-gallery-close]').addEventListener('click', function () { dialog.close(); });
-    // A click on the backdrop (outside the photo and buttons) closes it.
-    dialog.addEventListener('click', function (e) { if (e.target === dialog) dialog.close(); });
+    // Removing the player stops the video; Esc closes without our handlers.
+    function closeViewer() { player.innerHTML = ''; dialog.close(); }
+    root.querySelector('[data-bh-gallery-close]').addEventListener('click', closeViewer);
+    dialog.addEventListener('close', function () { player.innerHTML = ''; });
+    // A click on the backdrop (outside the photo, video and buttons) closes it.
+    dialog.addEventListener('click', function (e) { if (e.target === dialog) closeViewer(); });
     dialog.addEventListener('keydown', function (e) {
       if (e.key === 'ArrowLeft') show(current - 1);
       if (e.key === 'ArrowRight') show(current + 1);

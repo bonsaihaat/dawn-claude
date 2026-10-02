@@ -138,22 +138,32 @@
     pinInput.addEventListener('input', function () {
       pinInput.value = pinInput.value.replace(/[^0-9]/g, '').slice(0, 6);
       setPinMsg('');
+      if (!pinInput.value) window.bhDelivery.rememberPin('');
     });
     pinForm.addEventListener('submit', function (e) {
       e.preventDefault();
-      var pin = pinInput.value;
+      checkPin(pinInput.value);
+    });
+    function checkPin(pin) {
       if (!/^[1-9][0-9]{5}$/.test(pin)) { setPinMsg('Please enter a valid 6-digit pincode.'); return; }
       setPinMsg('Checking…');
       window.bhDelivery.place(pin).then(function (where) {
         if (pinInput.value !== pin) return;
         if (!where) { setPinMsg('We couldn’t find pincode ' + pin + '. Please check it.'); return; }
+        window.bhDelivery.rememberPin(pin);
         var label = [where.town, where.state].filter(Boolean).join(', ') || pin;
         var msg = label + ' · Arrives ' + window.bhDelivery.arrival(where.state);
         if (!where.state) setPinMsg(msg);
         else if (window.bhDelivery.region(where.state).paid) setPinMsg(msg + ' · Delivery charges apply, based on order value. You’ll see the exact amount in your cart.');
         else setPinMsg(msg + ' · Free shipping');
       });
-    });
+    }
+    // Start from the pincode checked last time, or the customer's saved address.
+    var startPin = window.bhDelivery.savedPin(root.getAttribute('data-account-pin'));
+    if (startPin) {
+      pinInput.value = startPin;
+      checkPin(startPin);
+    }
 
     // Mobile sticky bar
     var sticky = root.querySelector('[data-bh-sticky]');

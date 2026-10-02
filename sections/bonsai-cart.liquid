@@ -30,6 +30,7 @@
   data-section-id="{{ section.id }}"
   data-count="{{ cart.item_count }}"
   data-delivery-url="{{ section.settings.delivery_check_url }}"
+  data-account-pin="{{ customer.default_address.zip | escape }}"
 >
   <form id="bh-cart-checkout" action="{{ routes.cart_url }}" method="post"></form>
   <div class="bh-cart__wrap">

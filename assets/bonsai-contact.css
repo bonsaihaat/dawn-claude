@@ -47,7 +47,23 @@
 .bh-contact__field select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' fill='none' stroke='%231B1F17' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
 .bh-contact__field textarea { resize: vertical; min-height: 120px; }
 .bh-contact__field input:focus, .bh-contact__field select:focus, .bh-contact__field textarea:focus { outline: none; border-color: #5F8F2B; box-shadow: 0 0 0 3px rgba(95, 143, 43, 0.18); background: #ffffff; }
-.bh-contact__phone { display: flex; gap: 8px; }
+.bh-contact__phone { position: relative; display: flex; gap: 8px; }
+/* Searchable country picker (the native select stays in the form, hidden) */
+.bh-contact__cc-native { position: absolute !important; width: 1px !important; height: 1px !important; opacity: 0; pointer-events: none; }
+.bh .bh-contact__cc { flex: 0 0 auto; display: flex; align-items: center; gap: 6px; font-family: inherit; font-size: 15px; font-weight: 400; color: #1B1F17; background: #faf7f1 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' fill='none' stroke='%231B1F17' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 12px center; border: 1px solid #e3dccb; border-radius: 14px; padding: 12px 34px 12px 14px; cursor: pointer; white-space: nowrap; -webkit-tap-highlight-color: transparent; }
+.bh .bh-contact__cc[aria-expanded="true"], .bh .bh-contact__cc:focus-visible { outline: none; border-color: #5F8F2B; box-shadow: 0 0 0 3px rgba(95, 143, 43, 0.18); }
+.bh-contact__cc-panel { position: absolute; z-index: 30; top: calc(100% + 6px); left: 0; right: 0; background: #ffffff; border: 1px solid #e3dccb; border-radius: 16px; box-shadow: 0 18px 40px -18px rgba(20, 26, 15, 0.35); padding: 8px; }
+.bh-contact__cc-panel[hidden] { display: none; }
+.bh-contact__field .bh-contact__cc-search { font-weight: 400; background: #faf7f1; border-radius: 12px; padding: 10px 12px; font-size: 15px; }
+.bh-contact__cc-list { list-style: none; margin: 6px 0 0; padding: 0; max-height: 260px; overflow-y: auto; overscroll-behavior: contain; }
+.bh-contact__cc-list li { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 10px; cursor: pointer; font-size: 14.5px; font-weight: 400; color: #1B1F17; }
+.bh-contact__cc-list li[hidden] { display: none; }
+.bh-contact__cc-list li.is-active { background: #eef4e0; }
+.bh-contact__cc-list li[aria-selected="true"] { font-weight: 700; }
+.bh-contact__cc-flag { flex: 0 0 auto; font-size: 18px; line-height: 1; }
+.bh-contact__cc-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bh-contact__cc-code { flex: 0 0 auto; color: #767d6c; font-variant-numeric: tabular-nums; }
+.bh-contact__cc-list .bh-contact__cc-empty { cursor: default; color: #767d6c; }
 .bh-contact__field .bh-contact__phone select { flex: 0 0 auto; width: 168px; padding-right: 30px; background-position: right 10px center; text-overflow: ellipsis; }
 .bh-contact__field .bh-contact__phone input { flex: 1; min-width: 0; }
 @media (max-width: 380px) { .bh-contact__field .bh-contact__phone select { width: 132px; } }

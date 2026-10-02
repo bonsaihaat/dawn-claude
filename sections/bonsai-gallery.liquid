@@ -3,8 +3,8 @@
 {%- comment -%}
   Gallery page (template page.gallery) with Photos and Videos tabs. Entries come
   from Shopify admin → Content → Metaobjects → Gallery photo / Gallery video,
-  ordered by Position (entries without one go last, oldest first); tapping one
-  opens it full size, videos playing from YouTube. The tabs only show when
+  newest first (entry IDs only grow, so the highest ID is the latest added);
+  tapping one opens it full size, videos playing from YouTube. The tabs only show when
   both have entries, and #videos in the address opens the Videos tab. The
   theme editor's Photo blocks are only a fallback while no photo entries are
   shown. The page's own content (Online Store → Pages) shows as the intro.
@@ -16,11 +16,12 @@
     if entry.show_in_gallery.value == false or entry.image.value == blank
       continue
     endif
-    assign sort_position = entry.position.value | default: 9999 | at_least: 0 | at_most: 9999 | plus: 10000
+    # Padding keeps every ID the same length so text sorting matches number order.
+    assign sort_id = entry.system.id | plus: 1000000000000000
     assign sort_index = forloop.index0 | plus: 10000
-    assign photo_keys = photo_keys | append: sort_position | append: '-' | append: sort_index | append: ','
+    assign photo_keys = photo_keys | append: sort_id | append: '-' | append: sort_index | append: ','
   endfor
-  assign photo_keys = photo_keys | split: ',' | sort
+  assign photo_keys = photo_keys | split: ',' | sort | reverse
   assign photo_blocks = section.blocks | where: 'type', 'photo'
 
   assign video_entries = shop.metaobjects.gallery_video.values
@@ -29,11 +30,12 @@
     if entry.show_in_gallery.value == false or entry.youtube_url.value == blank
       continue
     endif
-    assign sort_position = entry.position.value | default: 9999 | at_least: 0 | at_most: 9999 | plus: 10000
+    # Padding keeps every ID the same length so text sorting matches number order.
+    assign sort_id = entry.system.id | plus: 1000000000000000
     assign sort_index = forloop.index0 | plus: 10000
-    assign video_keys = video_keys | append: sort_position | append: '-' | append: sort_index | append: ','
+    assign video_keys = video_keys | append: sort_id | append: '-' | append: sort_index | append: ','
   endfor
-  assign video_keys = video_keys | split: ',' | sort
+  assign video_keys = video_keys | split: ',' | sort | reverse
 -%}
 
 {%- capture photo_items -%}

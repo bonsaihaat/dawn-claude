@@ -1,0 +1,110 @@
+{{ 'bonsai-gallery.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  Photo gallery for the Gallery page (template page.gallery). Photos are the
+  section's Photo blocks; tapping one opens it full size. The page's own
+  content in Shopify admin → Online Store → Pages shows as the intro.
+{%- endcomment -%}
+{%- assign photos = section.blocks | where: 'type', 'photo' -%}
+
+<div class="bh bh-gallery" data-bh-gallery>
+  <div class="bh-gallery__wrap">
+    <nav class="bh-gallery__crumbs" aria-label="Breadcrumb">
+      <a href="{{ routes.root_url }}">Home</a>
+      <span>/</span>
+      <span class="bh-gallery__crumb-current">{{ page.title | default: 'Gallery' }}</span>
+    </nav>
+
+    <h1 class="bh-gallery__title">{{ section.settings.heading | default: page.title }}</h1>
+    {%- if page.content != blank -%}
+      <div class="bh-gallery__intro">{{ page.content }}</div>
+    {%- endif -%}
+
+    <div class="bh-gallery__grid">
+      {%- for block in photos -%}
+        {%- if block.settings.image != blank -%}
+          {%- assign alt = block.settings.caption | default: block.settings.image.alt -%}
+          <figure class="bh-gallery__item" {{ block.shopify_attributes }}>
+            <button type="button" class="bh-gallery__open" data-bh-gallery-open="{{ block.settings.image | image_url: width: 1800 }}" data-alt="{{ alt | escape }}" aria-label="View larger: {{ alt | escape }}">
+              {{
+                block.settings.image
+                | image_url: width: 900
+                | image_tag: loading: 'lazy', widths: '400, 600, 900', sizes: '(min-width: 1000px) 380px, (min-width: 640px) 45vw, 92vw', alt: alt
+              }}
+            </button>
+            {%- if block.settings.caption != blank -%}
+              <figcaption>{{ block.settings.caption }}</figcaption>
+            {%- endif -%}
+          </figure>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+    {%- if section.settings.cta_text != blank -%}
+      <div class="bh-gallery__cta">
+        <p>{{ section.settings.cta_text }}</p>
+        <a href="{{ section.settings.cta_link | default: routes.all_products_collection_url }}" class="bh-btn bh-btn--dark">{{ section.settings.cta_label }}</a>
+      </div>
+    {%- endif -%}
+  </div>
+
+  <dialog class="bh-gallery__dialog" data-bh-gallery-dialog aria-label="Photo">
+    <button type="button" class="bh-gallery__nav bh-gallery__nav--prev" data-bh-gallery-step="-1" aria-label="Previous photo">‹</button>
+    <img alt="" data-bh-gallery-img>
+    <button type="button" class="bh-gallery__nav bh-gallery__nav--next" data-bh-gallery-step="1" aria-label="Next photo">›</button>
+    <button type="button" class="bh-gallery__close" data-bh-gallery-close aria-label="Close">×</button>
+  </dialog>
+</div>
+
+<script>
+  (function () {
+    var root = document.currentScript.previousElementSibling;
+    var dialog = root.querySelector('[data-bh-gallery-dialog]');
+    var img = root.querySelector('[data-bh-gallery-img]');
+    var items = Array.prototype.slice.call(root.querySelectorAll('[data-bh-gallery-open]'));
+    if (!dialog || !dialog.showModal || !items.length) return;
+    var current = 0;
+    function show(i) {
+      current = (i + items.length) % items.length;
+      img.src = items[current].getAttribute('data-bh-gallery-open');
+      img.alt = items[current].getAttribute('data-alt');
+    }
+    items.forEach(function (btn, i) {
+      btn.addEventListener('click', function () { show(i); dialog.showModal(); });
+    });
+    root.querySelectorAll('[data-bh-gallery-step]').forEach(function (b) {
+      b.addEventListener('click', function () { show(current + Number(b.getAttribute('data-bh-gallery-step'))); });
+    });
+    root.querySelector('[data-bh-gallery-close]').addEventListener('click', function () { dialog.close(); });
+    // A click on the backdrop (outside the photo and buttons) closes it.
+    dialog.addEventListener('click', function (e) { if (e.target === dialog) dialog.close(); });
+    dialog.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowLeft') show(current - 1);
+      if (e.key === 'ArrowRight') show(current + 1);
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Gallery",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "info": "Defaults to the page title." },
+    { "type": "header", "content": "Call to action" },
+    { "type": "text", "id": "cta_text", "label": "Text", "default": "Every tree in our shop is photographed exactly as it ships." },
+    { "type": "text", "id": "cta_label", "label": "Button label", "default": "Shop bonsai" },
+    { "type": "url", "id": "cta_link", "label": "Button link" }
+  ],
+  "blocks": [
+    {
+      "type": "photo",
+      "name": "Photo",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Photo" },
+        { "type": "text", "id": "caption", "label": "Caption", "info": "Optional. Shown under the photo; the photo's alt text is used for screen readers when empty." }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Gallery" }]
+}
+{% endschema %}

@@ -9,7 +9,6 @@
         "s3": { "type": "slide", "settings": { "headline": "A living centerpiece for every space", "subline": "From starter trees to statement pieces" } },
         "t1": { "type": "trust", "settings": { "label": "Hand-trained trees" } },
         "t2": { "type": "trust", "settings": { "label": "Arrives healthy" } },
-        "t3": { "type": "trust", "settings": { "label": "Free replacement" } },
         "t4": { "type": "trust", "settings": { "label": "Bonsai care support" } },
         "p1": { "type": "product", "settings": { "title": "Juniper Bonsai", "subtitle": "Indoor · 6 yrs trained", "price": "₹1,499", "badge": "Bestseller" } },
         "p2": { "type": "product", "settings": { "title": "Ficus Ginseng", "subtitle": "Indoor · beginner friendly", "price": "₹1,199", "badge": "" } },
@@ -37,7 +36,7 @@
       },
       "block_order": [
         "s1", "s2", "s3",
-        "t1", "t2", "t3", "t4",
+        "t1", "t2", "t4",
         "p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8",
         "a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8",
         "c1", "c2", "c3", "c4",

@@ -44,8 +44,6 @@
   data-bh-pdp
   data-currency="{{ cart.currency.iso_code }}"
   data-product-id="{{ product.id }}"
-  data-paid-states="{{ section.settings.paid_states | escape }}"
-  data-delivery-days="{{ section.settings.delivery_days }}"
 >
   <div class="bh-pdp__wrap">
 
@@ -277,9 +275,7 @@
     { "type": "text", "id": "tax_note", "label": "Price note", "default": "Inclusive of all taxes" },
     { "type": "header", "content": "WhatsApp" },
     { "type": "text", "id": "whatsapp_label", "label": "Button label", "default": "Ask about this product on WhatsApp" },
-    { "type": "header", "content": "Delivery check" },
-    { "type": "textarea", "id": "paid_states", "label": "States with delivery charges", "default": "Andaman and Nicobar Islands, Arunachal Pradesh, Assam, Dadra and Nagar Haveli, Daman and Diu, Himachal Pradesh, Jammu and Kashmir, Ladakh, Lakshadweep, Manipur, Meghalaya, Mizoram, Nagaland, Puducherry, Sikkim, Tripura", "info": "Comma-separated, spelled as in Settings → Shipping and delivery. Keep it in step with your chargeable shipping zone there; every other state shows Free shipping." },
-    { "type": "range", "id": "delivery_days", "label": "Estimated delivery (days)", "min": 1, "max": 14, "step": 1, "default": 4 },
+    { "type": "header", "content": "Delivery check", "info": "Delivery windows and the states with delivery charges are in Theme settings → Delivery." },
     { "type": "text", "id": "trust_items", "label": "Trust items", "default": "Packed with care,Safe arrival guarantee,Exact tree in the photo", "info": "Comma-separated." },
     { "type": "header", "content": "Related products" },
     { "type": "text", "id": "related_heading", "label": "Heading", "default": "You may also like" }

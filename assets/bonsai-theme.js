@@ -277,8 +277,17 @@
 //   Shopify spells them; falls back to the pincode's leading digits offline.
 // - rates(pin, state): the store's own shipping rates for the current cart,
 //   from Settings → Shipping and delivery, cheapest first.
+// - region(state) / arrival(state): the delivery window for a state, from
+//   Theme settings → Delivery (window.bhDeliveryConfig, set in the layout).
 window.bhDelivery = (function () {
   var shopRoot = window.Shopify && Shopify.routes ? Shopify.routes.root : '/';
+  var config = window.bhDeliveryConfig || { regions: [], rest: { min: 5, max: 8 }, skipSundays: true, cutoffHour: 0 };
+  var regions = (config.regions || []).map(function (r) {
+    return {
+      states: String(r.states || '').split(',').map(function (s) { return s.trim().toLowerCase(); }).filter(Boolean),
+      min: r.min, max: r.max, paid: !!r.paid,
+    };
+  });
 
   // Pincodes India Post files under the wrong state, or that share a prefix
   // with a bigger neighbour.
@@ -368,5 +377,41 @@ window.bhDelivery = (function () {
       });
   }
 
-  return { place: place, rates: rates };
+  function region(state) {
+    var key = String(state || '').toLowerCase();
+    for (var i = 0; key && i < regions.length; i++) {
+      if (regions[i].states.indexOf(key) !== -1) return regions[i];
+    }
+    return { min: config.rest.min, max: config.rest.max, paid: false };
+  }
+
+  var DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  // n delivery days after the order counts from today (tomorrow after the
+  // cut-off), skipping Sundays when set.
+  function addDays(start, n) {
+    var d = new Date(start);
+    while (n > 0) {
+      d.setDate(d.getDate() + 1);
+      if (!(config.skipSundays && d.getDay() === 0)) n--;
+    }
+    return d;
+  }
+
+  // "Tue 13 – Fri 16 Oct", "Fri 30 Oct – Tue 3 Nov" or "Tue 13 Oct".
+  function arrival(state, now) {
+    var r = region(state);
+    var start = now ? new Date(now) : new Date();
+    if (config.cutoffHour > 0 && start.getHours() >= config.cutoffHour) start.setDate(start.getDate() + 1);
+    var from = addDays(start, Math.min(r.min, r.max));
+    var to = addDays(start, Math.max(r.min, r.max));
+    var day = function (d) { return DAYS[d.getDay()] + ' ' + d.getDate(); };
+    var month = function (d) { return MONTHS[d.getMonth()]; };
+    if (from.getTime() === to.getTime()) return day(to) + ' ' + month(to);
+    if (from.getMonth() === to.getMonth()) return day(from) + ' – ' + day(to) + ' ' + month(to);
+    return day(from) + ' ' + month(from) + ' – ' + day(to) + ' ' + month(to);
+  }
+
+  return { place: place, rates: rates, region: region, arrival: arrival };
 })();

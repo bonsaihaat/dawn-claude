@@ -231,14 +231,8 @@
       el.hidden = !text;
     }
 
-    function estimate() {
-      var min = parseInt(root.getAttribute('data-delivery-min'), 10) || 4;
-      var max = Math.max(min, parseInt(root.getAttribute('data-delivery-max'), 10) || min);
-      var d = new Date();
-      d.setDate(d.getDate() + Math.round((min + max) / 2));
-      var when = d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
-      var span = min === max ? String(min) : min + '–' + max;
-      return 'Delivers in ' + span + ' days · by ' + when;
+    function estimate(state) {
+      return 'Arrives ' + window.bhDelivery.arrival(state);
     }
 
     function setShipValue(text) {
@@ -263,6 +257,7 @@
       checkedPin = pin;
       setPinMsg('Checking…');
       var current = function () { return checkedPin === pin; };
+      var state = '';
       courierCheck(pin).then(function (courier) {
         if (!current()) return;
         if (courier && !courier.deliverable) {
@@ -273,18 +268,19 @@
           if (!current()) return;
           if (!where) { setPinMsg('We couldn’t find pincode ' + pin + '. Please check it.'); return; }
           var label = [where.town, where.state].filter(Boolean).join(', ') || pin;
-          if (!where.state) { setPinMsg(estimate()); return; }
+          state = where.state;
+          if (!where.state) { setPinMsg(label + ' · ' + estimate()); return; }
           return window.bhDelivery.rates(pin, where.state).then(function (list) {
             if (!current()) return;
             if (!list.length) { setPinMsg('Sorry, we don’t deliver to ' + label + ' yet.'); return; }
             var fee = parseFloat(list[0].price) || 0;
             var feeText = fee > 0 ? '₹' + fee.toLocaleString('en-IN', { maximumFractionDigits: 2 }) : 'Free';
             setShipValue(feeText);
-            setPinMsg(label + ' · ' + (fee > 0 ? 'Delivery ' + feeText : 'Free delivery') + ' · ' + estimate());
+            setPinMsg(label + ' · ' + (fee > 0 ? 'Delivery ' + feeText : 'Free delivery') + ' · ' + estimate(where.state));
           });
         });
       }).catch(function () {
-        if (current()) setPinMsg(estimate());
+        if (current()) setPinMsg(estimate(state));
       });
     }
 

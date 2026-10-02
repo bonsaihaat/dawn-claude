@@ -30,8 +30,6 @@
   data-section-id="{{ section.id }}"
   data-count="{{ cart.item_count }}"
   data-delivery-url="{{ section.settings.delivery_check_url }}"
-  data-delivery-min="{{ section.settings.delivery_days_min }}"
-  data-delivery-max="{{ section.settings.delivery_days_max }}"
 >
   <form id="bh-cart-checkout" action="{{ routes.cart_url }}" method="post"></form>
   <div class="bh-cart__wrap">
@@ -297,10 +295,8 @@
   "settings": [
     { "type": "paragraph", "content": "The free-shipping bar reads the shop metafield custom.free_shipping_threshold (Settings → Custom data → Shop). Keep it equal to the Free Shipping rate in Settings → Shipping and delivery." },
     { "type": "url", "id": "continue_url", "label": "Continue shopping link", "info": "Defaults to the menu item below." },
-    { "type": "header", "content": "Delivery check" },
+    { "type": "header", "content": "Delivery check", "info": "Delivery windows are in Theme settings → Delivery; fees come from Settings → Shipping and delivery." },
     { "type": "url", "id": "delivery_check_url", "label": "Courier lookup URL", "info": "Called as URL?pincode=110001. Return JSON {\"deliverable\": true, \"message\": \"…\"}. Leave empty to show an estimate from the days below." },
-    { "type": "range", "id": "delivery_days_min", "label": "Estimate: fastest (days)", "min": 1, "max": 14, "step": 1, "default": 4 },
-    { "type": "range", "id": "delivery_days_max", "label": "Estimate: slowest (days)", "min": 1, "max": 14, "step": 1, "default": 6 },
     { "type": "header", "content": "Order summary" },
     { "type": "text", "id": "payment_chips", "label": "Payment methods", "default": "UPI,Visa,Mastercard", "info": "Comma-separated." },
     { "type": "text", "id": "trust_items", "label": "Trust items", "default": "The tree you see ships,Arrives healthy,Bonsai care support", "info": "Comma-separated." },

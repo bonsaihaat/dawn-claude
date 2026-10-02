@@ -1299,5 +1299,149 @@
         "info": "Country code + number, digits only. Used by the header, footer and product page WhatsApp buttons."
       }
     ]
+  },
+  {
+    "name": "Delivery",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Used by the pincode checks on the product and cart pages. State names are spelled as in Settings → Shipping and delivery, comma-separated. Days count from the order day (or the next day after the cut-off)."
+      },
+      {
+        "type": "header",
+        "content": "Home state"
+      },
+      {
+        "type": "textarea",
+        "id": "delivery_home_states",
+        "label": "States",
+        "default": "Chhattisgarh"
+      },
+      {
+        "type": "range",
+        "id": "delivery_home_min",
+        "label": "Fastest",
+        "min": 1,
+        "max": 21,
+        "step": 1,
+        "unit": "d",
+        "default": 2
+      },
+      {
+        "type": "range",
+        "id": "delivery_home_max",
+        "label": "Slowest",
+        "min": 1,
+        "max": 21,
+        "step": 1,
+        "unit": "d",
+        "default": 4
+      },
+      {
+        "type": "header",
+        "content": "Nearby states"
+      },
+      {
+        "type": "textarea",
+        "id": "delivery_nearby_states",
+        "label": "States",
+        "default": "Madhya Pradesh, Maharashtra, Odisha, Telangana, Jharkhand"
+      },
+      {
+        "type": "range",
+        "id": "delivery_nearby_min",
+        "label": "Fastest",
+        "min": 1,
+        "max": 21,
+        "step": 1,
+        "unit": "d",
+        "default": 4
+      },
+      {
+        "type": "range",
+        "id": "delivery_nearby_max",
+        "label": "Slowest",
+        "min": 1,
+        "max": 21,
+        "step": 1,
+        "unit": "d",
+        "default": 7
+      },
+      {
+        "type": "header",
+        "content": "States with delivery charges"
+      },
+      {
+        "type": "textarea",
+        "id": "delivery_paid_states",
+        "label": "States",
+        "default": "Andaman and Nicobar Islands, Arunachal Pradesh, Assam, Dadra and Nagar Haveli, Daman and Diu, Himachal Pradesh, Jammu and Kashmir, Ladakh, Lakshadweep, Manipur, Meghalaya, Mizoram, Nagaland, Puducherry, Sikkim, Tripura",
+        "info": "Keep in step with the chargeable zone in Settings → Shipping and delivery. These show \"Delivery charges apply\" on the product page; every other state shows Free shipping."
+      },
+      {
+        "type": "range",
+        "id": "delivery_paid_min",
+        "label": "Fastest",
+        "min": 1,
+        "max": 21,
+        "step": 1,
+        "unit": "d",
+        "default": 8
+      },
+      {
+        "type": "range",
+        "id": "delivery_paid_max",
+        "label": "Slowest",
+        "min": 1,
+        "max": 21,
+        "step": 1,
+        "unit": "d",
+        "default": 12
+      },
+      {
+        "type": "header",
+        "content": "Rest of India"
+      },
+      {
+        "type": "range",
+        "id": "delivery_rest_min",
+        "label": "Fastest",
+        "min": 1,
+        "max": 21,
+        "step": 1,
+        "unit": "d",
+        "default": 5
+      },
+      {
+        "type": "range",
+        "id": "delivery_rest_max",
+        "label": "Slowest",
+        "min": 1,
+        "max": 21,
+        "step": 1,
+        "unit": "d",
+        "default": 8
+      },
+      {
+        "type": "header",
+        "content": "Dispatch"
+      },
+      {
+        "type": "checkbox",
+        "id": "delivery_skip_sundays",
+        "label": "Don't count Sundays",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "delivery_cutoff_hour",
+        "label": "Same-day cut-off (24-hour clock)",
+        "min": 0,
+        "max": 23,
+        "step": 1,
+        "default": 0,
+        "info": "Orders after this hour count from the next day. 0 means no cut-off."
+      }
+    ]
   }
 ]

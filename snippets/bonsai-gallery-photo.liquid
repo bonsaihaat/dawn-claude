@@ -1,0 +1,19 @@
+{%- comment -%}
+  One photo in the gallery grid; opens full size when tapped.
+  Accepts: image (image object), caption (optional), attributes (theme editor block attributes)
+{%- endcomment -%}
+{%- if image != blank -%}
+  {%- assign alt = caption | default: image.alt -%}
+  <figure class="bh-gallery__item" {{ attributes }}>
+    <button type="button" class="bh-gallery__open" data-bh-gallery-open="{{ image | image_url: width: 1800 }}" data-alt="{{ alt | escape }}" aria-label="View larger: {{ alt | escape }}">
+      {{
+        image
+        | image_url: width: 900
+        | image_tag: loading: 'lazy', widths: '400, 600, 900', sizes: '(min-width: 1000px) 380px, (min-width: 640px) 45vw, 92vw', alt: alt
+      }}
+    </button>
+    {%- if caption != blank -%}
+      <figcaption>{{ caption }}</figcaption>
+    {%- endif -%}
+  </figure>
+{%- endif -%}

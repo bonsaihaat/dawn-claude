@@ -203,6 +203,7 @@
         checkedPin = '';
         setPinMsg('');
         setShipValue('');
+        if (!e.target.value) window.bhDelivery.rememberPin('');
       }
       if (e.target.matches('[data-bh-note]')) saveNote(e.target.value);
     });
@@ -262,6 +263,9 @@
       setShipValue('');
       if (!/^[1-9][0-9]{5}$/.test(pin)) { setPinMsg('Please enter a valid 6-digit pincode.'); return; }
       checkedPin = pin;
+      // The pincode box is new after the cart re-renders from empty.
+      var input = root.querySelector('[data-bh-pin]');
+      if (input && input.value !== pin) input.value = pin;
       setPinMsg('Checking…');
       var current = function () { return checkedPin === pin; };
       var state = '';
@@ -274,6 +278,7 @@
         return window.bhDelivery.place(pin).then(function (where) {
           if (!current()) return;
           if (!where) { setPinMsg('We couldn’t find pincode ' + pin + '. Please check it.'); return; }
+          window.bhDelivery.rememberPin(pin);
           var label = [where.town, where.state].filter(Boolean).join(', ') || pin;
           state = where.state;
           if (!where.state) { setPinMsg(label + ' · ' + estimate()); return; }
@@ -300,6 +305,12 @@
     document.addEventListener('bh:cart:refresh', refresh);
 
     if (root.hasAttribute('data-bh-drawer')) initDrawer(root, refresh);
+
+    // Start from the pincode checked last time, or the customer's saved address.
+    if (root.querySelector('[data-bh-pin-form]')) {
+      var startPin = window.bhDelivery.savedPin(root.getAttribute('data-account-pin'));
+      if (startPin) checkPincode(startPin);
+    }
   }
 
   // Drawer: opens from the header cart icon and after anything is added to the

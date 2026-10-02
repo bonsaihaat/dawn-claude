@@ -279,6 +279,8 @@
 //   from Settings → Shipping and delivery, cheapest first.
 // - region(state) / arrival(state): the delivery window for a state, from
 //   Theme settings → Delivery (window.bhDeliveryConfig, set in the layout).
+// - rememberPin(pin) / savedPin(accountPin): the last pincode checked in this
+//   browser, else the logged-in customer's address pincode.
 window.bhDelivery = (function () {
   var shopRoot = window.Shopify && Shopify.routes ? Shopify.routes.root : '/';
   var config = window.bhDeliveryConfig || { regions: [], rest: { min: 5, max: 8 }, skipSundays: true, cutoffHour: 0 };
@@ -413,5 +415,21 @@ window.bhDelivery = (function () {
     return day(from) + ' ' + month(from) + ' – ' + day(to) + ' ' + month(to);
   }
 
-  return { place: place, rates: rates, region: region, arrival: arrival };
+  var PIN_KEY = 'bh-pincode';
+  var validPin = function (pin) { return /^[1-9][0-9]{5}$/.test(pin) ? pin : ''; };
+
+  function rememberPin(pin) {
+    try {
+      if (pin) localStorage.setItem(PIN_KEY, pin);
+      else localStorage.removeItem(PIN_KEY);
+    } catch (e) {}
+  }
+
+  function savedPin(accountPin) {
+    var pin = '';
+    try { pin = localStorage.getItem(PIN_KEY) || ''; } catch (e) {}
+    return validPin(pin) || validPin(String(accountPin || '').replace(/\s/g, ''));
+  }
+
+  return { place: place, rates: rates, region: region, arrival: arrival, rememberPin: rememberPin, savedPin: savedPin };
 })();

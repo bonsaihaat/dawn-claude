@@ -203,10 +203,12 @@
       </div>
     </div>
     <nav class="bh-nav" aria-label="Main">
+      <div class="bh-nav__bar">
       {%- for item in nav_items -%}
         {%- assign f = item | split: '§' -%}
+        {%- assign item_url = f[1] | strip -%}
         <div class="bh-nav__item">
-          <a href="{{ f[1] | strip }}" class="bh-nav__link{% if f[3] contains '1' %} is-active{% endif %}">
+          <a href="{{ item_url }}" class="bh-nav__link{% if f[3] contains '1' %} is-active{% endif %}{% if item_url == track_link %} bh-nav__link--cta{% endif %}">
             {{ f[0] | strip }}
             {%- if f[2] != blank -%}
               <svg width="9" height="9" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6l6-6" stroke="#1B1F17" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -223,6 +225,7 @@
           {%- endif -%}
         </div>
       {%- endfor -%}
+      </div>
     </nav>
   </div>
 

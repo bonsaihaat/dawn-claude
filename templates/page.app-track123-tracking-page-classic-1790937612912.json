@@ -1,0 +1,40 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "16709164393c099f56-1790937612912": {
+      "type": "apps",
+      "blocks": {
+        "11161dbd-4319-4295-8710-e7b7012a9712-1790937612912": {
+          "type": "shopify://apps/track123/blocks/search2/60c49c11-a7c0-49a0-861e-2f84d2f294e6",
+          "settings": {
+            "search_by": "by_order_number_or_by_tracking_number",
+            "time_format": "hh:mm a",
+            "show_estimated_delivery_time": true,
+            "show_carrier_info": true,
+            "show_tracking_number": true,
+            "show_package_info": true,
+            "show_reorder_button": true,
+            "custom_css": ""
+          }
+        }
+      },
+      "block_order": [
+        "11161dbd-4319-4295-8710-e7b7012a9712-1790937612912"
+      ],
+      "settings": {
+        "include_margins": false
+      }
+    }
+  },
+  "order": [
+    "16709164393c099f56-1790937612912"
+  ]
+}

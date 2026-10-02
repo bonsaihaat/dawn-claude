@@ -5,6 +5,7 @@
   assign popular_searches = section.settings.search_popular | split: ','
   assign all_url = routes.all_products_collection_url
   assign account_link = section.settings.account_url | default: routes.account_url
+  assign track_link = section.settings.track_url | default: '/apps/track-order'
 -%}
 
 {%- capture nav_data -%}
@@ -155,6 +156,7 @@
           <div class="bh-drawer__sep"></div>
           <div class="bh-drawer__minor">
             <a href="{{ account_link }}">Account</a>
+            <a href="{{ track_link }}">Track order</a>
             <a href="{{ section.settings.wishlist_url | default: account_link }}">Wishlist</a>
           </div>
           <div class="bh-drawer__copy">© {{ shop.name }}</div>
@@ -188,6 +190,9 @@
       <a href="{{ routes.root_url }}" class="bh-dh__logo">{{ logo_markup }}</a>
       {{ search_pill }}
       <div class="bh-dh__icons">
+        <a href="{{ track_link }}" aria-label="Track order" title="Track order">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 6h11v10H2z" stroke="#1B1F17" stroke-width="1.6" stroke-linejoin="round"/><path d="M13 9h4l3 3.5V16h-7" stroke="#1B1F17" stroke-width="1.6" stroke-linejoin="round"/><circle cx="6" cy="17.5" r="1.8" fill="#fff" stroke="#1B1F17" stroke-width="1.6"/><circle cx="16.5" cy="17.5" r="1.8" fill="#fff" stroke="#1B1F17" stroke-width="1.6"/></svg>
+        </a>
         <a href="{{ account_link }}" aria-label="Account">
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="4" stroke="#1B1F17" stroke-width="1.6"/><path d="M4 20c1.5-4 4.7-6 8-6s6.5 2 8 6" stroke="#1B1F17" stroke-width="1.6" stroke-linecap="round"/></svg>
         </a>
@@ -265,6 +270,7 @@
     { "type": "image_picker", "id": "logo", "label": "Logo" },
     { "type": "link_list", "id": "menu", "label": "Menu", "info": "Leave empty to use the design's default navigation." },
     { "type": "url", "id": "account_url", "label": "Account link", "info": "Leave empty to use Shopify's default account link." },
+    { "type": "url", "id": "track_url", "label": "Track order link", "info": "Leave empty to use the Track123 tracking page (/apps/track-order)." },
     { "type": "url", "id": "wishlist_url", "label": "Wishlist link" },
     { "type": "text", "id": "search_phrases", "label": "Search bar phrases", "default": "Bonsai Plants,Bonsai Pots,Fertilizers,Care Tools", "info": "Comma-separated, typed out one after another." },
     { "type": "text", "id": "search_popular", "label": "Popular searches", "default": "Ficus,Jade,Juniper,Indoor bonsai,Ceramic pots,Pruning shears", "info": "Comma-separated. Shown when the search panel opens, before the customer types." },

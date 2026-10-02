@@ -131,8 +131,7 @@
     var pinForm = root.querySelector('[data-bh-pin-form]');
     var pinInput = root.querySelector('[data-bh-pin]');
     var pinMsg = root.querySelector('[data-bh-pin-msg]');
-    var freeFrom = parseFloat(root.getAttribute('data-free-threshold')) || 0;
-    var fee = parseFloat(root.getAttribute('data-shipping-fee')) || 0;
+    var paidStates = (root.getAttribute('data-paid-states') || '').split(',').map(function (s) { return s.trim().toLowerCase(); });
     var days = parseInt(root.getAttribute('data-delivery-days'), 10) || 4;
     function setPinMsg(text) {
       pinMsg.textContent = text;
@@ -149,10 +148,18 @@
       var d = new Date();
       d.setDate(d.getDate() + days);
       var when = d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
-      // No threshold and no fee: every order ships free.
-      var free = freeFrom > 0 ? (state.price * state.qty) / 100 >= freeFrom : fee <= 0;
-      var cost = free ? ' · Free shipping' : fee > 0 ? ' · ' + money.format(fee) + ' shipping' : '';
-      setPinMsg('Delivered to ' + pin + ' by ' + when + cost);
+      setPinMsg('Checking…');
+      window.bhDelivery.place(pin).then(function (where) {
+        if (pinInput.value !== pin) return;
+        if (!where) { setPinMsg('We couldn’t find pincode ' + pin + '. Please check it.'); return; }
+        var label = [where.town, where.state].filter(Boolean).join(', ') || pin;
+        if (!where.state) { setPinMsg('Delivered to ' + label + ' by ' + when); return; }
+        if (paidStates.indexOf(where.state.toLowerCase()) !== -1) {
+          setPinMsg('Delivered to ' + label + ' by ' + when + ' · Delivery charges apply, based on order value. You’ll see the exact amount in your cart.');
+        } else {
+          setPinMsg('Delivered to ' + label + ' by ' + when + ' · Free shipping');
+        }
+      });
     });
 
     // Mobile sticky bar

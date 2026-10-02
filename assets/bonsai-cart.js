@@ -57,6 +57,8 @@
       });
       root.setAttribute('data-count', fresh.getAttribute('data-count'));
       document.querySelectorAll('.bh-badge').forEach(function (b) { b.textContent = fresh.getAttribute('data-count'); });
+      // The fee depends on the order value, so re-price it for the new cart.
+      if (checkedPin) checkPincode(checkedPin);
     }
 
     function enqueue(task) {
@@ -198,7 +200,9 @@
       if (e.target.matches('[data-bh-discount-input]')) setDiscountError('');
       if (e.target.matches('[data-bh-pin]')) {
         e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 6);
+        checkedPin = '';
         setPinMsg('');
+        setShipValue('');
       }
       if (e.target.matches('[data-bh-note]')) saveNote(e.target.value);
     });
@@ -216,8 +220,10 @@
       }, 400);
     }
 
-    // Delivery check: asks the courier lookup URL when one is set, otherwise
-    // shows the estimate window from the section settings.
+    // Delivery check: finds the pincode's state, asks Shopify for this cart's
+    // shipping rates there (Settings → Shipping and delivery) and, when a
+    // courier lookup URL is set, whether the courier delivers to it.
+    var checkedPin = '';
     function setPinMsg(text) {
       var el = root.querySelector('[data-bh-pin-msg]');
       if (!el) return;
@@ -235,20 +241,51 @@
       return 'Delivers in ' + span + ' days · by ' + when;
     }
 
-    function checkPincode(pin) {
-      if (!/^[1-9][0-9]{5}$/.test(pin)) { setPinMsg('Please enter a valid 6-digit pincode.'); return; }
+    function setShipValue(text) {
+      var el = root.querySelector('[data-bh-ship-value]');
+      if (el) el.textContent = text || 'Calculated at checkout';
+    }
+
+    function courierCheck(pin) {
       var url = root.getAttribute('data-delivery-url');
-      if (!url) { setPinMsg(estimate()); return; }
-      setPinMsg('Checking…');
+      if (!url) return Promise.resolve(null);
       var u = new URL(url, window.location.href);
       u.searchParams.set('pincode', pin);
-      fetch(u.toString(), { headers: { Accept: 'application/json' } })
+      return fetch(u.toString(), { headers: { Accept: 'application/json' } })
         .then(function (r) { return r.json(); })
-        .then(function (res) {
-          if (res.message) setPinMsg(res.message);
-          else setPinMsg(res.deliverable ? estimate() : 'Sorry, we don’t deliver to ' + pin + ' yet.');
-        })
-        .catch(function () { setPinMsg(estimate()); });
+        .catch(function () { return null; });
+    }
+
+    function checkPincode(pin) {
+      checkedPin = '';
+      setShipValue('');
+      if (!/^[1-9][0-9]{5}$/.test(pin)) { setPinMsg('Please enter a valid 6-digit pincode.'); return; }
+      checkedPin = pin;
+      setPinMsg('Checking…');
+      var current = function () { return checkedPin === pin; };
+      courierCheck(pin).then(function (courier) {
+        if (!current()) return;
+        if (courier && !courier.deliverable) {
+          setPinMsg(courier.message || 'Sorry, we don’t deliver to ' + pin + ' yet.');
+          return;
+        }
+        return window.bhDelivery.place(pin).then(function (where) {
+          if (!current()) return;
+          if (!where) { setPinMsg('We couldn’t find pincode ' + pin + '. Please check it.'); return; }
+          var label = [where.town, where.state].filter(Boolean).join(', ') || pin;
+          if (!where.state) { setPinMsg(estimate()); return; }
+          return window.bhDelivery.rates(pin, where.state).then(function (list) {
+            if (!current()) return;
+            if (!list.length) { setPinMsg('Sorry, we don’t deliver to ' + label + ' yet.'); return; }
+            var fee = parseFloat(list[0].price) || 0;
+            var feeText = fee > 0 ? '₹' + fee.toLocaleString('en-IN', { maximumFractionDigits: 2 }) : 'Free';
+            setShipValue(feeText);
+            setPinMsg(label + ' · ' + (fee > 0 ? 'Delivery ' + feeText : 'Free delivery') + ' · ' + estimate());
+          });
+        });
+      }).catch(function () {
+        if (current()) setPinMsg(estimate());
+      });
     }
 
     // Re-render from the server, e.g. after an app changed the cart.

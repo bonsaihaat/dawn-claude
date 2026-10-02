@@ -160,7 +160,7 @@
             <span class="bh-cd__subtotal-val">{% render 'bonsai-money', amount: cart.total_price %}</span>
           </div>
         </div>
-        <span class="bh-cd__tax">{% if cart.taxes_included %}Taxes included. Shipping calculated at checkout.{% else %}Taxes and shipping calculated at checkout.{% endif %}</span>
+        <span class="bh-cd__tax">{% if cart.taxes_included %}Taxes included{% else %}Taxes calculated at checkout{% endif %} · Free delivery across most of India. Exact shipping shown at checkout.</span>
 
         <button type="submit" name="checkout" form="bh-cd-checkout" class="bh-cd__checkout" data-bh-part="checkout">Checkout · {% render 'bonsai-money', amount: cart.total_price %}</button>
         <a href="{{ routes.cart_url }}" class="bh-cd__view">View cart</a>

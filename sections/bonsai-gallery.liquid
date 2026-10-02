@@ -174,8 +174,10 @@
       }
       steps.forEach(function (b) { b.hidden = items.length < 2; });
     }
+    // A tap anywhere on a card (photo, caption or padding) opens it.
     root.addEventListener('click', function (e) {
-      var el = e.target.closest('[data-bh-gallery-item]');
+      var card = e.target.closest('.bh-gallery__item, .bh-gallery__video');
+      var el = card && card.querySelector('[data-bh-gallery-item]');
       if (!el || !root.contains(el)) return;
       var panel = el.closest('[data-bh-gallery-panel]');
       items = Array.prototype.slice.call(panel.querySelectorAll('[data-bh-gallery-item]'));

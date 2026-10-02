@@ -114,8 +114,8 @@
           </div>
           <div class="bh-contact__row">
             <label class="bh-contact__field">
-              <span>Phone number</span>
-              <input type="tel" name="contact[Phone]" autocomplete="tel" inputmode="tel" value="{{ form.phone }}">
+              <span>Phone number <em>*</em></span>
+              <input type="tel" name="contact[Phone]" autocomplete="tel" inputmode="tel" required pattern="[0-9 +\-\(\)]{10,}" title="Please enter a valid phone number (at least 10 digits)" value="{{ form.phone }}">
             </label>
             <label class="bh-contact__field">
               <span>What is it about? <em>*</em></span>

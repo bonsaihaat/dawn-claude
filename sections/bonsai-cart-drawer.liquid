@@ -160,7 +160,7 @@
             <span class="bh-cd__subtotal-val">{% render 'bonsai-money', amount: cart.total_price %}</span>
           </div>
         </div>
-        <span class="bh-cd__tax">{% if cart.taxes_included %}Taxes included. Shipping calculated at checkout.{% else %}Taxes and shipping calculated at checkout.{% endif %}</span>
+        <span class="bh-cd__tax">{% if cart.taxes_included %}Taxes included{% else %}Taxes calculated at checkout{% endif %} · Free delivery across most of India. Exact shipping shown at checkout.</span>
 
         <button type="submit" name="checkout" form="bh-cd-checkout" class="bh-cd__checkout" data-bh-part="checkout">Checkout · {% render 'bonsai-money', amount: cart.total_price %}</button>
         <a href="{{ routes.cart_url }}" class="bh-cd__view">View cart</a>
@@ -185,7 +185,7 @@
   "settings": [
     { "type": "paragraph", "content": "Opens from the header cart icon and after Add to cart. The free-shipping bar reads the shop metafield custom.free_shipping_threshold." },
     { "type": "text", "id": "note_label", "label": "Order note toggle", "default": "Add order note / gift message" },
-    { "type": "text", "id": "trust_items", "label": "Trust items", "default": "Arrives healthy,Free replacement,Bonsai care support", "info": "Comma-separated." },
+    { "type": "text", "id": "trust_items", "label": "Trust items", "default": "The tree you see ships,Arrives healthy,Bonsai care support", "info": "Comma-separated." },
     { "type": "text", "id": "whatsapp_label", "label": "WhatsApp link label", "default": "Need help choosing? Chat on WhatsApp" },
     { "type": "header", "content": "Empty cart" },
     { "type": "text", "id": "empty_title", "label": "Heading", "default": "Your cart is empty" },

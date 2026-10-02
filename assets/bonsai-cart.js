@@ -57,6 +57,8 @@
       });
       root.setAttribute('data-count', fresh.getAttribute('data-count'));
       document.querySelectorAll('.bh-badge').forEach(function (b) { b.textContent = fresh.getAttribute('data-count'); });
+      // The fee depends on the order value, so re-price it for the new cart.
+      if (checkedPin) checkPincode(checkedPin);
     }
 
     function enqueue(task) {
@@ -198,7 +200,9 @@
       if (e.target.matches('[data-bh-discount-input]')) setDiscountError('');
       if (e.target.matches('[data-bh-pin]')) {
         e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 6);
+        checkedPin = '';
         setPinMsg('');
+        setShipValue('');
       }
       if (e.target.matches('[data-bh-note]')) saveNote(e.target.value);
     });
@@ -216,8 +220,10 @@
       }, 400);
     }
 
-    // Delivery check: asks the courier lookup URL when one is set, otherwise
-    // shows the estimate window from the section settings.
+    // Delivery check: finds the pincode's state, asks Shopify for this cart's
+    // shipping rates there (Settings → Shipping and delivery) and, when a
+    // courier lookup URL is set, whether the courier delivers to it.
+    var checkedPin = '';
     function setPinMsg(text) {
       var el = root.querySelector('[data-bh-pin-msg]');
       if (!el) return;
@@ -225,30 +231,64 @@
       el.hidden = !text;
     }
 
-    function estimate() {
-      var min = parseInt(root.getAttribute('data-delivery-min'), 10) || 4;
-      var max = Math.max(min, parseInt(root.getAttribute('data-delivery-max'), 10) || min);
-      var d = new Date();
-      d.setDate(d.getDate() + Math.round((min + max) / 2));
-      var when = d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
-      var span = min === max ? String(min) : min + '–' + max;
-      return 'Delivers in ' + span + ' days · by ' + when;
+    function estimate(state) {
+      return 'Arrives ' + window.bhDelivery.arrival(state);
+    }
+
+    // Shows the delivery fee in the Shipping row and adds it to every total
+    // (summary, checkout button, mobile sticky bar); no text resets them.
+    function setShipValue(text, feePaise) {
+      var el = root.querySelector('[data-bh-ship-value]');
+      if (el) el.textContent = text || 'Free for most of India · enter pincode to check';
+      root.querySelectorAll('[data-bh-grand]').forEach(function (t) {
+        var paise = (parseInt(t.getAttribute('data-bh-grand'), 10) || 0) + (text ? feePaise || 0 : 0);
+        var rupees = paise / 100;
+        t.textContent = '₹' + rupees.toLocaleString('en-IN', { minimumFractionDigits: paise % 100 ? 2 : 0, maximumFractionDigits: 2 });
+      });
+    }
+
+    function courierCheck(pin) {
+      var url = root.getAttribute('data-delivery-url');
+      if (!url) return Promise.resolve(null);
+      var u = new URL(url, window.location.href);
+      u.searchParams.set('pincode', pin);
+      return fetch(u.toString(), { headers: { Accept: 'application/json' } })
+        .then(function (r) { return r.json(); })
+        .catch(function () { return null; });
     }
 
     function checkPincode(pin) {
+      checkedPin = '';
+      setShipValue('');
       if (!/^[1-9][0-9]{5}$/.test(pin)) { setPinMsg('Please enter a valid 6-digit pincode.'); return; }
-      var url = root.getAttribute('data-delivery-url');
-      if (!url) { setPinMsg(estimate()); return; }
+      checkedPin = pin;
       setPinMsg('Checking…');
-      var u = new URL(url, window.location.href);
-      u.searchParams.set('pincode', pin);
-      fetch(u.toString(), { headers: { Accept: 'application/json' } })
-        .then(function (r) { return r.json(); })
-        .then(function (res) {
-          if (res.message) setPinMsg(res.message);
-          else setPinMsg(res.deliverable ? estimate() : 'Sorry, we don’t deliver to ' + pin + ' yet.');
-        })
-        .catch(function () { setPinMsg(estimate()); });
+      var current = function () { return checkedPin === pin; };
+      var state = '';
+      courierCheck(pin).then(function (courier) {
+        if (!current()) return;
+        if (courier && !courier.deliverable) {
+          setPinMsg(courier.message || 'Sorry, we don’t deliver to ' + pin + ' yet.');
+          return;
+        }
+        return window.bhDelivery.place(pin).then(function (where) {
+          if (!current()) return;
+          if (!where) { setPinMsg('We couldn’t find pincode ' + pin + '. Please check it.'); return; }
+          var label = [where.town, where.state].filter(Boolean).join(', ') || pin;
+          state = where.state;
+          if (!where.state) { setPinMsg(label + ' · ' + estimate()); return; }
+          return window.bhDelivery.rates(pin, where.state).then(function (list) {
+            if (!current()) return;
+            if (!list.length) { setPinMsg('Sorry, we don’t deliver to ' + label + ' yet.'); return; }
+            var fee = parseFloat(list[0].price) || 0;
+            var feeText = fee > 0 ? '₹' + fee.toLocaleString('en-IN', { maximumFractionDigits: 2 }) : 'Free';
+            setShipValue(feeText, Math.round(fee * 100));
+            setPinMsg(label + ' · ' + (fee > 0 ? 'Delivery ' + feeText : 'Free delivery') + ' · ' + estimate(where.state));
+          });
+        });
+      }).catch(function () {
+        if (current()) setPinMsg(estimate(state));
+      });
     }
 
     // Re-render from the server, e.g. after an app changed the cart.

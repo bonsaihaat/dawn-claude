@@ -131,9 +131,6 @@
     var pinForm = root.querySelector('[data-bh-pin-form]');
     var pinInput = root.querySelector('[data-bh-pin]');
     var pinMsg = root.querySelector('[data-bh-pin-msg]');
-    var freeFrom = parseFloat(root.getAttribute('data-free-threshold')) || 0;
-    var fee = parseFloat(root.getAttribute('data-shipping-fee')) || 0;
-    var days = parseInt(root.getAttribute('data-delivery-days'), 10) || 4;
     function setPinMsg(text) {
       pinMsg.textContent = text;
       pinMsg.hidden = !text;
@@ -146,13 +143,16 @@
       e.preventDefault();
       var pin = pinInput.value;
       if (!/^[1-9][0-9]{5}$/.test(pin)) { setPinMsg('Please enter a valid 6-digit pincode.'); return; }
-      var d = new Date();
-      d.setDate(d.getDate() + days);
-      var when = d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
-      // No threshold and no fee: every order ships free.
-      var free = freeFrom > 0 ? (state.price * state.qty) / 100 >= freeFrom : fee <= 0;
-      var cost = free ? ' · Free shipping' : fee > 0 ? ' · ' + money.format(fee) + ' shipping' : '';
-      setPinMsg('Delivered to ' + pin + ' by ' + when + cost);
+      setPinMsg('Checking…');
+      window.bhDelivery.place(pin).then(function (where) {
+        if (pinInput.value !== pin) return;
+        if (!where) { setPinMsg('We couldn’t find pincode ' + pin + '. Please check it.'); return; }
+        var label = [where.town, where.state].filter(Boolean).join(', ') || pin;
+        var msg = label + ' · Arrives ' + window.bhDelivery.arrival(where.state);
+        if (!where.state) setPinMsg(msg);
+        else if (window.bhDelivery.region(where.state).paid) setPinMsg(msg + ' · Delivery charges apply, based on order value. You’ll see the exact amount in your cart.');
+        else setPinMsg(msg + ' · Free shipping');
+      });
     });
 
     // Mobile sticky bar

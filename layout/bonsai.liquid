@@ -25,6 +25,18 @@
     {{ content_for_layout }}
     {% sections 'footer-group' %}
     <script src="{{ 'standard-actions-override.js' | asset_url }}" defer></script>
+    <script>
+      window.bhDeliveryConfig = {
+        regions: [
+          { states: {{ settings.delivery_home_states | json }}, min: {{ settings.delivery_home_min | json }}, max: {{ settings.delivery_home_max | json }} },
+          { states: {{ settings.delivery_nearby_states | json }}, min: {{ settings.delivery_nearby_min | json }}, max: {{ settings.delivery_nearby_max | json }} },
+          { states: {{ settings.delivery_paid_states | json }}, min: {{ settings.delivery_paid_min | json }}, max: {{ settings.delivery_paid_max | json }}, paid: true }
+        ],
+        rest: { min: {{ settings.delivery_rest_min | json }}, max: {{ settings.delivery_rest_max | json }} },
+        skipSundays: {{ settings.delivery_skip_sundays | json }},
+        cutoffHour: {{ settings.delivery_cutoff_hour | json }}
+      };
+    </script>
     <script src="{{ 'bonsai-theme.js' | asset_url }}" defer></script>
   </body>
 </html>

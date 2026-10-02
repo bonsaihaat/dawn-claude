@@ -44,9 +44,6 @@
   data-bh-pdp
   data-currency="{{ cart.currency.iso_code }}"
   data-product-id="{{ product.id }}"
-  data-free-threshold="{{ shop.metafields.custom.free_shipping_threshold.value }}"
-  data-shipping-fee="{{ shop.metafields.custom.standard_shipping_fee.value }}"
-  data-delivery-days="{{ section.settings.delivery_days }}"
 >
   <div class="bh-pdp__wrap">
 
@@ -278,9 +275,8 @@
     { "type": "text", "id": "tax_note", "label": "Price note", "default": "Inclusive of all taxes" },
     { "type": "header", "content": "WhatsApp" },
     { "type": "text", "id": "whatsapp_label", "label": "Button label", "default": "Ask about this product on WhatsApp" },
-    { "type": "header", "content": "Delivery check", "info": "Free-shipping threshold and fee come from the shop metafields custom.free_shipping_threshold and custom.standard_shipping_fee (Settings → Custom data → Shop)." },
-    { "type": "range", "id": "delivery_days", "label": "Estimated delivery (days)", "min": 1, "max": 14, "step": 1, "default": 4 },
-    { "type": "text", "id": "trust_items", "label": "Trust items", "default": "Arrives healthy,Free replacement,Care support", "info": "Comma-separated." },
+    { "type": "header", "content": "Delivery check", "info": "Delivery windows and the states with delivery charges are in Theme settings → Delivery." },
+    { "type": "text", "id": "trust_items", "label": "Trust items", "default": "Packed with care,Safe arrival guarantee,Exact tree in the photo", "info": "Comma-separated." },
     { "type": "header", "content": "Related products" },
     { "type": "text", "id": "related_heading", "label": "Heading", "default": "You may also like" }
   ]

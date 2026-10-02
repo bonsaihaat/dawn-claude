@@ -271,3 +271,147 @@
     });
   });
 })();
+
+// Delivery lookups shared by the product page and the cart page.
+// - place(pin): the pincode's town and state (India Post), with state names as
+//   Shopify spells them; falls back to the pincode's leading digits offline.
+// - rates(pin, state): the store's own shipping rates for the current cart,
+//   from Settings → Shipping and delivery, cheapest first.
+// - region(state) / arrival(state): the delivery window for a state, from
+//   Theme settings → Delivery (window.bhDeliveryConfig, set in the layout).
+window.bhDelivery = (function () {
+  var shopRoot = window.Shopify && Shopify.routes ? Shopify.routes.root : '/';
+  var config = window.bhDeliveryConfig || { regions: [], rest: { min: 5, max: 8 }, skipSundays: true, cutoffHour: 0 };
+  var regions = (config.regions || []).map(function (r) {
+    return {
+      states: String(r.states || '').split(',').map(function (s) { return s.trim().toLowerCase(); }).filter(Boolean),
+      min: r.min, max: r.max, paid: !!r.paid,
+    };
+  });
+
+  // Pincodes India Post files under the wrong state, or that share a prefix
+  // with a bigger neighbour.
+  var EXACT = {
+    396210: 'Daman and Diu', 396215: 'Daman and Diu', 396220: 'Daman and Diu', 362520: 'Daman and Diu',
+    396230: 'Dadra and Nagar Haveli', 396235: 'Dadra and Nagar Haveli', 396240: 'Dadra and Nagar Haveli',
+    682551: 'Lakshadweep', 682552: 'Lakshadweep', 682553: 'Lakshadweep', 682554: 'Lakshadweep',
+    682555: 'Lakshadweep', 682556: 'Lakshadweep', 682557: 'Lakshadweep', 682558: 'Lakshadweep', 682559: 'Lakshadweep',
+  };
+  // [first three digits from, to, state], checked in order.
+  var PREFIXES = [
+    [110, 110, 'Delhi'], [121, 136, 'Haryana'], [160, 160, 'Chandigarh'], [140, 160, 'Punjab'],
+    [171, 177, 'Himachal Pradesh'], [194, 194, 'Ladakh'], [180, 193, 'Jammu and Kashmir'],
+    [246, 246, 'Uttarakhand'], [248, 249, 'Uttarakhand'], [263, 263, 'Uttarakhand'], [201, 285, 'Uttar Pradesh'],
+    [301, 345, 'Rajasthan'], [360, 396, 'Gujarat'], [403, 403, 'Goa'], [400, 445, 'Maharashtra'],
+    [450, 488, 'Madhya Pradesh'], [490, 497, 'Chhattisgarh'], [500, 509, 'Telangana'], [510, 535, 'Andhra Pradesh'],
+    [560, 591, 'Karnataka'], [600, 643, 'Tamil Nadu'], [670, 695, 'Kerala'], [737, 737, 'Sikkim'],
+    [744, 744, 'Andaman and Nicobar Islands'], [700, 743, 'West Bengal'], [751, 770, 'Odisha'], [781, 788, 'Assam'],
+    [790, 792, 'Arunachal Pradesh'], [793, 794, 'Meghalaya'], [795, 795, 'Manipur'], [796, 796, 'Mizoram'],
+    [797, 798, 'Nagaland'], [799, 799, 'Tripura'], [814, 816, 'Jharkhand'], [822, 822, 'Jharkhand'],
+    [825, 835, 'Jharkhand'], [800, 855, 'Bihar'],
+  ];
+  var RENAME = {
+    'chattisgarh': 'Chhattisgarh', 'pondicherry': 'Puducherry', 'orissa': 'Odisha', 'uttaranchal': 'Uttarakhand',
+    'andaman & nicobar': 'Andaman and Nicobar Islands', 'andaman and nicobar': 'Andaman and Nicobar Islands',
+  };
+
+  function stateFromPrefix(pin) {
+    var p = Math.floor(pin / 1000);
+    for (var i = 0; i < PREFIXES.length; i++) {
+      if (p >= PREFIXES[i][0] && p <= PREFIXES[i][1]) return PREFIXES[i][2];
+    }
+    return '';
+  }
+
+  function shopifyState(name, district) {
+    var key = String(name || '').trim().toLowerCase();
+    if (/^(leh|kargil)/i.test(district || '')) return 'Ladakh';
+    if (RENAME[key]) return RENAME[key];
+    if (key.indexOf('dadra') !== -1) return /daman|diu/i.test(district || '') ? 'Daman and Diu' : 'Dadra and Nagar Haveli';
+    return String(name || '').replace(/\s*&\s*/g, ' and ');
+  }
+
+  function withTimeout(promise, ms) {
+    return Promise.race([promise, new Promise(function (_, reject) { setTimeout(reject, ms); })]);
+  }
+
+  function place(pin) {
+    var n = Number(pin);
+    var offline = { pin: pin, town: '', state: EXACT[n] || stateFromPrefix(n) };
+    return withTimeout(fetch('https://api.postalpincode.in/pincode/' + pin).then(function (r) { return r.json(); }), 5000)
+      .then(function (res) {
+        var po = res && res[0] && res[0].Status === 'Success' && res[0].PostOffice && res[0].PostOffice[0];
+        if (!po) return res && res[0] && res[0].Status === 'Error' ? null : offline;
+        var state = shopifyState(po.State, po.District);
+        // When the override disagrees with India Post, its district is the wrong one too.
+        if (EXACT[n] && EXACT[n] !== state) return { pin: pin, town: '', state: EXACT[n] };
+        return { pin: pin, town: po.District || '', state: state };
+      })
+      .catch(function () { return offline; });
+  }
+
+  function rates(pin, state) {
+    var q = '?shipping_address%5Bzip%5D=' + encodeURIComponent(pin) +
+      '&shipping_address%5Bcountry%5D=India&shipping_address%5Bprovince%5D=' + encodeURIComponent(state);
+    var tries = 0;
+    function poll() {
+      return fetch(shopRoot + 'cart/async_shipping_rates.json' + q, { headers: { Accept: 'application/json' } })
+        .then(function (r) {
+          if (!r.ok) throw new Error('rates ' + r.status);
+          return r.json();
+        })
+        .then(function (res) {
+          if (res && res.shipping_rates) {
+            return res.shipping_rates.slice().sort(function (a, b) { return parseFloat(a.price) - parseFloat(b.price); });
+          }
+          if (++tries > 12) throw new Error('rates timeout');
+          return new Promise(function (resolve) { setTimeout(resolve, 500); }).then(poll);
+        });
+    }
+    return fetch(shopRoot + 'cart/prepare_shipping_rates.json' + q, { method: 'POST', headers: { Accept: 'application/json' } })
+      .then(function (r) {
+        // 422: Shopify rejected the address, e.g. the pincode isn't in that state.
+        if (r.status === 422) throw new Error('address');
+        if (!r.ok) throw new Error('rates ' + r.status);
+        return poll();
+      });
+  }
+
+  function region(state) {
+    var key = String(state || '').toLowerCase();
+    for (var i = 0; key && i < regions.length; i++) {
+      if (regions[i].states.indexOf(key) !== -1) return regions[i];
+    }
+    return { min: config.rest.min, max: config.rest.max, paid: false };
+  }
+
+  var DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  // n delivery days after the order counts from today (tomorrow after the
+  // cut-off), skipping Sundays when set.
+  function addDays(start, n) {
+    var d = new Date(start);
+    while (n > 0) {
+      d.setDate(d.getDate() + 1);
+      if (!(config.skipSundays && d.getDay() === 0)) n--;
+    }
+    return d;
+  }
+
+  // "Tue 13 – Fri 16 Oct", "Fri 30 Oct – Tue 3 Nov" or "Tue 13 Oct".
+  function arrival(state, now) {
+    var r = region(state);
+    var start = now ? new Date(now) : new Date();
+    if (config.cutoffHour > 0 && start.getHours() >= config.cutoffHour) start.setDate(start.getDate() + 1);
+    var from = addDays(start, Math.min(r.min, r.max));
+    var to = addDays(start, Math.max(r.min, r.max));
+    var day = function (d) { return DAYS[d.getDay()] + ' ' + d.getDate(); };
+    var month = function (d) { return MONTHS[d.getMonth()]; };
+    if (from.getTime() === to.getTime()) return day(to) + ' ' + month(to);
+    if (from.getMonth() === to.getMonth()) return day(from) + ' – ' + day(to) + ' ' + month(to);
+    return day(from) + ' ' + month(from) + ' – ' + day(to) + ' ' + month(to);
+  }
+
+  return { place: place, rates: rates, region: region, arrival: arrival };
+})();

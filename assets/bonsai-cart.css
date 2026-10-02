@@ -64,6 +64,7 @@ body:has(.bh-cart) .bh-mh__search { display: none; }
 .bh-cart__summary-title { font-size: 16px; font-weight: 800; color: #1B1F17; }
 .bh-cart__rows { display: flex; flex-direction: column; gap: 10px; }
 .bh-cart__row { display: flex; justify-content: space-between; font-size: 13.5px; color: #20241b; }
+.bh-cart__row [data-bh-ship-value] { margin-left: 12px; text-align: right; }
 .bh-cart__row-val { font-weight: 600; }
 .bh-cart__row--muted { color: #767d6c; }
 .bh-cart__row--discount { align-items: center; color: #2E4716; }

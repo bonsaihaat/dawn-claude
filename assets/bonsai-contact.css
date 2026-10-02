@@ -47,6 +47,10 @@
 .bh-contact__field select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' fill='none' stroke='%231B1F17' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
 .bh-contact__field textarea { resize: vertical; min-height: 120px; }
 .bh-contact__field input:focus, .bh-contact__field select:focus, .bh-contact__field textarea:focus { outline: none; border-color: #5F8F2B; box-shadow: 0 0 0 3px rgba(95, 143, 43, 0.18); background: #ffffff; }
+.bh-contact__phone { display: flex; gap: 8px; }
+.bh-contact__field .bh-contact__phone select { flex: 0 0 auto; width: 168px; padding-right: 30px; background-position: right 10px center; text-overflow: ellipsis; }
+.bh-contact__field .bh-contact__phone input { flex: 1; min-width: 0; }
+@media (max-width: 380px) { .bh-contact__field .bh-contact__phone select { width: 132px; } }
 .bh-contact__field small { font-size: 12px; color: #767d6c; }
 .bh .bh-contact__submit { align-self: flex-start; font-family: inherit; font-size: 15px; font-weight: 700; background: #1B1F17; color: #faf7f1; border: 0; border-radius: 999px; padding: 15px 34px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 @media (max-width: 639px) { .bh .bh-contact__submit { align-self: stretch; } }

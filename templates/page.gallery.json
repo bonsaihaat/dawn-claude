@@ -7,67 +7,78 @@
         "photo_01": {
           "type": "photo",
           "settings": {
-            "image": "shopify://shop_images/bonsai-haat-gallery-01.jpg"
+            "image": "shopify://shop_images/bonsai-haat-gallery-01.jpg",
+            "caption": "Artist Purnima Joshi giving finishing touches to bonsai plants during an exhibition"
           }
         },
         "photo_02": {
           "type": "photo",
           "settings": {
-            "image": "shopify://shop_images/bonsai-haat-gallery-02.jpg"
+            "image": "shopify://shop_images/bonsai-haat-gallery-02.jpg",
+            "caption": "Entry view of Bonsai Haat's exclusive exhibition in Magnetto Mall, Raipur held in July, 2021"
           }
         },
         "photo_03": {
           "type": "photo",
           "settings": {
-            "image": "shopify://shop_images/bonsai-haat-gallery-03.jpg"
+            "image": "shopify://shop_images/bonsai-haat-gallery-03.jpg",
+            "caption": "Bonsai display during Bonsai Haat's exhibition"
           }
         },
         "photo_04": {
           "type": "photo",
           "settings": {
-            "image": "shopify://shop_images/bonsai-haat-gallery-04.jpg"
+            "image": "shopify://shop_images/bonsai-haat-gallery-04.jpg",
+            "caption": "Display during an exhibition"
           }
         },
         "photo_05": {
           "type": "photo",
           "settings": {
-            "image": "shopify://shop_images/bonsai-haat-gallery-05.jpg"
+            "image": "shopify://shop_images/bonsai-haat-gallery-05.jpg",
+            "caption": "Miniature Landscapes at display"
           }
         },
         "photo_06": {
           "type": "photo",
           "settings": {
-            "image": "shopify://shop_images/bonsai-haat-gallery-06.jpg"
+            "image": "shopify://shop_images/bonsai-haat-gallery-06.jpg",
+            "caption": "Young bonsai lover admiring landscapes"
           }
         },
         "photo_07": {
           "type": "photo",
           "settings": {
-            "image": "shopify://shop_images/bonsai-haat-gallery-07.jpg"
+            "image": "shopify://shop_images/bonsai-haat-gallery-07.jpg",
+            "caption": "Visitors having a view of Bonsais in the exhibition"
           }
         },
         "photo_08": {
           "type": "photo",
           "settings": {
-            "image": "shopify://shop_images/bonsai-haat-gallery-08.jpg"
+            "image": "shopify://shop_images/bonsai-haat-gallery-08.jpg",
+            "caption": "Center of attraction in the exhibition"
           }
         },
         "photo_09": {
           "type": "photo",
           "settings": {
-            "image": "shopify://shop_images/bonsai-haat-gallery-09.jpg"
+            "image": "shopify://shop_images/bonsai-haat-gallery-09.jpg",
+            "caption": "Display idea at home"
           }
         },
         "photo_10": {
           "type": "photo",
           "settings": {
-            "image": "shopify://shop_images/bonsai-haat-gallery-10.jpg"
+            "image": "shopify://shop_images/bonsai-haat-gallery-10.jpg",
+            "caption": "Bonsai display idea on the boundary walls - a space saver"
           }
         },
         "photo_11": {
           "type": "photo",
           "settings": {
-            "image": "shopify://shop_images/bonsai-haat-gallery-11.jpg"
+            "image": "shopify://shop_images/bonsai-haat-gallery-11.jpg",
+            "caption": "Vertical display idea"
           }
         },
         "photo_12": {

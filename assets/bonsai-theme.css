@@ -179,6 +179,7 @@ body.bh-body { background: #faf7f1; }
 .bh-hero__arrow--prev { left: 14px; }
 .bh-hero__arrow--next { right: 14px; }
 .bh-hero__dots { position: absolute; left: 0; right: 0; bottom: 14px; display: flex; justify-content: center; gap: 7px; z-index: 3; }
+@media (max-width: 819.98px) { .bh-hero__dots { display: none; } }
 .bh-hero__dot { position: relative; overflow: hidden; width: 6px; height: 6px; border-radius: 999px; border: none; cursor: pointer; padding: 0; background: #faf7f1cc; transition: width 0.35s ease; }
 .bh-hero__dot.is-active { width: 22px; }
 .bh-hero__dot.is-active::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: #5F8F2B; transform-origin: left; }

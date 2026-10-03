@@ -82,21 +82,30 @@
           </div>
           <div class="bh-footer__col bh-footer__contact">
             <span class="bh-footer__title">{{ section.settings.footer_col3_title }}</span>
-            {%- if contact_phone != blank -%}
-              <a href="{{ phone_url }}">{{ contact_phone }}</a>
-            {%- endif -%}
-            {%- if contact_email != blank -%}
-              <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>
-            {%- endif -%}
-            {%- if wa_number != blank -%}
-              <a href="{{ wa_url }}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px"><img src="{{ 'whatsapp-logo.png' | asset_url }}" width="18" height="18" alt="" loading="lazy" aria-hidden="true">Chat on WhatsApp</a>
-            {%- endif -%}
-            {%- if section.settings.contact_hours != blank -%}
-              <p>{{ section.settings.contact_hours }}</p>
-            {%- endif -%}
-            {%- if address_parts.size > 0 -%}
-              <address>{{ shop.name }}<br>{{ address_parts | join: '<br>' }}</address>
-            {%- endif -%}
+            <div class="bh-footer__contact-group">
+              {%- if contact_phone != blank -%}
+                <a href="{{ phone_url }}">{{ contact_phone }}</a>
+              {%- endif -%}
+              {%- if contact_email != blank -%}
+                <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>
+              {%- endif -%}
+              {%- if wa_number != blank -%}
+                <a href="{{ wa_url }}" class="bh-footer__wa" target="_blank" rel="noopener"><img src="{{ 'whatsapp-logo.png' | asset_url }}" width="18" height="18" alt="" loading="lazy" aria-hidden="true">Chat on WhatsApp</a>
+              {%- endif -%}
+            </div>
+            <div class="bh-footer__contact-group">
+              {%- if section.settings.contact_hours != blank -%}
+                <p>{{ section.settings.contact_hours }}</p>
+              {%- endif -%}
+              {%- if address_parts.size > 0 -%}
+                <address>
+                  <span class="bh-footer__addr-name">{{ shop.name }}</span>
+                  {%- for part in address_parts -%}
+                    <span class="bh-footer__addr-line">{{ part }}</span>
+                  {%- endfor -%}
+                </address>
+              {%- endif -%}
+            </div>
           </div>
         </div>
       </div>

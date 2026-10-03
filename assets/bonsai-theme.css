@@ -179,6 +179,7 @@ body.bh-body { background: #faf7f1; }
 .bh-hero__arrow--prev { left: 14px; }
 .bh-hero__arrow--next { right: 14px; }
 .bh-hero__dots { position: absolute; left: 0; right: 0; bottom: 14px; display: flex; justify-content: center; gap: 7px; z-index: 3; }
+@media (max-width: 819.98px) { .bh-hero__dots { display: none; } }
 .bh-hero__dot { position: relative; overflow: hidden; width: 6px; height: 6px; border-radius: 999px; border: none; cursor: pointer; padding: 0; background: #faf7f1cc; transition: width 0.35s ease; }
 .bh-hero__dot.is-active { width: 22px; }
 .bh-hero__dot.is-active::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: #5F8F2B; transform-origin: left; }
@@ -316,11 +317,23 @@ body.bh-body { background: #faf7f1; }
 .bh-footer__cols { flex: 0 1 640px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
 .bh-footer__contact p, .bh-footer__contact address { margin: 0; font-size: 13px; font-style: normal; line-height: 1.6; color: #a9ac9f; }
 .bh .bh-footer__contact a { overflow-wrap: anywhere; }
+.bh .bh-footer__contact a.bh-footer__wa { display: inline-flex; align-items: center; gap: 8px; }
+.bh-footer__addr-name, .bh-footer__addr-line { display: block; }
+.bh-footer__col, .bh-footer__contact-group { display: flex; flex-direction: column; gap: 12px; }
 @media (max-width: 640px) {
-  .bh-footer__cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .bh-footer__contact { grid-column: 1 / -1; }
+  .bh-footer__inner, .bh-footer__top { gap: 22px; }
+  .bh-footer__cols { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 24px; }
+  .bh-footer__col, .bh-footer__contact-group { gap: 10px; }
+  /* Contact spans the row but splits into two columns aligned with Shop / Support */
+  .bh-footer__contact { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 24px; align-items: start; }
+  .bh-footer__contact .bh-footer__title { grid-column: 1 / -1; }
+  /* The floating WhatsApp button already covers this on mobile */
+  .bh .bh-footer__contact a.bh-footer__wa { display: none; }
+  /* Logo already names the shop; run the address together so it wraps */
+  .bh-footer__addr-name { display: none; }
+  .bh-footer__addr-line { display: inline; }
+  .bh-footer__addr-line + .bh-footer__addr-line::before { content: ', '; }
 }
-.bh-footer__col { display: flex; flex-direction: column; gap: 12px; }
 .bh-footer__title { font-size: 12.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #f4f7ea; }
 .bh .bh-footer__col a { font-size: 13.5px; color: #a9ac9f; text-decoration: none; }
 .bh-footer__rule { height: 1px; background: #232a1b; }

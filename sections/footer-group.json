@@ -7,7 +7,12 @@
       "settings": {
         "footer_blurb": "India's first dedicated bonsai platform — hand-trained trees, delivered healthy.",
         "footer_col1_title": "Shop",
-        "footer_col2_title": "Support"
+        "footer_col1_menu": "footer-shop",
+        "footer_col2_title": "Support",
+        "footer_col2_menu": "footer",
+        "footer_col3_title": "Contact",
+        "contact_phone": "+91 93409 57839",
+        "contact_hours": "Mon–Sat, 10 AM – 6 PM"
       }
     }
   },

@@ -5,6 +5,9 @@ body.bh-body { background: #faf7f1; }
 @keyframes bh-caret { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
 @keyframes bh-rise { from { opacity: 0; transform: translateY(0.45em); } to { opacity: 1; transform: none; } }
 @keyframes bh-dot-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes bh-word-up { from { transform: translateY(110%); } to { transform: none; } }
+@keyframes bh-unfold { from { clip-path: inset(4% 4% round 44px); } to { clip-path: inset(0 round 26px); } }
+@keyframes bh-settle { from { scale: 1.14; } to { scale: 1; } }
 
 .bh { font-family: 'Archivo', Helvetica, Arial, sans-serif; background: #faf7f1; }
 /* Pin inherited metrics so header/footer render the same under theme.liquid (Dawn globals) as under bonsai.liquid */
@@ -169,7 +172,9 @@ body.bh-body { background: #faf7f1; }
 .bh-slide.is-active { opacity: 1; pointer-events: auto; }
 .bh-slide__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 .bh-slide__link { position: absolute; inset: 0; z-index: 2; -webkit-tap-highlight-color: transparent; }
-.bh-word { display: inline-block; }
+/* Each word is a mask its inner span rises through; padding keeps descenders out of the clip */
+.bh-word { display: inline-block; overflow: hidden; vertical-align: top; padding: 0.06em 0 0.14em; margin: -0.06em 0 -0.14em; }
+.bh-word__in { display: inline-block; }
 .bh-slide__shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(27, 31, 23, 0.4) 0%, rgba(27, 31, 23, 0) 34%, rgba(27, 31, 23, 0) 60%, rgba(27, 31, 23, 0.55) 100%); pointer-events: none; }
 .bh-slide__top { position: absolute; left: 0; right: 0; top: 0; padding: clamp(20px, 4vw, 40px); display: flex; flex-direction: column; gap: 12px; pointer-events: none; }
 .bh-slide__title { margin: 0; font-weight: 700; font-size: clamp(28px, 4.6vw, 52px); line-height: 1.08; color: #ffffff; max-width: 13ch; }
@@ -189,11 +194,14 @@ body.bh-body { background: #faf7f1; }
   .bh-slide__img { transition: transform 0s linear 0.6s; }
   .bh-slide.is-zoomed .bh-slide__img { transform: scale(1.08); transition: transform 6s cubic-bezier(0.25, 0.6, 0.3, 1); }
   /* Headline words, then the chip, rise in each time a slide becomes active */
-  .bh-slide.is-active .bh-word { animation: bh-rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(0.15s + var(--w, 0) * 70ms); }
-  .bh-slide.is-active .bh-slide__chip { animation: bh-rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(0.3s + var(--words, 0) * 70ms); }
+  .bh-slide.is-active .bh-word__in { animation: bh-word-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(0.15s + var(--w, 0) * 60ms); }
+  .bh-slide.is-active .bh-slide__chip { animation: bh-rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(0.35s + var(--words, 0) * 60ms); }
   /* Active dot fills over the autoplay interval (5s, matches bonsai-theme.js) */
   .bh-hero__dot.is-active::after { animation: bh-dot-fill 5s linear both; }
 }
+/* First paint: the hero card opens out from a slightly inset, rounder frame while its image settles back */
+.bh-anim .bh-hero { animation: bh-unfold 1.2s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.bh-anim .bh-hero .bh-slide__img { animation: bh-settle 1.8s cubic-bezier(0.16, 1, 0.3, 1) both; }
 
 /* Promo cards */
 .bh-promos { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 16px; }
@@ -216,6 +224,10 @@ body.bh-body { background: #faf7f1; }
 .bh-trust__set--clone { display: none; }
 .bh-trust__item { flex: 1 1 200px; display: flex; align-items: center; justify-content: center; gap: 8px; background: #ffffff; border: 1px solid #eee7d8; border-radius: 999px; padding: 10px 16px; box-sizing: border-box; }
 .bh-trust__label { font-size: 12.5px; font-weight: 500; color: #20241b; white-space: nowrap; }
+/* Ticks draw themselves in just after their pill arrives */
+.bh-trust__item path { stroke-dasharray: 1; }
+.bh-anim .bh-trust__item path { stroke-dashoffset: 1; }
+.bh-anim .bh-trust__item.is-revealed path { stroke-dashoffset: 0; transition: stroke-dashoffset 0.6s cubic-bezier(0.65, 0, 0.35, 1) calc(var(--bh-d) + 0.3s); }
 
 /* Trust strip loops as a marquee on mobile instead of wrapping */
 @media (max-width: 819.98px) and (prefers-reduced-motion: no-preference) {
@@ -241,6 +253,19 @@ body.bh-body { background: #faf7f1; }
 }
 .bh-card__media { position: relative; border-radius: 18px; overflow: hidden; aspect-ratio: 1 / 1; background: #eef4e0; }
 .bh-card__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Second photo only exists for a precise pointer; display:none keeps phones from downloading it */
+.bh-card__media .bh-card__alt { display: none; }
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .bh-card__media img { transition: scale 0.9s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease, filter 0.7s ease; }
+  .bh-card:hover .bh-card__media img { scale: 1.06; }
+  .bh-card__media .bh-card__alt { display: block; opacity: 0; }
+  .bh-card--swap:hover .bh-card__media .bh-card__alt { opacity: 1; }
+  .bh-card__name { transition: color 0.2s ease; }
+  .bh-card:hover .bh-card__name { color: #2E4716; }
+}
+/* Photos fade in from a soft blur as they load (bonsai-theme.js marks them .is-loaded) */
+.bh-anim .bh-card__media img:not(.bh-card__alt):not(.is-loaded) { opacity: 0; filter: blur(14px); }
+.bh-anim .bh-card__media img:not(.bh-card__alt) { transition: opacity 0.6s ease, filter 0.8s ease, scale 0.9s cubic-bezier(0.16, 1, 0.3, 1); }
 .bh-card__badge { position: absolute; top: 10px; left: 10px; background: #2E4716; color: #faf7f1; font-size: 10.5px; font-weight: 600; letter-spacing: 0.03em; padding: 5px 10px; border-radius: 999px; }
 .bh-card__info { flex: 1; padding-top: 12px; display: flex; flex-direction: column; gap: 3px; }
 .bh-card__name { font-size: 14px; font-weight: 600; color: #1B1F17; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; }
@@ -288,8 +313,11 @@ body.bh-body { background: #faf7f1; }
 .bh-review__loc { font-size: 12px; color: #767d6c; }
 
 /* Scroll reveals: .bh-anim is set on <html> by the homepage only when motion is allowed */
-.bh-anim [data-bh-reveal]:not([data-bh-reveal="group"]) > *, .bh-anim [data-bh-reveal-item] { opacity: 0; transform: translateY(48px); }
-.bh-anim [data-bh-reveal] .is-revealed { --bh-d: calc(var(--bh-i, 0) * 200ms); opacity: 1; transform: none; transition: opacity 1.4s ease var(--bh-d), transform 1.8s cubic-bezier(0.22, 0.61, 0.36, 1) var(--bh-d), scale 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.bh-anim [data-bh-reveal]:not([data-bh-reveal="group"]) > *, .bh-anim [data-bh-reveal-item] { opacity: 0; transform: translateY(32px); }
+.bh-anim [data-bh-reveal] .is-revealed { --bh-d: calc(var(--bh-i, 0) * 90ms); opacity: 1; transform: none; transition: opacity 0.8s ease var(--bh-d), transform 1.1s cubic-bezier(0.16, 1, 0.3, 1) var(--bh-d), scale 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+/* Section headings rise word by word from behind their baseline */
+.bh-anim [data-bh-words] .bh-word__in { transform: translateY(110%); }
+.bh-anim [data-bh-words].is-revealed .bh-word__in { transform: none; transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--w, 0) * 60ms); }
 /* Sideways-scrolling rows: a quick fade in place, so cards never slide, get clipped or lag behind a swipe */
 .bh-anim .bh-reviews[data-bh-reveal] > * { transform: none; }
 .bh-anim .bh-reviews[data-bh-reveal] > .is-revealed { transition: opacity 0.4s ease, scale 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }

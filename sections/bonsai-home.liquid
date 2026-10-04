@@ -114,7 +114,7 @@
             <div class="bh-trust__set{% if copy == 2 %} bh-trust__set--clone{% endif %}"{% if copy == 2 %} aria-hidden="true"{% endif %}>
               {%- for block in trust_blocks -%}
                 <div class="bh-trust__item" data-bh-reveal-item{% if copy == 1 %} {{ block.shopify_attributes }}{% endif %}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12.5L9.5 18L20 6" stroke="#5F8F2B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path pathLength="1" d="M4 12.5L9.5 18L20 6" stroke="#5F8F2B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
                   <span class="bh-trust__label">{{ block.settings.label }}</span>
                 </div>
               {%- endfor -%}
@@ -151,7 +151,7 @@
       {%- endif -%}
 
       <div class="bh-head">
-        <div><h2 class="bh-h2">{{ row_heading }}</h2></div>
+        <div><h2 class="bh-h2" data-bh-words>{%- render 'bonsai-words', text: row_heading -%}</h2></div>
       </div>
 
       <div class="bh-products" data-bh-reveal>
@@ -164,7 +164,8 @@
               title: product.title,
               subtitle: product.metafields.custom.subtitle,
               price: product_price,
-              badge: product.metafields.custom.badge
+              badge: product.metafields.custom.badge,
+              hover_image: product.media[1].preview_image
             -%}
           {%- endfor -%}
         {%- else -%}
@@ -189,7 +190,7 @@
     {%- assign category_blocks = section.blocks | where: 'type', 'category' -%}
     {%- if category_blocks.size > 0 -%}
       <div style="margin:8px 0 18px;">
-        <h2 class="bh-h2">{{ section.settings.categories_heading }}</h2>
+        <h2 class="bh-h2" data-bh-words>{%- render 'bonsai-words', text: section.settings.categories_heading -%}</h2>
       </div>
       <div class="bh-cats" data-bh-reveal>
         {%- for block in category_blocks -%}
@@ -229,7 +230,7 @@
     -%}
     {%- if review_keys.size > 0 or review_blocks.size > 0 -%}
       <div class="bh-head">
-        <h2 class="bh-h2">{{ section.settings.testimonials_heading }}</h2>
+        <h2 class="bh-h2" data-bh-words>{%- render 'bonsai-words', text: section.settings.testimonials_heading -%}</h2>
         {%- comment -%} Desktop only, shown by JS when the row overflows {%- endcomment -%}
         <div class="bh-scroll-arrows" data-bh-scroll-arrows hidden>
           <button type="button" class="bh-scroll-arrow" data-bh-scroll-prev aria-label="Previous reviews">

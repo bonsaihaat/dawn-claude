@@ -30,6 +30,26 @@
     document.querySelectorAll('[data-bh-reveal="group"], [data-bh-reveal]:not([data-bh-reveal="group"]) > *').forEach(function (el) {
       revealObserver.observe(el);
     });
+
+    // Section headings: words rise once the heading is a little way into the viewport
+    var headingObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-revealed');
+        headingObserver.unobserve(entry.target);
+      });
+    }, { rootMargin: '0px 0px -10% 0px' });
+    document.querySelectorAll('[data-bh-words]').forEach(function (el) { headingObserver.observe(el); });
+
+    // Card photos fade in from a blur as each one finishes loading (a failed load still shows its empty tile)
+    document.querySelectorAll('.bh-card__media img:not(.bh-card__alt)').forEach(function (img) {
+      function done() { img.classList.add('is-loaded'); }
+      if (img.complete) done();
+      else {
+        img.addEventListener('load', done, { once: true });
+        img.addEventListener('error', done, { once: true });
+      }
+    });
   }
 
   // Sideways rows with arrow buttons (desktop): arrows show only when the row overflows,

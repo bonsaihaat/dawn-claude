@@ -185,14 +185,7 @@
         wish.classList.remove('is-popping');
         void wish.offsetWidth;
         wish.classList.add('is-popping');
-        for (var i = 0; i < 6; i++) {
-          var leaf = document.createElement('span');
-          leaf.className = 'bh-plp-leaf';
-          leaf.setAttribute('aria-hidden', 'true');
-          leaf.style.setProperty('--a', (i * 60 + 15) + 'deg');
-          leaf.addEventListener('animationend', function (ev) { ev.currentTarget.remove(); });
-          wish.appendChild(leaf);
-        }
+        if (window.bhLeafBurst) window.bhLeafBurst(wish.closest('.bh-plp-card'), wish);
       }
       try { on ? localStorage.setItem(key, '1') : localStorage.removeItem(key); } catch (err) {}
       return;
@@ -262,7 +255,7 @@
       if (!grid) return;
       var copy = grid.cloneNode(true);
       copy.querySelectorAll('.is-arriving').forEach(function (c) { c.classList.remove('is-arriving'); });
-      copy.querySelectorAll('.bh-plp-leaf').forEach(function (l) { l.remove(); });
+      copy.querySelectorAll('.bh-leaves').forEach(function (l) { l.remove(); });
       copy.querySelectorAll('.bh-plp-card__cart.is-added').forEach(function (b) {
         b.classList.remove('is-added');
         b.textContent = 'Add to cart';

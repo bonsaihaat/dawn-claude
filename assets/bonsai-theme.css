@@ -15,6 +15,11 @@ body.bh-body { background: #faf7f1; }
   @view-transition { navigation: auto; }
 }
 .bh-vt .bh-plp-card { view-transition-name: none !important; }
+
+/* Wishlist leaf burst (window.bhLeafBurst in bonsai-theme.js): clipped to its card, never catches taps */
+.bh-leaves { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; pointer-events: none; z-index: 4; perspective: 500px; }
+.bh-leaf { position: absolute; display: block; will-change: transform, opacity; }
+.bh-leaf svg { display: block; filter: drop-shadow(0 1px 1.5px rgba(20, 26, 15, 0.3)); }
 ::view-transition-group(bh-product) { animation-duration: 0.5s; animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1); }
 ::view-transition-old(bh-product), ::view-transition-new(bh-product) { height: 100%; object-fit: cover; }
 

@@ -85,6 +85,11 @@
 .bh-pdp__add:disabled { background: #a9ac9f; cursor: not-allowed; }
 .bh-pdp__wish { width: 50px; flex-shrink: 0; background: #ffffff; border: 1px solid #e3dccb; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
 .bh-pdp__wish[aria-pressed="true"] svg { fill: #5F8F2B; }
+@media (prefers-reduced-motion: no-preference) {
+  .bh-pdp__wish svg { transition: fill 0.2s ease; }
+  .bh-pdp__wish.is-popping svg { animation: bh-pdp-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+}
+@keyframes bh-pdp-pop { 0% { scale: 1; } 35% { scale: 0.75; } 100% { scale: 1; } }
 
 .bh .bh-pdp__ask { display: flex; align-items: center; justify-content: center; gap: 8px; border: 1.5px solid #1B1F17; border-radius: 999px; padding: 13px; font-size: 14px; font-weight: 600; color: #1B1F17; text-decoration: none; }
 

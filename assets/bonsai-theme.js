@@ -2,6 +2,91 @@
   // iOS Safari only applies :active (press feedback) when a touch listener exists
   document.addEventListener('touchstart', function () {}, { passive: true });
 
+  // Wishlist celebration: leaves burst out of `from` (or the top of `container` when `from` sits
+  // outside it), then flutter down through the container for ~2s. Used by listing cards and the
+  // product page. Nothing happens under reduced motion.
+  var LEAF_GREENS = ['#5F8F2B', '#7FA843', '#9BBF5E', '#2E4716', '#B9CF8E', '#D4E4A8'];
+  window.bhLeafBurst = function (container, from) {
+    if (!container || !container.animate || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var old = container.querySelector(':scope > .bh-leaves');
+    if (old) old.remove(); // a quick second tap starts a fresh burst instead of stacking
+    var layer = document.createElement('div');
+    layer.className = 'bh-leaves';
+    layer.setAttribute('aria-hidden', 'true');
+    container.appendChild(layer);
+
+    var box = container.getBoundingClientRect();
+    var ox = box.width / 2;
+    var oy = Math.min(box.height * 0.18, 60);
+    var aim = -90; // fan direction in degrees (-90 = straight up)
+    var spread = 0.55; // narrow, low fan when leaves start from the container's top edge
+    var lift = 0.4;
+    if (from) {
+      var f = from.getBoundingClientRect();
+      var cx = f.left + f.width / 2 - box.left;
+      var cy = f.top + f.height / 2 - box.top;
+      if (cx >= 0 && cx <= box.width && cy >= 0 && cy <= box.height) {
+        ox = cx; oy = cy; spread = 0.75; lift = 1;
+        // A heart near the top edge (card corner) fans toward the middle of the card instead of out of it
+        if (oy < 120) aim = Math.atan2(box.height * 0.3 - oy, box.width / 2 - ox) * 180 / Math.PI;
+      }
+    }
+    var count = box.width > 400 ? 22 : 16;
+    var size = box.width > 400 ? 1.4 : 1;
+    var rand = function (a, b) { return a + Math.random() * (b - a); };
+    var pending = count;
+
+    for (var i = 0; i < count; i++) {
+      var s = rand(14, 30) * size;
+      var color = LEAF_GREENS[i % LEAF_GREENS.length];
+      var leaf = document.createElement('span');
+      leaf.className = 'bh-leaf';
+      leaf.style.width = s + 'px';
+      leaf.style.height = s + 'px';
+      leaf.style.left = (ox - s / 2) + 'px';
+      leaf.style.top = (oy - s / 2) + 'px';
+      leaf.innerHTML = '<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 1.5C5.6 6.6 5.2 15 12 22.5 18.8 15 18.4 6.6 12 1.5Z" fill="' + color + '"/><path d="M12 4v18M12 10l-3.2-2.6M12 10l3.2-2.6M12 15l-3.6-2.8M12 15l3.6-2.8" stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.9" stroke-linecap="round" fill="none"/></svg>';
+      layer.appendChild(leaf);
+
+      // Burst out along the fan, then fall with a side-to-side sway and a 3D flutter
+      var angle = (aim + rand(-80, 80) * spread) * Math.PI / 180;
+      var dist = rand(40, 110) * size;
+      var bx = Math.cos(angle) * dist;
+      var by = Math.sin(angle) * dist * lift;
+      var fall = box.height - oy + s + 10;
+      var drift = rand(-50, 50) * size;
+      var sway = rand(14, 30) * size;
+      var waves = rand(1.2, 2.4);
+      var phase = rand(0, Math.PI * 2);
+      var spin = rand(-260, 260);
+      var r0 = rand(0, 360);
+      var frames = [];
+      var STEPS = 28;
+      for (var k = 0; k <= STEPS; k++) {
+        var t = k / STEPS;
+        var x, y, sc;
+        if (t < 0.18) {
+          var p = 1 - Math.pow(1 - t / 0.18, 3);
+          x = bx * p; y = by * p; sc = 0.3 + 0.7 * p;
+        } else {
+          var u = (t - 0.18) / 0.82;
+          var w = Math.sin(u * waves * Math.PI * 2 + phase);
+          x = bx + drift * u + sway * w;
+          y = by + (fall - by) * Math.pow(u, 1.25);
+          sc = 1;
+        }
+        var flutter = Math.sin(t * waves * Math.PI * 2 + phase);
+        frames.push({
+          transform: 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) rotate(' + (r0 + spin * t).toFixed(1) + 'deg) rotateY(' + (flutter * 65).toFixed(1) + 'deg) rotateX(' + (Math.cos(t * waves * Math.PI * 2 + phase) * 35).toFixed(1) + 'deg) scale(' + sc.toFixed(2) + ')',
+          opacity: t > 0.8 ? (1 - (t - 0.8) / 0.2).toFixed(2) : 1,
+        });
+      }
+      leaf.animate(frames, { duration: rand(1700, 2300), delay: rand(0, 90), easing: 'linear', fill: 'both' }).finished.then(function () {
+        if (--pending === 0) layer.remove();
+      }, function () {});
+    }
+  };
+
   // Scroll reveals: each item fades up once it is itself well inside the viewport;
   // items that arrive together (a row of cards, a swipe) are staggered in order
   if (document.documentElement.classList.contains('bh-anim')) {

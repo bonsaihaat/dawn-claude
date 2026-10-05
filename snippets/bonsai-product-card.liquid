@@ -1,7 +1,8 @@
 {%- comment -%}
-  Accepts: url, image (image object, optional), title, subtitle, price, badge
+  Accepts: url, image (image object, optional), title, subtitle, price, badge,
+  hover_image (optional, shown on desktop hover)
 {%- endcomment -%}
-<a href="{{ url | default: routes.all_products_collection_url }}" class="bh-card">
+<a href="{{ url | default: routes.all_products_collection_url }}" class="bh-card{% if hover_image != blank and image != blank %} bh-card--swap{% endif %}">
   <div class="bh-card__media">
     {%- if image != blank -%}
       {{
@@ -13,6 +14,18 @@
           sizes: '(min-width: 820px) 280px, 40vw',
           alt: title
       }}
+      {%- if hover_image != blank -%}
+        {{
+          hover_image
+          | image_url: width: 800
+          | image_tag:
+            class: 'bh-card__alt',
+            loading: 'lazy',
+            widths: '300, 400, 600, 800',
+            sizes: '280px',
+            alt: ''
+        }}
+      {%- endif -%}
     {%- endif -%}
     {%- if badge != blank -%}
       <span class="bh-card__badge">{{ badge }}</span>

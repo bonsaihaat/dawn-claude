@@ -48,9 +48,7 @@
   <div class="bh-slide__shade"></div>
   <div class="bh-slide__top">
     <h1 class="bh-slide__title">
-      {%- for word in words -%}
-        <span class="bh-word" style="--w: {{ forloop.index0 }}">{{ word }}</span>{% unless forloop.last %} {% endunless %}
-      {%- endfor -%}
+      {%- render 'bonsai-words', text: headline -%}
     </h1>
   </div>
   {%- if caption != blank -%}

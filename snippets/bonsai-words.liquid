@@ -1,0 +1,7 @@
+{%- comment -%}
+  Accepts: text. Wraps each word in a mask so it can rise into view from behind its own baseline.
+{%- endcomment -%}
+{%- assign words = text | split: ' ' -%}
+{%- for word in words -%}
+  <span class="bh-word" style="--w: {{ forloop.index0 }}"><span class="bh-word__in">{{ word }}</span></span>{% unless forloop.last %} {% endunless %}
+{%- endfor -%}

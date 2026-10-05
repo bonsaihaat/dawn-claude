@@ -15,8 +15,10 @@
   endif
   assign rating = product.metafields.reviews.rating.value
   assign variant = product.selected_or_first_available_variant
+  assign hover_image = product.media[1].preview_image
 -%}
-<div class="bh-plp-card">
+{%- comment -%} The transition name lets a card glide to its new spot when filters or sort change {%- endcomment -%}
+<div class="bh-plp-card{% if hover_image != blank and product.featured_media != blank %} bh-plp-card--swap{% endif %}" style="view-transition-name: bh-p-{{ product.id }}">
   <div class="bh-plp-card__media">
     <a href="{{ product.url }}" class="bh-plp-card__img" tabindex="-1" aria-hidden="true">
       {%- if product.featured_media != blank -%}
@@ -29,6 +31,18 @@
             sizes: '(min-width: 820px) 240px, 45vw',
             alt: product.title
         }}
+        {%- if hover_image != blank -%}
+          {{
+            hover_image
+            | image_url: width: 800
+            | image_tag:
+              class: 'bh-plp-card__alt',
+              loading: 'lazy',
+              widths: '300, 400, 600, 800',
+              sizes: '240px',
+              alt: ''
+          }}
+        {%- endif -%}
       {%- endif -%}
     </a>
     {%- if m.badge.value != blank -%}

@@ -8,6 +8,44 @@
   var extended = false;
   var SNAPSHOT_KEY = 'bh-plp-snapshot';
   var SNAPSHOT_MAX_AGE = 30 * 60 * 1000;
+  var calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function wait(ms) {
+    return new Promise(function (resolve) { setTimeout(resolve, calm ? 0 : ms); });
+  }
+
+  // Thin loading bar along the top of the window while filters and sort load
+  var bar = document.createElement('div');
+  bar.className = 'bh-plp-bar';
+  bar.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(bar);
+  function barStart() {
+    bar.classList.remove('is-done', 'is-running');
+    void bar.offsetWidth; // restart from empty
+    bar.classList.add('is-running');
+  }
+  function barDone() {
+    bar.classList.remove('is-running');
+    bar.classList.add('is-done');
+  }
+
+  // Swap in fresh results inside a view transition, so cards glide to their new places.
+  // The first few photos get a moment to decode, so arriving cards don't fade in empty.
+  function transition(update) {
+    // Skipped under the open mobile sheet: the moving cards would be drawn on top of it
+    if (calm || !document.startViewTransition || root.classList.contains('is-sheet-open')) {
+      update();
+      return Promise.resolve();
+    }
+    return document.startViewTransition(function () {
+      update();
+      var imgs = Array.prototype.slice.call(root.querySelectorAll('.bh-plp-card__img img:not(.bh-plp-card__alt)'), 0, 8);
+      return Promise.race([
+        Promise.all(imgs.map(function (img) { return img.decode ? img.decode().catch(function () {}) : null; })),
+        wait(300),
+      ]);
+    }).updateCallbackDone;
+  }
 
   function sectionUrl(url) {
     var u = new URL(url, window.location.href);
@@ -43,21 +81,32 @@
 
   function render(url, push) {
     root.classList.add('is-loading');
+    barStart();
     var sheetBody = root.querySelector('[data-bh-sheet-body]');
     var sheetScroll = sheetBody ? sheetBody.scrollTop : 0;
-    return fetchSection(url)
+    var request = fetchSection(url);
+    var mine = pending;
+    return request
       .then(function (fresh) {
         if (!fresh) { window.location.href = url; return; }
-        root.innerHTML = fresh.innerHTML;
-        var body = root.querySelector('[data-bh-sheet-body]');
-        if (body) body.scrollTop = sheetScroll;
-        syncWishlist(root);
-        revealActiveChip();
-        extended = false;
-        if (push) window.history.pushState({ bhPlp: true }, '', url);
+        return transition(function () {
+          root.innerHTML = fresh.innerHTML;
+          root.classList.remove('is-loading');
+          var body = root.querySelector('[data-bh-sheet-body]');
+          if (body) body.scrollTop = sheetScroll;
+          syncWishlist(root);
+          revealActiveChip();
+          extended = false;
+          if (push) window.history.pushState({ bhPlp: true }, '', url);
+        });
       })
       .catch(function (err) { if (err.name !== 'AbortError') window.location.href = url; })
-      .finally(function () { root.classList.remove('is-loading'); });
+      .finally(function () {
+        // A newer request aborted this one and is still loading: leave the bar running for it
+        if (pending !== mine) return;
+        root.classList.remove('is-loading');
+        barDone();
+      });
   }
 
   root.addEventListener('click', function (e) {
@@ -73,14 +122,21 @@
       e.preventDefault();
       if (more.getAttribute('aria-busy') === 'true') return;
       more.setAttribute('aria-busy', 'true');
-      more.textContent = 'Loading…';
+      more.textContent = 'Loading';
       fetchSection(more.href)
         .then(function (fresh) {
           var grid = root.querySelector('[data-bh-grid]');
           var freshGrid = fresh && fresh.querySelector('[data-bh-grid]');
           if (!grid || !freshGrid) { window.location.href = more.href; return; }
           var firstNew = freshGrid.firstElementChild;
-          while (freshGrid.firstElementChild) grid.appendChild(freshGrid.firstElementChild);
+          var n = 0;
+          while (freshGrid.firstElementChild) {
+            var card = freshGrid.firstElementChild;
+            card.classList.add('is-arriving');
+            card.style.setProperty('--bh-i', Math.min(n++, 7));
+            card.addEventListener('animationend', function (ev) { ev.currentTarget.classList.remove('is-arriving'); }, { once: true });
+            grid.appendChild(card);
+          }
           syncWishlist(grid);
           extended = true;
           var wrap = more.closest('[data-bh-more-wrap]');
@@ -125,6 +181,19 @@
       var key = 'bh-wish-' + wish.getAttribute('data-bh-wish');
       var on = wish.getAttribute('aria-pressed') !== 'true';
       wish.setAttribute('aria-pressed', String(on));
+      if (on && !calm) {
+        wish.classList.remove('is-popping');
+        void wish.offsetWidth;
+        wish.classList.add('is-popping');
+        for (var i = 0; i < 6; i++) {
+          var leaf = document.createElement('span');
+          leaf.className = 'bh-plp-leaf';
+          leaf.setAttribute('aria-hidden', 'true');
+          leaf.style.setProperty('--a', (i * 60 + 15) + 'deg');
+          leaf.addEventListener('animationend', function (ev) { ev.currentTarget.remove(); });
+          wish.appendChild(leaf);
+        }
+      }
       try { on ? localStorage.setItem(key, '1') : localStorage.removeItem(key); } catch (err) {}
       return;
     }
@@ -143,9 +212,14 @@
           });
         })
         .then(function () {
-          add.textContent = 'Added ✓';
+          add.removeAttribute('aria-busy');
+          add.innerHTML = '<svg class="bh-plp-card__tick" width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path pathLength="1" d="M4 12.5L9.5 18L20 6" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Added';
           add.classList.add('is-added');
-          return fetch(shopRoot + 'cart.js').then(function (r) { return r.json(); });
+          // Let the tick finish drawing before the cart drawer slides over
+          return Promise.all([fetch(shopRoot + 'cart.js').then(function (r) { return r.json(); }), wait(550)]);
+        })
+        .then(function (results) {
+          return results[0];
         })
         .then(function (cart) {
           document.querySelectorAll('.bh-badge').forEach(function (b) { b.textContent = cart.item_count; });
@@ -187,6 +261,8 @@
       var wrap = root.querySelector('[data-bh-more-wrap]');
       if (!grid) return;
       var copy = grid.cloneNode(true);
+      copy.querySelectorAll('.is-arriving').forEach(function (c) { c.classList.remove('is-arriving'); });
+      copy.querySelectorAll('.bh-plp-leaf').forEach(function (l) { l.remove(); });
       copy.querySelectorAll('.bh-plp-card__cart.is-added').forEach(function (b) {
         b.classList.remove('is-added');
         b.textContent = 'Add to cart';

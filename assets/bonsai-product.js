@@ -138,6 +138,13 @@
       var on = wish.getAttribute('aria-pressed') !== 'true';
       wish.setAttribute('aria-pressed', String(on));
       try { on ? localStorage.setItem(wishKey, '1') : localStorage.removeItem(wishKey); } catch (e) {}
+      if (on) {
+        wish.classList.remove('is-popping');
+        void wish.offsetWidth;
+        wish.classList.add('is-popping');
+        // Leaves fall through the main photo (shared with listing cards, bonsai-theme.js)
+        if (window.bhLeafBurst) window.bhLeafBurst(root.querySelector('.bh-pdp__stage'), wish);
+      }
     });
 
     // Delivery estimate

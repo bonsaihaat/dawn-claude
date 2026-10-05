@@ -71,6 +71,17 @@
 .bh-pdp__qty span { min-width: 22px; text-align: center; font-size: 15px; font-weight: 700; color: #1B1F17; }
 .bh-pdp__add { flex: 1; font-family: inherit; border: none; border-radius: 999px; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s ease; background: #5F8F2B; color: #ffffff; }
 .bh-pdp__add.is-added { background: #2E4716; }
+/* Adding: the label hides behind a spinner, then "Added to cart" arrives with a tick that draws itself */
+.bh-pdp__add { position: relative; }
+.bh-pdp__add[aria-busy="true"] { color: transparent; }
+.bh-pdp__add[aria-busy="true"]::after { content: ''; position: absolute; left: 50%; top: 50%; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; border: 2px solid #ffffff; border-right-color: transparent; box-sizing: border-box; animation: bh-pdp-spin 0.7s linear infinite; }
+.bh-pdp__tick { display: inline-block; vertical-align: -2px; margin-right: 7px; }
+.bh-pdp__tick path { stroke-dasharray: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .bh-pdp__tick path { stroke-dashoffset: 1; animation: bh-pdp-draw 0.4s cubic-bezier(0.65, 0, 0.35, 1) 0.05s forwards; }
+}
+@keyframes bh-pdp-spin { to { transform: rotate(360deg); } }
+@keyframes bh-pdp-draw { to { stroke-dashoffset: 0; } }
 .bh-pdp__add:disabled { background: #a9ac9f; cursor: not-allowed; }
 .bh-pdp__wish { width: 50px; flex-shrink: 0; background: #ffffff; border: 1px solid #e3dccb; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
 .bh-pdp__wish[aria-pressed="true"] svg { fill: #5F8F2B; }

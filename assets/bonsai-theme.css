@@ -9,6 +9,15 @@ body.bh-body { background: #faf7f1; }
 @keyframes bh-unfold { from { clip-path: inset(4% 4% round 44px); } to { clip-path: inset(0 round 26px); } }
 @keyframes bh-settle { from { scale: 1.14; } to { scale: 1; } }
 
+/* Page-to-page transitions (names are set by snippets/bonsai-view-transitions.liquid): a product card's
+   photo grows into the product page's main photo; everything else crossfades */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+}
+.bh-vt .bh-plp-card { view-transition-name: none !important; }
+::view-transition-group(bh-product) { animation-duration: 0.5s; animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1); }
+::view-transition-old(bh-product), ::view-transition-new(bh-product) { height: 100%; object-fit: cover; }
+
 .bh { font-family: 'Archivo', Helvetica, Arial, sans-serif; background: #faf7f1; }
 /* Pin inherited metrics so header/footer render the same under theme.liquid (Dawn globals) as under bonsai.liquid */
 .bh { line-height: normal; letter-spacing: normal; }

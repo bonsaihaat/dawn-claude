@@ -1,0 +1,73 @@
+{%- comment -%}
+  Page-to-page transitions: the photo on a clicked product card grows into the product page's main
+  photo (and shrinks back into its card on Back). Both pages opt in via @view-transition in
+  bonsai-theme.css; this script names just the two elements that should morph, for one navigation.
+  Rendered in <head> so the pagereveal listener is in place before the first paint.
+{%- endcomment -%}
+<script>
+  (function () {
+    var root = document.documentElement;
+    var picked = null;
+    var named = [];
+
+    function handleOf(url) {
+      var m = /\/products\/([^/?#]+)/.exec(url || '');
+      return m ? m[1] : null;
+    }
+    function cardMedia(card) {
+      return card && card.querySelector('.bh-card__media, .bh-plp-card__media');
+    }
+    function reset() {
+      root.classList.remove('bh-vt');
+      named.forEach(function (el) { el.style.viewTransitionName = ''; });
+      named = [];
+    }
+    function begin(vt) {
+      // Listing cards carry their own names for filter animations; drop them for page changes
+      root.classList.add('bh-vt');
+      vt.finished.finally(reset);
+    }
+    function name(el) {
+      if (!el) return;
+      el.style.viewTransitionName = 'bh-product';
+      named.push(el);
+    }
+
+    // Remember which card was clicked (capture phase, before any navigation starts)
+    document.addEventListener('click', function (e) {
+      var link = e.target.closest && e.target.closest('a[href*="/products/"]');
+      var card = link && link.closest('.bh-card, .bh-plp-card');
+      picked = card ? { media: cardMedia(card), handle: handleOf(link.href) } : null;
+    }, true);
+
+    window.addEventListener('pageswap', function (e) {
+      if (!e.viewTransition || !e.activation || !e.activation.entry) return;
+      reset();
+      begin(e.viewTransition);
+      var to = handleOf(e.activation.entry.url);
+      if (to && picked && picked.handle === to) name(picked.media);
+      else name(document.getElementById('bh-pdp-stage'));
+      picked = null;
+    });
+
+    window.addEventListener('pagereveal', function (e) {
+      reset();
+      if (!e.viewTransition) return;
+      begin(e.viewTransition);
+      var stage = document.getElementById('bh-pdp-stage');
+      if (stage) { name(stage); return; }
+      // Back on a page of cards: send the photo home to its card, if that card is on screen
+      var from = window.navigation && navigation.activation && navigation.activation.from;
+      var handle = from && handleOf(from.url);
+      if (!handle) return;
+      var links = document.querySelectorAll('a[href*="/products/"]');
+      for (var i = 0; i < links.length; i++) {
+        if (handleOf(links[i].href) !== handle) continue;
+        var media = cardMedia(links[i].closest('.bh-card, .bh-plp-card'));
+        if (!media) continue;
+        var r = media.getBoundingClientRect();
+        if (r.bottom > 0 && r.top < window.innerHeight) { name(media); return; }
+      }
+    });
+  })();
+</script>

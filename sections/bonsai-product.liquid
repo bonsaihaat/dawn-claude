@@ -59,7 +59,7 @@
     <div class="bh-pdp__layout">
 
       <div class="bh-pdp__gallery">
-        <div class="bh-pdp__stage">
+        <div class="bh-pdp__stage" id="bh-pdp-stage">
           {%- for media in product.media -%}
             <div class="bh-pdp__slide{% if forloop.first %} is-active{% endif %}" data-bh-slide="{{ forloop.index0 }}" data-media-id="{{ media.id }}">
               {%- if forloop.first -%}

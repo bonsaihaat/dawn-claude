@@ -130,14 +130,20 @@
     addBtn.addEventListener('click', addToCart);
     if (proxyBtn) proxyBtn.addEventListener('click', addToCart);
 
-    // Wishlist (per-browser)
+    // Wishlist (per-browser, snippets/bonsai-wishlist-store.liquid)
     var wish = root.querySelector('[data-bh-wish]');
-    var wishKey = 'bh-wish-' + root.getAttribute('data-product-id');
-    try { if (localStorage.getItem(wishKey)) wish.setAttribute('aria-pressed', 'true'); } catch (e) {}
+    var productId = root.getAttribute('data-product-id');
+    function syncWish() {
+      if (window.bhWishlist) wish.setAttribute('aria-pressed', String(bhWishlist.has(productId)));
+    }
+    syncWish();
+    document.addEventListener('bh:wishlist:change', function (e) {
+      if (e.detail && e.detail.external) syncWish();
+    });
     wish.addEventListener('click', function () {
-      var on = wish.getAttribute('aria-pressed') !== 'true';
+      if (!window.bhWishlist) return;
+      var on = bhWishlist.toggle(productId, root.getAttribute('data-product-handle'));
       wish.setAttribute('aria-pressed', String(on));
-      try { on ? localStorage.setItem(wishKey, '1') : localStorage.removeItem(wishKey); } catch (e) {}
       if (on) {
         wish.classList.remove('is-popping');
         void wish.offsetWidth;

@@ -14,6 +14,9 @@
       <meta name="description" content="{{ page_description | escape }}">
     {%- endif -%}
     {% render 'meta-tags' %}
+    {%- if template.suffix == 'wishlist' -%}
+      <meta name="robots" content="noindex">
+    {%- endif -%}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -23,6 +26,7 @@
       <link rel="expect" href="#bh-pdp-stage" blocking="render">
     {%- endif -%}
     {% render 'bonsai-view-transitions' %}
+    {% render 'bonsai-wishlist-store' %}
     {{ content_for_header }}
   </head>
   <body class="bh-body">

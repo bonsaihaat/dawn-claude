@@ -1,0 +1,15 @@
+{%- comment -%}
+  One listing card for the wishlist page, which requests it per saved product as
+  /products/<handle>?section_id=bonsai-wishlist-card (Section Rendering API, product context).
+  Not meant for templates, so it has no presets.
+{%- endcomment -%}
+{%- if product != blank -%}
+  {%- render 'bonsai-listing-card', product: product -%}
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Wishlist card",
+  "tag": "div"
+}
+{% endschema %}

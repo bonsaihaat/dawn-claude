@@ -101,16 +101,28 @@ body.bh-body { background: #faf7f1; }
 }
 
 /* Mobile header */
-.bh-mh__bar { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; padding: 10px 12px; background: #faf7f1; }
+.bh-mh__bar { display: grid; grid-template-columns: 88px minmax(0, 1fr) 88px; align-items: center; padding: 10px 12px; background: #faf7f1; }
 .bh-mh__menu-btn { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: none; border: none; padding: 0; cursor: pointer; }
-.bh-mh__menu-btn, .bh-mh__cart, .bh-drawer__close, .bh-dnav, .bh-sub__back, .bh-sub__link, .bh-sub__all, .bh-drawer__minor a, .bh-backdrop { -webkit-tap-highlight-color: transparent; }
-.bh-mh__logo { justify-self: center; display: block; line-height: 0; text-decoration: none; }
-.bh-mh__logo img { height: 46px; width: auto; display: block; }
+.bh-mh__menu-btn, .bh-mh__cart, .bh-mh__wish, .bh-drawer__close, .bh-dnav, .bh-sub__back, .bh-sub__link, .bh-sub__all, .bh-drawer__minor a, .bh-backdrop { -webkit-tap-highlight-color: transparent; }
+.bh-mh__logo { justify-self: center; min-width: 0; display: block; line-height: 0; text-decoration: none; }
+/* Shrinks on the narrowest phones, where the wishlist and cart icons leave less room */
+.bh-mh__logo img { height: auto; max-height: 46px; width: auto; max-width: 100%; display: block; }
 .bh-mh__cart { position: relative; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+.bh-mh__icons { justify-self: end; display: flex; align-items: center; }
+.bh-mh__wish { position: relative; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; text-decoration: none; }
 .bh-mh__search { padding: 6px 16px 14px; }
 
 .bh-badge { position: absolute; background: #5F8F2B; color: #fff; font-size: 9px; font-weight: 700; width: 15px; height: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 .bh-mh__cart .bh-badge { top: 6px; right: 4px; }
+/* Wishlist count: same dot as the cart's, hidden while nothing is saved */
+.bh-wbadge { position: absolute; background: #5F8F2B; color: #fff; font-size: 9px; font-weight: 700; min-width: 15px; height: 15px; padding: 0 3px; box-sizing: border-box; border-radius: 999px; display: flex; align-items: center; justify-content: center; }
+.bh-wbadge[hidden], .bh-drawer__count[hidden] { display: none; }
+.bh-mh__wish .bh-wbadge { top: 6px; right: 3px; }
+.bh-drawer__count { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 6px; margin-left: 8px; box-sizing: border-box; border-radius: 999px; background: #eef4e0; color: #2E4716; font-size: 11px; font-weight: 700; vertical-align: 1px; }
+@media (prefers-reduced-motion: no-preference) {
+  .bh-wbadge.is-bumped { animation: bh-wbadge-bump 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); }
+}
+@keyframes bh-wbadge-bump { 40% { transform: scale(1.35); } }
 
 /* Mobile drawer */
 .bh-backdrop { position: fixed; inset: 0; background: #1B1F17; transition: opacity 0.3s ease; z-index: 40; opacity: 0; pointer-events: none; }
@@ -153,6 +165,8 @@ body.bh-body { background: #faf7f1; }
 .bh-dh__icons a { display: block; line-height: 0; text-decoration: none; }
 .bh-dh__cart { position: relative; }
 .bh-dh__cart .bh-badge { top: -7px; right: -9px; }
+.bh-dh__wish { position: relative; }
+.bh-dh__wish .bh-wbadge { top: -7px; right: -9px; }
 
 .bh-nav { display: flex; align-items: center; justify-content: center; padding: 4px 24px 14px; border-bottom: 1px solid #eee7d8; }
 .bh-nav__bar { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px; padding: 5px; background: #f4f1e6; border-radius: 14px; }

@@ -1,0 +1,123 @@
+{{ 'bonsai-listing.css' | asset_url | stylesheet_tag }}
+{{ 'bonsai-wishlist.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'bonsai-wishlist.js' | asset_url }}" defer></script>
+
+{%- liquid
+  assign heading = section.settings.heading | default: page.title
+  assign all_url = routes.all_products_collection_url
+  if section.settings.primary_collection != blank
+    assign primary_url = section.settings.primary_collection.url
+  else
+    assign primary_url = all_url
+  endif
+  if section.settings.secondary_collection != blank
+    assign secondary_url = section.settings.secondary_collection.url
+  else
+    assign secondary_url = all_url
+  endif
+-%}
+
+{%- comment -%}
+  Saved products live in this browser (snippets/bonsai-wishlist-store.liquid), so the page is drawn
+  in the browser: bonsai-wishlist.js fetches each product's listing card and swaps it in for a
+  placeholder. Cards keep the listing page's look and its Add to cart; the heart removes, with Undo.
+{%- endcomment -%}
+<div class="bh bh-plp bh-wl" data-bh-wl>
+  <div class="bh-plp__wrap">
+
+    <nav class="bh-plp__crumbs" aria-label="Breadcrumb">
+      <a href="{{ routes.root_url }}">Home</a>
+      <span>/</span>
+      <span class="bh-plp__crumb-current">{{ heading }}</span>
+    </nav>
+
+    <div class="bh-wl__head">
+      <h1 class="bh-plp__title" tabindex="-1" data-bh-wl-heading>{{ heading }}</h1>
+      <p class="bh-wl__count" aria-live="polite" data-bh-wl-count></p>
+    </div>
+
+    <div class="bh-plp__grid bh-wl__grid" aria-busy="true" data-bh-wl-grid></div>
+
+    <div class="bh-wl__empty" hidden data-bh-wl-empty>
+      <svg class="bh-wl__art" width="128" height="128" viewBox="0 0 128 128" fill="none" aria-hidden="true">
+        <circle cx="64" cy="64" r="60" fill="#eef4e0"/>
+        <path d="M64 100s-24-15-24-34a13.6 13.6 0 0 1 24-8.8A13.6 13.6 0 0 1 88 66c0 19-24 34-24 34Z" fill="#ffffff" stroke="#2E4716" stroke-width="2.6" stroke-linejoin="round"/>
+        <g class="bh-wl__sprout">
+          <path d="M64 57V36" stroke="#2E4716" stroke-width="2.6" stroke-linecap="round"/>
+          <path d="M64 46c-9 0-14-5-14-12 9 0 14 5 14 12Z" fill="#5F8F2B"/>
+          <path d="M64 41c8 0 12.5-4.5 12.5-11-8 0-12.5 4.5-12.5 11Z" fill="#9BBF5E"/>
+        </g>
+      </svg>
+      <h2 class="bh-wl__empty-title" tabindex="-1" data-bh-wl-empty-title>{{ section.settings.empty_heading }}</h2>
+      <p class="bh-wl__empty-text">{{ section.settings.empty_text }}</p>
+      <div class="bh-wl__actions">
+        <a href="{{ primary_url }}" class="bh-wl__btn bh-wl__btn--dark">{{ section.settings.primary_label }}</a>
+        {%- if section.settings.secondary_label != blank -%}
+          <a href="{{ secondary_url }}" class="bh-wl__btn bh-wl__btn--outline">{{ section.settings.secondary_label }}</a>
+        {%- endif -%}
+      </div>
+    </div>
+
+    <p class="bh-wl__error" hidden data-bh-wl-error>
+      Your saved items couldn’t load just now. <a href="{{ request.path }}">Try again</a>
+    </p>
+
+    {%- if section.settings.note != blank -%}
+      <p class="bh-wl__note">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5" stroke="#767d6c" stroke-width="1.7"/><line x1="10.5" y1="18" x2="13.5" y2="18" stroke="#767d6c" stroke-width="1.7" stroke-linecap="round"/></svg>
+        <span>{{ section.settings.note }}</span>
+      </p>
+    {%- endif -%}
+  </div>
+
+  <template data-bh-wl-skeleton>
+    <div class="bh-wl__skel" aria-hidden="true">
+      <div class="bh-wl__skel-media"></div>
+      <div class="bh-wl__skel-line"></div>
+      <div class="bh-wl__skel-line bh-wl__skel-line--short"></div>
+      <div class="bh-wl__skel-btn"></div>
+    </div>
+  </template>
+
+  {%- comment -%} Draws placeholders (or the empty state) before first paint, so the page never flashes the wrong one {%- endcomment -%}
+  <script>
+    (function () {
+      var root = document.querySelector('[data-bh-wl]');
+      var n = window.bhWishlist ? bhWishlist.count() : 0;
+      if (!n) {
+        root.querySelector('[data-bh-wl-grid]').hidden = true;
+        root.querySelector('[data-bh-wl-empty]').hidden = false;
+        return;
+      }
+      var skel = root.querySelector('[data-bh-wl-skeleton]').innerHTML;
+      var html = '';
+      for (var i = 0; i < Math.min(n, 8); i++) html += skel;
+      root.querySelector('[data-bh-wl-grid]').innerHTML = html;
+      root.querySelector('[data-bh-wl-count]').textContent = n === 1 ? '1 saved item' : n + ' saved items';
+    })();
+  </script>
+
+  <div class="bh-wl__toast" role="status" aria-live="polite" hidden data-bh-wl-toast>
+    <span class="bh-wl__toast-text" data-bh-wl-toast-text>Removed from your wishlist</span>
+    <button type="button" class="bh-wl__undo" data-bh-wl-undo>Undo</button>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Bonsai wishlist",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Your wishlist", "info": "Leave empty to use the page title." },
+    { "type": "header", "content": "When nothing is saved" },
+    { "type": "text", "id": "empty_heading", "label": "Heading", "default": "Nothing saved yet" },
+    { "type": "textarea", "id": "empty_text", "label": "Text", "default": "Tap the heart on any tree or pot to keep it here while you decide." },
+    { "type": "text", "id": "primary_label", "label": "First button", "default": "Shop bonsai plants" },
+    { "type": "collection", "id": "primary_collection", "label": "First button link", "info": "Leave empty to link to all products." },
+    { "type": "text", "id": "secondary_label", "label": "Second button", "default": "Pots & accessories", "info": "Leave empty to hide." },
+    { "type": "collection", "id": "secondary_collection", "label": "Second button link" },
+    { "type": "header", "content": "Note" },
+    { "type": "text", "id": "note", "label": "Note under the list", "default": "Your wishlist is saved in this browser, so it won’t show on your other devices." }
+  ]
+}
+{% endschema %}

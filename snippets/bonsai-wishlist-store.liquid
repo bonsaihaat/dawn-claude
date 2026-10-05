@@ -1,0 +1,72 @@
+{%- comment -%}
+  Wishlist storage, shared by the hearts on listing cards and the product page, the header count and
+  the wishlist page (sections/bonsai-wishlist.liquid). Saved items live in this browser's localStorage
+  as [{ id, handle, added }], newest first; the handle is what the wishlist page fetches cards by.
+  Rendered inline in <head> so it exists before any section script runs.
+  Every change fires `bh:wishlist:change` on document, including changes made in another tab.
+{%- endcomment -%}
+<script>
+  (function () {
+    var KEY = 'bh-wishlist';
+
+    function read() {
+      var list = [];
+      try { list = JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) {}
+      if (!Array.isArray(list)) return [];
+      return list.filter(function (i) { return i && i.id && i.handle; });
+    }
+    var items = read();
+
+    function save() {
+      try { localStorage.setItem(KEY, JSON.stringify(items)); } catch (e) {}
+      document.dispatchEvent(new CustomEvent('bh:wishlist:change', { detail: { count: items.length } }));
+    }
+    function indexOf(id) {
+      for (var i = 0; i < items.length; i++) if (items[i].id === String(id)) return i;
+      return -1;
+    }
+
+    window.bhWishlist = {
+      items: function () { return items.slice(); },
+      count: function () { return items.length; },
+      has: function (id) { return indexOf(id) > -1; },
+      add: function (id, handle) {
+        if (!id || !handle || indexOf(id) > -1) return;
+        items.unshift({ id: String(id), handle: handle, added: Date.now() });
+        save();
+      },
+      // Returns { item, index } so the wishlist page can put it back on Undo
+      remove: function (id) {
+        var i = indexOf(id);
+        if (i < 0) return null;
+        var removed = items.splice(i, 1)[0];
+        save();
+        return { item: removed, index: i };
+      },
+      restore: function (entry) {
+        if (!entry || indexOf(entry.item.id) > -1) return;
+        items.splice(Math.min(entry.index, items.length), 0, entry.item);
+        save();
+      },
+      // Returns true when the item is now saved
+      toggle: function (id, handle) {
+        if (indexOf(id) > -1) { this.remove(id); return false; }
+        this.add(id, handle);
+        return true;
+      }
+    };
+
+    window.addEventListener('storage', function (e) {
+      if (e.key !== KEY) return;
+      items = read();
+      document.dispatchEvent(new CustomEvent('bh:wishlist:change', { detail: { count: items.length, external: true } }));
+    });
+
+    // Hearts saved before the list existed kept only a product id, which the wishlist page can't show
+    try {
+      Object.keys(localStorage).forEach(function (k) {
+        if (k.indexOf('bh-wish-') === 0) localStorage.removeItem(k);
+      });
+    } catch (e) {}
+  })();
+</script>

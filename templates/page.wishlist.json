@@ -1,0 +1,15 @@
+{
+  "layout": "bonsai",
+  "sections": {
+    "main": {
+      "type": "bonsai-wishlist",
+      "settings": {
+        "primary_collection": "bonsai-plants",
+        "secondary_collection": "pots-and-accessories"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

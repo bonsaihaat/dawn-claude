@@ -30,10 +30,14 @@
       available: !addBtn.disabled,
     };
 
+    var TICK = '<svg class="bh-pdp__tick" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path pathLength="1" d="M4 12.5L9.5 18L20 6" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    var calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     function setAddLabel(label, added) {
       [addBtn, proxyBtn].forEach(function (b) {
         if (!b) return;
-        b.textContent = label;
+        // "Added" gets a tick that draws itself (bonsai-product.css)
+        if (added) b.innerHTML = TICK + label;
+        else b.textContent = label;
         b.classList.toggle('is-added', !!added);
         b.disabled = !state.available;
       });
@@ -88,7 +92,8 @@
 
     function addToCart() {
       if (!state.available || addBtn.getAttribute('aria-busy') === 'true') return;
-      addBtn.setAttribute('aria-busy', 'true');
+      // Both buttons (main + sticky bar) show a spinner while the item is added
+      [addBtn, proxyBtn].forEach(function (b) { if (b) b.setAttribute('aria-busy', 'true'); });
       fetch((window.Shopify && Shopify.routes ? Shopify.routes.root : '/') + 'cart/add.js', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
@@ -101,10 +106,16 @@
           });
         })
         .then(function () {
-          setAddLabel('Added to cart ✓', true);
-          return fetch((window.Shopify && Shopify.routes ? Shopify.routes.root : '/') + 'cart.js').then(function (r) { return r.json(); });
+          [addBtn, proxyBtn].forEach(function (b) { if (b) b.removeAttribute('aria-busy'); });
+          setAddLabel('Added to cart', true);
+          // Let the tick finish drawing before the cart drawer slides over
+          return Promise.all([
+            fetch((window.Shopify && Shopify.routes ? Shopify.routes.root : '/') + 'cart.js').then(function (r) { return r.json(); }),
+            new Promise(function (resolve) { setTimeout(resolve, calm ? 0 : 550); }),
+          ]);
         })
-        .then(function (cart) {
+        .then(function (results) {
+          var cart = results[0];
           document.querySelectorAll('.bh-badge').forEach(function (b) { b.textContent = cart.item_count; });
           document.dispatchEvent(new CustomEvent('bh:cart:added'));
         })
@@ -112,7 +123,9 @@
           setAddLabel(err.message, false);
           setTimeout(resetAdded, 2500);
         })
-        .finally(function () { addBtn.removeAttribute('aria-busy'); });
+        .finally(function () {
+          [addBtn, proxyBtn].forEach(function (b) { if (b) b.removeAttribute('aria-busy'); });
+        });
     }
     addBtn.addEventListener('click', addToCart);
     if (proxyBtn) proxyBtn.addEventListener('click', addToCart);

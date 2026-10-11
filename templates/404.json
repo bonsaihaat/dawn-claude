@@ -1,11 +1,20 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "layout": "bonsai",
   "sections": {
     "main": {
       "type": "bonsai-404",
       "settings": {
-        "products_collection": "bestselling-bonsai-plants",
-        "extra_collection": "pots-and-accessories"
+        "extra_collection": "bonsai-pots",
+        "products_collection": "bestselling-bonsai-plants"
       }
     }
   },

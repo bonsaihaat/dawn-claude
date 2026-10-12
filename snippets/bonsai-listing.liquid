@@ -40,7 +40,6 @@
     endif
   endif
 
-  assign band_lines = section.settings.price_bands | newline_to_br | split: '<br />'
   assign active_count = 0
   assign filter_groups = ''
   assign pills = ''
@@ -63,120 +62,74 @@
 {%- for filter in filters -%}
   {%- if filter.type == 'price_range' -%}
     {%- liquid
-      assign price_set = false
-      if filter.min_value.value != nil or filter.max_value.value != nil
-        assign price_set = true
+      # Slider runs from ₹0 to the highest price here, rounded up to the next ₹500 (amounts in rupees)
+      assign price_ceil = filter.range_max | divided_by: 100.0 | divided_by: 500.0 | ceil | times: 500
+      assign lo = 0
+      assign hi = price_ceil
+      if filter.min_value.value != nil
+        assign lo = filter.min_value.value | divided_by: 100
       endif
-      assign cur_min = filter.min_value.value | default: 0
-      assign cur_max = filter.max_value.value | default: 99999999999
-      assign flags = ''
-      for line in band_lines
-        assign parts = line | strip | split: '|'
-        if parts.size == 0
-          continue
+      if filter.max_value.value != nil
+        assign hi = filter.max_value.value | divided_by: 100.0 | ceil
+        if hi > price_ceil
+          assign price_ceil = hi | divided_by: 500.0 | ceil | times: 500
         endif
-        assign b_min = parts[1] | plus: 0 | times: 100
-        assign b_max_raw = parts[2] | strip
-        assign on = '0'
-        if price_set and b_min >= cur_min
-          if b_max_raw == blank
-            if filter.max_value.value == nil
-              assign on = '1'
-            endif
-          else
-            assign b_last = b_max_raw | plus: 0 | times: 100 | minus: 1
-            if b_last <= cur_max
-              assign on = '1'
-            endif
-          endif
-        endif
-        assign flags = flags | append: on | append: ','
-      endfor
-      assign flag_list = flags | split: ','
-      if filter.url_to_remove contains '?'
-        assign sep = '&'
-      else
-        assign sep = '?'
       endif
+      if lo > hi
+        assign lo = hi
+      endif
+      assign hi_half = price_ceil | divided_by: 2
     -%}
-    {%- capture group -%}
-      <div class="bh-plp__group">
-        <span class="bh-plp__group-title">{{ filter.label }}</span>
-        {%- assign i = 0 -%}
-        {%- for line in band_lines -%}
-          {%- assign parts = line | strip | split: '|' -%}
-          {%- if parts.size == 0 -%}{%- continue -%}{%- endif -%}
-          {%- liquid
-            assign this_on = flag_list[i]
-            assign new_min = 99999999999
-            assign new_max = -1
-            assign any = false
-            assign j = 0
-            for other in band_lines
-              assign o_parts = other | strip | split: '|'
-              if o_parts.size == 0
-                continue
-              endif
-              assign include = flag_list[j]
-              if j == i
-                if this_on == '1'
-                  assign include = '0'
-                else
-                  assign include = '1'
-                endif
-              endif
-              if include == '1'
-                assign any = true
-                assign o_min = o_parts[1] | plus: 0 | times: 100
-                if o_min < new_min
-                  assign new_min = o_min
-                endif
-                assign o_max_raw = o_parts[2] | strip
-                if o_max_raw == blank
-                  assign new_max = 'open'
-                elsif new_max != 'open'
-                  assign o_max = o_max_raw | plus: 0 | times: 100
-                  if o_max > new_max
-                    assign new_max = o_max
-                  endif
-                endif
-              endif
-              assign j = j | plus: 1
-            endfor
-            if any
-              assign href = filter.url_to_remove | append: sep
-              if new_min > 0
-                assign gte = new_min | divided_by: 100
-                assign href = href | append: filter.min_value.param_name | append: '=' | append: gte
-                if new_max != 'open'
-                  assign href = href | append: '&'
-                endif
-              endif
-              if new_max != 'open'
-                assign lte = new_max | minus: 1 | divided_by: 100.0
-                assign href = href | append: filter.max_value.param_name | append: '=' | append: lte
-              endif
-            else
-              assign href = filter.url_to_remove
-            endif
-          -%}
-          <a href="{{ href }}" class="bh-plp__opt{% if this_on == '1' %} is-on{% endif %}" data-bh-nav rel="nofollow">
-            <span class="bh-plp__box">{{ icon_tick }}</span>
-            <span class="bh-plp__opt-label">{{ parts[0] | strip }}</span>
-            <span class="bh-plp__opt-count"></span>
-          </a>
-          {%- if this_on == '1' -%}
-            {%- assign active_count = active_count | plus: 1 -%}
-            {%- capture pill -%}
-              <a href="{{ href }}" class="bh-plp__pill" data-bh-nav>{{ parts[0] | strip }}{{ icon_x }}</a>
-            {%- endcapture -%}
-            {%- assign pills = pills | append: pill -%}
+    {%- if price_ceil > 0 -%}
+      {%- capture group -%}
+        <div class="bh-plp__group">
+          <span class="bh-plp__group-title">{{ filter.label }}</span>
+          <div
+            class="bh-plp__price{% if lo > hi_half %} is-lo-top{% endif %}"
+            data-bh-price
+            data-base="{{ filter.url_to_remove }}"
+            data-min-param="{{ filter.min_value.param_name }}"
+            data-max-param="{{ filter.max_value.param_name }}"
+            data-ceil="{{ price_ceil }}"
+            style="--lo: {{ lo | times: 100.0 | divided_by: price_ceil }}%; --hi: {{ hi | times: 100.0 | divided_by: price_ceil }}%;"
+          >
+            <div class="bh-plp__range">
+              <span class="bh-plp__track"></span>
+              <input type="range" min="0" max="{{ price_ceil }}" step="100" value="{{ lo }}" aria-label="Minimum price" data-bh-price-lo>
+              <input type="range" min="0" max="{{ price_ceil }}" step="100" value="{{ hi }}" aria-label="Maximum price" data-bh-price-hi>
+            </div>
+            <div class="bh-plp__price-fields">
+              <label class="bh-plp__price-field">
+                <span>Min ₹</span>
+                <input type="number" inputmode="numeric" min="0" max="{{ price_ceil }}" value="{{ lo }}" aria-label="Minimum price in rupees" data-bh-price-lo-input>
+              </label>
+              <span class="bh-plp__price-dash" aria-hidden="true">–</span>
+              <label class="bh-plp__price-field">
+                <span>Max ₹</span>
+                <input type="number" inputmode="numeric" min="0" max="{{ price_ceil }}" value="{{ hi }}" aria-label="Maximum price in rupees" data-bh-price-hi-input>
+              </label>
+            </div>
+          </div>
+        </div>
+      {%- endcapture -%}
+      {%- assign filter_groups = filter_groups | append: group -%}
+    {%- endif -%}
+    {%- if filter.min_value.value != nil or filter.max_value.value != nil -%}
+      {%- assign active_count = active_count | plus: 1 -%}
+      {%- capture pill -%}
+        <a href="{{ filter.url_to_remove }}" class="bh-plp__pill" data-bh-nav>
+          {%- if filter.min_value.value != nil and filter.max_value.value != nil -%}
+            {% render 'bonsai-money', amount: filter.min_value.value %} – {% render 'bonsai-money', amount: filter.max_value.value %}
+          {%- elsif filter.min_value.value != nil -%}
+            From {% render 'bonsai-money', amount: filter.min_value.value %}
+          {%- else -%}
+            Up to {% render 'bonsai-money', amount: filter.max_value.value %}
           {%- endif -%}
-          {%- assign i = i | plus: 1 -%}
-        {%- endfor -%}
-      </div>
-    {%- endcapture -%}
-    {%- assign filter_groups = filter_groups | append: group -%}
+          {{ icon_x }}
+        </a>
+      {%- endcapture -%}
+      {%- assign pills = pills | append: pill -%}
+    {%- endif -%}
   {%- elsif filter.values.size > 0 -%}
     {%- capture group -%}
       <div class="bh-plp__group">

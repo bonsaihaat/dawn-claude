@@ -224,7 +224,82 @@
     }
   });
 
+  // Price slider: two range inputs share one track, with typed Min/Max boxes underneath.
+  // The sidebar and the mobile sheet each carry a copy, so everything works from the one
+  // that was touched. Dragging only moves the handles; results load once a handle is let go.
+  function priceParts(box) {
+    return {
+      lo: box.querySelector('[data-bh-price-lo]'),
+      hi: box.querySelector('[data-bh-price-hi]'),
+      loInput: box.querySelector('[data-bh-price-lo-input]'),
+      hiInput: box.querySelector('[data-bh-price-hi-input]'),
+      ceil: Number(box.getAttribute('data-ceil')),
+    };
+  }
+
+  function priceDraw(box, lo, hi) {
+    var p = priceParts(box);
+    box.style.setProperty('--lo', (lo / p.ceil) * 100 + '%');
+    box.style.setProperty('--hi', (hi / p.ceil) * 100 + '%');
+    // With both handles at the top end, the low one has to sit above the high one to be draggable
+    box.classList.toggle('is-lo-top', lo > p.ceil / 2);
+  }
+
+  function priceApply(box, lo, hi) {
+    var p = priceParts(box);
+    var u = new URL(box.getAttribute('data-base'), window.location.href);
+    u.searchParams.delete(box.getAttribute('data-min-param'));
+    u.searchParams.delete(box.getAttribute('data-max-param'));
+    u.searchParams.delete('page');
+    if (lo > 0) u.searchParams.set(box.getAttribute('data-min-param'), lo);
+    if (hi < p.ceil) u.searchParams.set(box.getAttribute('data-max-param'), hi);
+    if (u.toString() === window.location.href) return;
+    render(u.toString(), true);
+  }
+
+  root.addEventListener('input', function (e) {
+    var box = e.target.closest('[data-bh-price]');
+    if (!box || e.target.type !== 'range') return;
+    var p = priceParts(box);
+    var lo = Number(p.lo.value);
+    var hi = Number(p.hi.value);
+    // Handles can meet but not cross
+    if (lo > hi) {
+      if (e.target === p.lo) p.lo.value = lo = hi;
+      else p.hi.value = hi = lo;
+    }
+    p.loInput.value = lo;
+    p.hiInput.value = hi;
+    priceDraw(box, lo, hi);
+  });
+
   root.addEventListener('change', function (e) {
+    var box = e.target.closest('[data-bh-price]');
+    if (box) {
+      var p = priceParts(box);
+      var lo, hi;
+      if (e.target.type === 'range') {
+        lo = Number(p.lo.value);
+        hi = Number(p.hi.value);
+      } else {
+        lo = Math.round(Number(p.loInput.value) || 0);
+        hi = p.hiInput.value === '' ? p.ceil : Math.round(Number(p.hiInput.value) || 0);
+        lo = Math.min(Math.max(lo, 0), p.ceil);
+        hi = Math.min(Math.max(hi, 0), p.ceil);
+        if (lo > hi) {
+          if (e.target === p.loInput) lo = hi;
+          else hi = lo;
+        }
+        p.loInput.value = lo;
+        p.hiInput.value = hi;
+        p.lo.value = lo;
+        p.hi.value = hi;
+        priceDraw(box, lo, hi);
+      }
+      priceApply(box, lo, hi);
+      return;
+    }
+
     var sort = e.target.closest('[data-bh-sort]');
     if (!sort) return;
     var u = new URL(window.location.href);
@@ -235,6 +310,8 @@
 
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') root.classList.remove('is-sheet-open');
+    // Enter in a typed Min/Max box applies it, the same as leaving the box
+    if (e.key === 'Enter' && e.target.closest && e.target.closest('[data-bh-price]') && e.target.type === 'number') e.target.blur();
   });
 
   window.addEventListener('popstate', function () {

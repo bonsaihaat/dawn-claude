@@ -48,10 +48,12 @@
         "bestsellers_collection": "bestselling-bonsai-plants",
         "bestsellers_button_collection": "bonsai-plants",
         "accessories_collection": "bestselling-bonsai-pots",
-        "accessories_heading": "Bonsai Pots",
+        "accessories_heading": "Bestselling Bonsai Pots",
         "accessories_button": "View All Bonsai Pots →",
         "accessories_button_collection": "bonsai-pots",
-        "tools_collection": "tools-and-accessories"
+        "tools_heading": "Bestselling Tools & Accessories",
+        "tools_collection": "bestselling-tools-accessories",
+        "tools_button_collection": "tools-and-accessories"
       }
     }
   },

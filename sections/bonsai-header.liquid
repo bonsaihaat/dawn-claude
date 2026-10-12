@@ -21,7 +21,7 @@
       {%- unless forloop.last -%}¶{%- endunless -%}
     {%- endfor -%}
   {%- else -%}
-    Home§{{ routes.root_url }}§§1¶Bonsai Plants§{{ all_url }}§Indoor &amp; Easy-Care Bonsai‡{{ all_url }}†Outdoor Bonsai‡{{ all_url }}†Premium &amp; Collector’s Bonsai‡{{ all_url }}†Gift Bonsai &amp; Hampers‡{{ all_url }}†Pre-Bonsai &amp; Raw Material‡{{ all_url }}§¶Pots &amp; Others§{{ all_url }}§Ceramic Pots‡{{ all_url }}†Wooden Pots‡{{ all_url }}†Trays &amp; Saucers‡{{ all_url }}†Soil &amp; Fertilizers‡{{ all_url }}†Accessories‡{{ all_url }}§¶Blogs§/blogs/journal§§¶Gallery§/pages/gallery§§
+    Home§{{ routes.root_url }}§§1¶Bonsai Plants§{{ collections['bonsai-plants'].url | default: all_url }}§Gifting Special‡{{ collections['gifting-special'].url | default: all_url }}†Indoor Bonsai‡{{ collections['indoor-bonsai'].url | default: all_url }}†Holy Bonsai‡{{ collections['holy-bonsai'].url | default: all_url }}†Exotic Bonsai‡{{ collections['exotic-bonsai'].url | default: all_url }}†Flowering Bonsai‡{{ collections['flowering-bonsai'].url | default: all_url }}†Fruiting Bonsai‡{{ collections['fruiting-bonsai'].url | default: all_url }}§¶Bonsai Pots§{{ collections['bonsai-pots'].url | default: all_url }}§Ceramic Pots‡{{ collections['ceramic-pots'].url | default: all_url }}†Resin Pots‡{{ collections['resin-pots'].url | default: all_url }}†Plastic Pots‡{{ collections['plastic-pots'].url | default: all_url }}§¶Tools &amp; Accessories§{{ collections['tools-and-accessories'].url | default: all_url }}§§¶Blogs§/blogs/journal§§¶Gallery§/pages/gallery§§
   {%- endif -%}
 {%- endcapture -%}
 {%- assign nav_items = nav_data | strip | split: '¶' -%}
@@ -289,7 +289,7 @@
     { "type": "url", "id": "account_url", "label": "Account link", "info": "Leave empty to use Shopify's default account link." },
     { "type": "url", "id": "track_url", "label": "Track order link", "info": "Leave empty to use the Track123 tracking page (/apps/track-order)." },
     { "type": "url", "id": "wishlist_url", "label": "Wishlist link", "info": "Leave empty to use the wishlist page at /pages/wishlist (a page using the 'wishlist' template)." },
-    { "type": "text", "id": "search_phrases", "label": "Search bar phrases", "default": "Bonsai Plants,Bonsai Pots,Fertilizers,Care Tools", "info": "Comma-separated, typed out one after another." },
+    { "type": "text", "id": "search_phrases", "label": "Search bar phrases", "default": "Bonsai Plants,Bonsai Pots,Bonsai Tools,Accessories", "info": "Comma-separated, typed out one after another." },
     { "type": "text", "id": "search_popular", "label": "Popular searches", "default": "Ficus,Jade,Juniper,Indoor bonsai,Ceramic pots,Pruning shears", "info": "Comma-separated. Shown when the search panel opens, before the customer types." },
     { "type": "checkbox", "id": "show_marquee", "label": "Show announcement marquee", "default": true, "info": "Messages are managed in Content → Metaobjects → Announcement. The Marquee message blocks below are only used when there are none." }
   ],

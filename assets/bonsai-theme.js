@@ -162,6 +162,27 @@
     update();
   });
 
+  // Wishlist count on the header heart and in the mobile menu (snippets/bonsai-wishlist-store.liquid)
+  function syncWishCount(bump) {
+    if (!window.bhWishlist) return;
+    var n = bhWishlist.count();
+    document.querySelectorAll('[data-bh-wish-count]').forEach(function (b) {
+      var was = b.textContent;
+      b.textContent = n > 99 ? '99+' : String(n);
+      b.hidden = n === 0;
+      if (bump && n > Number(was || 0) && b.classList.contains('bh-wbadge')) {
+        b.classList.remove('is-bumped');
+        void b.offsetWidth;
+        b.classList.add('is-bumped');
+      }
+    });
+    document.querySelectorAll('[data-bh-wish-link]').forEach(function (a) {
+      if (a.hasAttribute('aria-label')) a.setAttribute('aria-label', n ? 'Wishlist, ' + n + ' saved' : 'Wishlist');
+    });
+  }
+  syncWishCount(false);
+  document.addEventListener('bh:wishlist:change', function () { syncWishCount(true); });
+
   document.querySelectorAll('[data-bh]').forEach(function (root) {
     // Mobile drawer with main pane and per-category sub panes
     var subPanes = root.querySelectorAll('[data-bh-subpane]');

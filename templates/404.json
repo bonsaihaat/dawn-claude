@@ -13,8 +13,8 @@
     "main": {
       "type": "bonsai-404",
       "settings": {
-        "extra_collection": "bonsai-pots",
-        "products_collection": "bestselling-bonsai-plants"
+        "products_collection": "bestselling-bonsai-plants",
+        "extra_collection": "bonsai-pots"
       }
     }
   },

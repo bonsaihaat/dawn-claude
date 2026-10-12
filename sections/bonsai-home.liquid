@@ -124,7 +124,7 @@
       </div>
     {%- endif -%}
 
-    {%- for row in (1..2) -%}
+    {%- for row in (1..3) -%}
       {%- if row == 1 -%}
         {%- assign row_heading = section.settings.bestsellers_heading -%}
         {%- assign row_collection = section.settings.bestsellers_collection -%}
@@ -132,14 +132,23 @@
         {%- assign row_button_collection = section.settings.bestsellers_button_collection -%}
         {%- assign row_blocks = section.blocks | where: 'type', 'product' -%}
         {%- assign row_btn_class = 'bh-btn--dark' -%}
-      {%- else -%}
+      {%- elsif row == 2 -%}
         {%- assign row_heading = section.settings.accessories_heading -%}
         {%- assign row_collection = section.settings.accessories_collection -%}
         {%- assign row_button = section.settings.accessories_button -%}
         {%- assign row_button_collection = section.settings.accessories_button_collection -%}
         {%- assign row_blocks = section.blocks | where: 'type', 'accessory' -%}
         {%- assign row_btn_class = 'bh-btn--outline' -%}
+      {%- else -%}
+        {%- assign row_heading = section.settings.tools_heading -%}
+        {%- assign row_collection = section.settings.tools_collection -%}
+        {%- assign row_button = section.settings.tools_button -%}
+        {%- assign row_button_collection = section.settings.tools_button_collection -%}
+        {%- assign row_blocks = nil -%}
+        {%- assign row_btn_class = 'bh-btn--outline' -%}
       {%- endif -%}
+      {%- comment -%} A row with nothing to show stays hidden, e.g. tools before any are listed {%- endcomment -%}
+      {%- if row_collection.products_count > 0 or row_blocks.size > 0 -%}
       {%- if row_collection != blank -%}
         {%- assign row_url = row_collection.url -%}
       {%- else -%}
@@ -185,6 +194,7 @@
       <div class="bh-center">
         <a href="{{ row_url }}" class="bh-btn {{ row_btn_class }}">{{ row_button }}</a>
       </div>
+      {%- endif -%}
     {%- endfor -%}
 
     {%- assign category_blocks = section.blocks | where: 'type', 'category' -%}
@@ -194,10 +204,15 @@
       </div>
       <div class="bh-cats" data-bh-reveal>
         {%- for block in category_blocks -%}
-          <a href="{{ block.settings.link | default: all_url }}" class="bh-cat" {{ block.shopify_attributes }}>
-            {%- if block.settings.image != blank -%}
+          {%- liquid
+            assign tile_collection = block.settings.collection
+            assign tile_url = block.settings.link | default: tile_collection.url | default: all_url
+            assign tile_image = block.settings.image | default: tile_collection.featured_image
+          -%}
+          <a href="{{ tile_url }}" class="bh-cat" {{ block.shopify_attributes }}>
+            {%- if tile_image != blank -%}
               {{
-                block.settings.image
+                tile_image
                 | image_url: width: 800
                 | image_tag: loading: 'lazy', widths: '300, 500, 800', sizes: '(min-width: 820px) 280px, 50vw', alt: block.settings.label
               }}
@@ -288,19 +303,24 @@
     { "type": "text", "id": "promo1_button", "label": "Card 1 button", "default": "Under ₹999 →" },
     { "type": "url", "id": "promo1_url", "label": "Card 1 link" },
     { "type": "text", "id": "promo2_eyebrow", "label": "Card 2 eyebrow", "default": "Already growing one?" },
-    { "type": "text", "id": "promo2_title", "label": "Card 2 title", "default": "Explore Pots & Other Accessories" },
-    { "type": "text", "id": "promo2_button", "label": "Card 2 button", "default": "Shop accessories →" },
+    { "type": "text", "id": "promo2_title", "label": "Card 2 title", "default": "Explore Pots, Tools & Accessories" },
+    { "type": "text", "id": "promo2_button", "label": "Card 2 button", "default": "Shop pots →" },
     { "type": "url", "id": "promo2_url", "label": "Card 2 link" },
-    { "type": "header", "content": "Bestsellers row" },
+    { "type": "header", "content": "Bestselling plants row" },
     { "type": "text", "id": "bestsellers_heading", "label": "Heading", "default": "Bestselling Bonsai" },
     { "type": "collection", "id": "bestsellers_collection", "label": "Collection", "info": "When set, shows this collection's products instead of the 'Product' blocks." },
     { "type": "text", "id": "bestsellers_button", "label": "Button label", "default": "View All Bonsai Plants →" },
     { "type": "collection", "id": "bestsellers_button_collection", "label": "Button link", "info": "Collection the button opens. Leave empty to use the row's collection." },
-    { "type": "header", "content": "Accessories row" },
-    { "type": "text", "id": "accessories_heading", "label": "Heading", "default": "Pots & Accessories" },
-    { "type": "collection", "id": "accessories_collection", "label": "Collection", "info": "When set, shows this collection's products instead of the 'Accessory' blocks." },
-    { "type": "text", "id": "accessories_button", "label": "Button label", "default": "View All Pots & Accessories →" },
+    { "type": "header", "content": "Bestselling pots row" },
+    { "type": "text", "id": "accessories_heading", "label": "Heading", "default": "Bestselling Bonsai Pots" },
+    { "type": "collection", "id": "accessories_collection", "label": "Collection", "info": "When set, shows this collection's products instead of the 'Product (pots)' blocks." },
+    { "type": "text", "id": "accessories_button", "label": "Button label", "default": "View All Bonsai Pots →" },
     { "type": "collection", "id": "accessories_button_collection", "label": "Button link", "info": "Collection the button opens. Leave empty to use the row's collection." },
+    { "type": "header", "content": "Bestselling tools & accessories row" },
+    { "type": "text", "id": "tools_heading", "label": "Heading", "default": "Bestselling Tools & Accessories" },
+    { "type": "collection", "id": "tools_collection", "label": "Collection", "info": "The row stays hidden until this collection has products." },
+    { "type": "text", "id": "tools_button", "label": "Button label", "default": "View All Tools & Accessories →" },
+    { "type": "collection", "id": "tools_button_collection", "label": "Button link", "info": "Collection the button opens. Leave empty to use the row's collection." },
     { "type": "header", "content": "Other headings" },
     { "type": "text", "id": "categories_heading", "label": "Categories heading", "default": "Shop by Category" },
     { "type": "text", "id": "testimonials_heading", "label": "Testimonials heading", "default": "Loved by bonsai parents across India" }
@@ -334,7 +354,7 @@
     },
     {
       "type": "accessory",
-      "name": "Product (accessories)",
+      "name": "Product (pots)",
       "settings": [
         { "type": "image_picker", "id": "image", "label": "Image" },
         { "type": "text", "id": "title", "label": "Name", "default": "Glazed Ceramic Pot" },
@@ -350,7 +370,8 @@
       "settings": [
         { "type": "image_picker", "id": "image", "label": "Image" },
         { "type": "text", "id": "label", "label": "Label", "default": "Indoor Bonsai" },
-        { "type": "url", "id": "link", "label": "Link" }
+        { "type": "collection", "id": "collection", "label": "Collection", "info": "Sets the link, and the image when none is picked above." },
+        { "type": "url", "id": "link", "label": "Link", "info": "Overrides the collection link." }
       ]
     },
     {

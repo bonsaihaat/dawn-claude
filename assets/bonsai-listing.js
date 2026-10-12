@@ -64,10 +64,9 @@
   }
 
   function syncWishlist(scope) {
+    if (!window.bhWishlist) return;
     scope.querySelectorAll('[data-bh-wish]').forEach(function (b) {
-      var on = false;
-      try { on = !!localStorage.getItem('bh-wish-' + b.getAttribute('data-bh-wish')); } catch (e) {}
-      b.setAttribute('aria-pressed', String(on));
+      b.setAttribute('aria-pressed', String(bhWishlist.has(b.getAttribute('data-bh-wish'))));
     });
   }
 
@@ -178,8 +177,8 @@
 
     var wish = e.target.closest('[data-bh-wish]');
     if (wish) {
-      var key = 'bh-wish-' + wish.getAttribute('data-bh-wish');
-      var on = wish.getAttribute('aria-pressed') !== 'true';
+      if (!window.bhWishlist) return;
+      var on = bhWishlist.toggle(wish.getAttribute('data-bh-wish'), wish.getAttribute('data-bh-wish-handle'));
       wish.setAttribute('aria-pressed', String(on));
       if (on && !calm) {
         wish.classList.remove('is-popping');
@@ -187,7 +186,6 @@
         wish.classList.add('is-popping');
         if (window.bhLeafBurst) window.bhLeafBurst(wish.closest('.bh-plp-card'), wish);
       }
-      try { on ? localStorage.setItem(key, '1') : localStorage.removeItem(key); } catch (err) {}
       return;
     }
 
@@ -291,6 +289,11 @@
   }
 
   window.addEventListener('pagehide', saveSnapshot);
+
+  // Hearts changed in another tab
+  document.addEventListener('bh:wishlist:change', function (e) {
+    if (e.detail && e.detail.external) syncWishlist(root);
+  });
 
   restoreSnapshot();
   syncWishlist(root);

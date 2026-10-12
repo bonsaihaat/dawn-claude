@@ -134,6 +134,14 @@
     {%- capture group -%}
       <div class="bh-plp__group">
         <span class="bh-plp__group-title">{{ filter.label }}</span>
+        {%- comment -%} Product metafield filters (Species, Location) start with an "All" option, ticked until a value is picked {%- endcomment -%}
+        {%- if filter.param_name contains 'filter.p.m.' -%}
+          <a href="{{ filter.url_to_remove }}" class="bh-plp__opt{% if filter.active_values.size == 0 %} is-on{% endif %}" data-bh-nav rel="nofollow">
+            <span class="bh-plp__box">{{ icon_tick }}</span>
+            <span class="bh-plp__opt-label">All</span>
+            <span class="bh-plp__opt-count"></span>
+          </a>
+        {%- endif -%}
         {%- for value in filter.values -%}
           {%- if value.active -%}
             {%- assign href = value.url_to_remove -%}

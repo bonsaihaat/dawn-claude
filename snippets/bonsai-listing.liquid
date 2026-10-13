@@ -59,7 +59,15 @@
   {%- assign pills = pills | append: pill -%}
 {%- endif -%}
 
+{%- liquid
+  # Collections (by handle) that skip the Location filter, e.g. Indoor Bonsai, where every plant is already indoor
+  assign no_location = section.settings.hide_location_on | remove: ' ' | split: ','
+-%}
+
 {%- for filter in filters -%}
+  {%- if filter.param_name == 'filter.p.m.custom.location' and is_search != true and no_location contains collection.handle -%}
+    {%- continue -%}
+  {%- endif -%}
   {%- if filter.type == 'price_range' -%}
     {%- liquid
       # Slider runs from ₹0 to the highest price here, rounded up to the next ₹500 (amounts in rupees)

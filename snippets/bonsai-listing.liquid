@@ -253,8 +253,19 @@
       {%- endcapture -%}
       {%- assign pills = pills | append: pill -%}
     {%- endif -%}
-  {%- elsif filter.values.size > 1 or filter.active_values.size > 0 -%}
-    {%- comment -%} A filter with a single option changes nothing, so it only shows once there are two {%- endcomment -%}
+  {%- elsif filter.values.size > 0 -%}
+    {%- comment -%} A filter with a single option that has products changes nothing, so it only shows once there are two {%- endcomment -%}
+    {%- liquid
+      assign live_values = 0
+      for value in filter.values
+        if value.count > 0
+          assign live_values = live_values | plus: 1
+        endif
+      endfor
+    -%}
+    {%- if live_values < 2 and filter.active_values.size == 0 -%}
+      {%- continue -%}
+    {%- endif -%}
     {%- capture group -%}
       <div class="bh-plp__group">
         <span class="bh-plp__group-title">{{ filter.label }}</span>
@@ -302,7 +313,7 @@
       assign on_sale = true
       assign all_url = routes.all_products_collection_url
       if sale_back_value != blank
-        assign back_handle = sale_back_value | split: '> ' | last | replace: '&', 'and' | handleize
+        assign back_handle = sale_back_value | replace: '&gt;', '>' | split: '> ' | last | replace: '&', 'and' | handleize
         assign all_url = routes.collections_url | append: '/' | append: back_handle
       endif
       assign sale_url = collection.url

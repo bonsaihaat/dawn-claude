@@ -68,17 +68,6 @@
         <div data-bh-part="items">
           {%- for item in cart.items -%}
             {%- liquid
-              assign m = item.product.metafields.custom
-              assign subtitle = m.subtitle.value
-              if subtitle == blank
-                assign light = m.light.value
-                assign age = m.age.value
-                if light != blank and age != blank
-                  assign subtitle = light | append: ' · ' | append: age
-                else
-                  assign subtitle = age | default: light
-                endif
-              endif
               assign max_qty = ''
               assign at_max = false
               if item.variant.inventory_management == 'shopify' and item.variant.inventory_policy == 'deny'
@@ -96,9 +85,6 @@
               </a>
               <div class="bh-cd-line__info">
                 <a href="{{ item.url }}" class="bh-cd-line__name">{{ item.product.title }}</a>
-                {%- if subtitle != blank -%}
-                  <span class="bh-cd-line__sub">{{ subtitle }}</span>
-                {%- endif -%}
                 <div class="bh-cd-line__price">
                   {%- if item.variant.compare_at_price > item.original_price -%}
                     <span class="bh-cd-line__compare">{% render 'bonsai-money', amount: item.variant.compare_at_price %}</span>

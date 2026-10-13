@@ -2,17 +2,6 @@
   Accepts: product
 {%- endcomment -%}
 {%- liquid
-  assign m = product.metafields.custom
-  assign subtitle = m.subtitle.value
-  if subtitle == blank
-    assign light = m.light.value
-    assign age = m.age.value
-    if light != blank and age != blank
-      assign subtitle = light | append: ' · ' | append: age
-    else
-      assign subtitle = age | default: light
-    endif
-  endif
   assign rating = product.metafields.reviews.rating.value
   assign variant = product.selected_or_first_available_variant
   assign hover_image = product.media[1].preview_image
@@ -45,18 +34,12 @@
         {%- endif -%}
       {%- endif -%}
     </a>
-    {%- if m.badge.value != blank -%}
-      <span class="bh-plp-card__badge">{{ m.badge.value }}</span>
-    {%- endif -%}
     <button type="button" class="bh-plp-card__wish" data-bh-wish="{{ product.id }}" data-bh-wish-handle="{{ product.handle }}" aria-label="Add to wishlist" aria-pressed="false">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" stroke="#1B1F17" stroke-width="1.7" stroke-linejoin="round"/></svg>
     </button>
   </div>
   <a href="{{ product.url }}" class="bh-plp-card__info">
     <span class="bh-plp-card__name" title="{{ product.title | escape }}">{{ product.title }}</span>
-    {%- if subtitle != blank -%}
-      <span class="bh-plp-card__sub">{{ subtitle }}</span>
-    {%- endif -%}
     {%- if rating != blank -%}
       {%- assign rating_label = rating.rating | round: 1 | append: '' -%}
       {%- unless rating_label contains '.' -%}{%- assign rating_label = rating_label | append: '.0' -%}{%- endunless -%}

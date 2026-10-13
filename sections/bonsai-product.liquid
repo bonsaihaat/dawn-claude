@@ -24,12 +24,6 @@
     assign crumb_url = routes.all_products_collection_url
   endif
 
-  assign m = product.metafields.custom
-  assign light = m.light.value
-  assign spec_age = m.age.value
-  assign spec_height = m.height.value
-  assign spec_care = m.care_level.value
-
   assign rating = product.metafields.reviews.rating.value
   assign rating_count = product.metafields.reviews.rating_count.value | default: 0
   assign trust_items = section.settings.trust_items | split: ','
@@ -127,23 +121,6 @@
           <div class="bh-pdp__desc">{{ product.description }}</div>
         {%- endif -%}
 
-        {%- if spec_age != blank or spec_height != blank or light != blank or spec_care != blank -%}
-          <div class="bh-pdp__specs">
-            {%- if spec_age != blank -%}
-              <div class="bh-pdp__spec"><span class="bh-pdp__spec-label">Age</span><span class="bh-pdp__spec-value">{{ spec_age }}</span></div>
-            {%- endif -%}
-            {%- if spec_height != blank -%}
-              <div class="bh-pdp__spec"><span class="bh-pdp__spec-label">Height</span><span class="bh-pdp__spec-value">{{ spec_height }}</span></div>
-            {%- endif -%}
-            {%- if light != blank -%}
-              <div class="bh-pdp__spec"><span class="bh-pdp__spec-label">Light</span><span class="bh-pdp__spec-value">{{ light }}</span></div>
-            {%- endif -%}
-            {%- if spec_care != blank -%}
-              <div class="bh-pdp__spec"><span class="bh-pdp__spec-label">Care level</span><span class="bh-pdp__spec-value">{{ spec_care }}</span></div>
-            {%- endif -%}
-          </div>
-        {%- endif -%}
-
         {%- unless product.has_only_default_variant -%}
           <fieldset class="bh-pdp__options">
             <legend class="bh-pdp__spec-label">{{ product.options | join: ' / ' }}</legend>
@@ -219,7 +196,6 @@
           url: p.url,
           image: p.featured_media,
           title: p.title,
-          subtitle: p.metafields.custom.subtitle,
           price: related_price
         -%}
       {%- endfor -%}
@@ -234,8 +210,7 @@
             url: p.url,
             image: p.featured_media,
             title: p.title,
-            subtitle: p.metafields.custom.subtitle,
-            price: related_price
+              price: related_price
           -%}
         {%- endfor -%}
       {%- endif -%}

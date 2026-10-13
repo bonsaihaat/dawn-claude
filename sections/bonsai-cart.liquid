@@ -79,17 +79,6 @@
           <div class="bh-cart__part" data-bh-part="items">
             {%- for item in cart.items -%}
               {%- liquid
-                assign m = item.product.metafields.custom
-                assign subtitle = m.subtitle.value
-                if subtitle == blank
-                  assign light = m.light.value
-                  assign age = m.age.value
-                  if light != blank and age != blank
-                    assign subtitle = light | append: ' · ' | append: age
-                  else
-                    assign subtitle = age | default: light
-                  endif
-                endif
                 assign max_qty = ''
                 assign at_max = false
                 if item.variant.inventory_management == 'shopify' and item.variant.inventory_policy == 'deny'
@@ -107,9 +96,6 @@
                 </a>
                 <div class="bh-cart-line__info">
                   <a href="{{ item.url }}" class="bh-cart-line__name">{{ item.product.title }}</a>
-                  {%- if subtitle != blank -%}
-                    <span class="bh-cart-line__sub">{{ subtitle }}</span>
-                  {%- endif -%}
                   <div class="bh-cart-line__price">
                     {%- if item.variant.compare_at_price > item.original_price -%}
                       <span class="bh-cart-line__compare">{% render 'bonsai-money', amount: item.variant.compare_at_price %}</span>
@@ -253,19 +239,6 @@
             <h3>{{ section.settings.bestsellers_heading }}</h3>
             <div class="bh-cart__best-grid">
               {%- for product in best.products limit: 4 -%}
-                {%- liquid
-                  assign m = product.metafields.custom
-                  assign subtitle = m.subtitle.value
-                  if subtitle == blank
-                    assign light = m.light.value
-                    assign age = m.age.value
-                    if light != blank and age != blank
-                      assign subtitle = light | append: ' · ' | append: age
-                    else
-                      assign subtitle = age | default: light
-                    endif
-                  endif
-                -%}
                 <a href="{{ product.url }}" class="bh-cart-card">
                   <div class="bh-cart-card__img">
                     {%- if product.featured_media != blank -%}
@@ -274,7 +247,6 @@
                   </div>
                   <div class="bh-cart-card__info">
                     <span class="bh-cart-card__name">{{ product.title }}</span>
-                    {%- if subtitle != blank -%}<span class="bh-cart-card__sub">{{ subtitle }}</span>{%- endif -%}
                     <span class="bh-cart-card__price">{% render 'bonsai-money', amount: product.price %}</span>
                   </div>
                 </a>

@@ -224,7 +224,7 @@
     }
   });
 
-  // Price slider: two range inputs share one track, with typed Min/Max boxes underneath.
+  // Range sliders (Price, Size): two range inputs share one track, with typed Min/Max boxes underneath.
   // The sidebar and the mobile sheet each carry a copy, so everything works from the one
   // that was touched. Dragging only moves the handles; results load once a handle is let go.
   function priceParts(box) {
@@ -248,9 +248,28 @@
   function priceApply(box, lo, hi) {
     var p = priceParts(box);
     var u = new URL(box.getAttribute('data-base'), window.location.href);
+    u.searchParams.delete('page');
+    // Size: Shopify filters a number field by exact values, so pick every size inside the range
+    var valuesParam = box.getAttribute('data-values-param');
+    if (valuesParam) {
+      u.searchParams.delete(valuesParam);
+      var values = JSON.parse(box.getAttribute('data-values') || '[]');
+      var picked = values.filter(function (x) { return x.n >= lo && x.n <= hi; });
+      // A range that takes in every size here is no filter at all
+      if (picked.length < values.length) {
+        // Nothing that size here: take the size nearest the middle of the range rather than show nothing
+        if (!picked.length && values.length) {
+          var mid = (lo + hi) / 2;
+          picked = [values.reduce(function (a, b) { return Math.abs(b.n - mid) < Math.abs(a.n - mid) ? b : a; })];
+        }
+        picked.forEach(function (x) { u.searchParams.append(valuesParam, x.v); });
+      }
+      if (u.toString() === window.location.href) return;
+      render(u.toString(), true);
+      return;
+    }
     u.searchParams.delete(box.getAttribute('data-min-param'));
     u.searchParams.delete(box.getAttribute('data-max-param'));
-    u.searchParams.delete('page');
     if (lo > 0) u.searchParams.set(box.getAttribute('data-min-param'), lo);
     if (hi < p.ceil) u.searchParams.set(box.getAttribute('data-max-param'), hi);
     if (u.toString() === window.location.href) return;
@@ -282,8 +301,10 @@
         lo = Number(p.lo.value);
         hi = Number(p.hi.value);
       } else {
-        lo = Math.round(Number(p.loInput.value) || 0);
-        hi = p.hiInput.value === '' ? p.ceil : Math.round(Number(p.hiInput.value) || 0);
+        // Price rounds typed amounts to whole rupees, Size to the nearest half inch
+        var unit = Number(box.getAttribute('data-round')) || 1;
+        lo = Math.round((Number(p.loInput.value) || 0) / unit) * unit;
+        hi = p.hiInput.value === '' ? p.ceil : Math.round((Number(p.hiInput.value) || 0) / unit) * unit;
         lo = Math.min(Math.max(lo, 0), p.ceil);
         hi = Math.min(Math.max(hi, 0), p.ceil);
         if (lo > hi) {

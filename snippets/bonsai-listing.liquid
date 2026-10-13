@@ -59,7 +59,24 @@
   {%- assign pills = pills | append: pill -%}
 {%- endif -%}
 
+{%- liquid
+  # Collections (by handle) that skip the Location filter, e.g. Indoor Bonsai, where every plant is already indoor
+  assign no_location = section.settings.hide_location_on | remove: ' ' | split: ','
+-%}
+
 {%- for filter in filters -%}
+  {%- if filter.param_name == 'filter.p.m.custom.location' and is_search != true and no_location contains collection.handle -%}
+    {%- continue -%}
+  {%- endif -%}
+  {%- comment -%} Category and Subcategories filters only narrow the Sale page; other pages are already one category {%- endcomment -%}
+  {%- if filter.param_name == 'filter.p.m.custom.category' or filter.param_name == 'filter.p.m.custom.subcategories' -%}
+    {%- for value in filter.active_values -%}
+      {%- assign sale_back_value = value.value -%}
+    {%- endfor -%}
+    {%- if is_search or collection.handle != section.settings.sale_handle -%}
+      {%- continue -%}
+    {%- endif -%}
+  {%- endif -%}
   {%- if filter.type == 'price_range' -%}
     {%- liquid
       # Slider runs from ₹0 to the highest price here, rounded up to the next ₹500 (amounts in rupees)
@@ -79,8 +96,13 @@
         assign lo = hi
       endif
       assign hi_half = price_ceil | divided_by: 2
+      # Hidden when there is nothing to compare: one product or fewer, and no price picked
+      assign price_set = false
+      if filter.min_value.value != nil or filter.max_value.value != nil
+        assign price_set = true
+      endif
     -%}
-    {%- if price_ceil > 0 -%}
+    {%- if price_ceil > 0 and results_count > 1 or price_set -%}
       {%- capture group -%}
         <div class="bh-plp__group">
           <span class="bh-plp__group-title">{{ filter.label }}</span>
@@ -130,12 +152,114 @@
       {%- endcapture -%}
       {%- assign pills = pills | append: pill -%}
     {%- endif -%}
-  {%- elsif filter.values.size > 0 -%}
+  {%- elsif filter.param_name == 'filter.p.m.custom.size' and filter.values.size > 0 -%}
+    {%- comment -%}
+      Size (inches) is a number field, which Shopify can only filter by exact values. The
+      slider runs from 0 to the largest size here; letting go selects every size in between.
+    {%- endcomment -%}
+    {%- liquid
+      assign size_max = 0
+      assign size_min = nil
+      assign act_lo = nil
+      assign act_hi = nil
+      assign size_json = ''
+      for value in filter.values
+        assign n = value.value | plus: 0.0
+        if n > size_max
+          assign size_max = n
+        endif
+        if size_min == nil or n < size_min
+          assign size_min = n
+        endif
+        if value.active
+          if act_lo == nil or n < act_lo
+            assign act_lo = n
+          endif
+          if act_hi == nil or n > act_hi
+            assign act_hi = n
+          endif
+        endif
+        if size_json != ''
+          assign size_json = size_json | append: ','
+        endif
+        assign v_json = value.value | json
+        assign size_json = size_json | append: '{"n":' | append: n | append: ',"v":' | append: v_json | append: '}'
+      endfor
+      assign size_ceil = size_max | ceil
+      # Ends that reach the smallest or largest size here sit at the ends of the slider
+      assign lo = 0
+      assign hi = size_ceil
+      if act_lo != nil and act_lo > size_min
+        assign lo = act_lo
+      endif
+      if act_hi != nil and act_hi < size_max
+        assign hi = act_hi
+      endif
+      assign hi_half = size_ceil | divided_by: 2.0
+    -%}
+    {%- comment -%} Hidden when every product here is the same size, unless a size is picked {%- endcomment -%}
+    {%- if size_ceil > 0 and filter.values.size > 1 or act_lo != nil -%}
+      {%- capture group -%}
+        <div class="bh-plp__group">
+          <span class="bh-plp__group-title">{{ filter.label }}</span>
+          <div
+            class="bh-plp__price{% if lo > hi_half %} is-lo-top{% endif %}"
+            data-bh-price
+            data-base="{{ filter.url_to_remove }}"
+            data-values-param="{{ filter.param_name }}"
+            data-values='[{{ size_json | escape }}]'
+            data-round="0.5"
+            data-ceil="{{ size_ceil }}"
+            style="--lo: {{ lo | times: 100.0 | divided_by: size_ceil }}%; --hi: {{ hi | times: 100.0 | divided_by: size_ceil }}%;"
+          >
+            <div class="bh-plp__range">
+              <span class="bh-plp__track"></span>
+              <input type="range" min="0" max="{{ size_ceil }}" step="0.5" value="{{ lo }}" aria-label="Minimum size" data-bh-price-lo>
+              <input type="range" min="0" max="{{ size_ceil }}" step="0.5" value="{{ hi }}" aria-label="Maximum size" data-bh-price-hi>
+            </div>
+            <div class="bh-plp__price-fields">
+              <label class="bh-plp__price-field">
+                <span>Min</span>
+                <input type="number" inputmode="decimal" min="0" max="{{ size_ceil }}" step="any" value="{{ lo }}" aria-label="Minimum size in inches" data-bh-price-lo-input>
+                <span>in</span>
+              </label>
+              <span class="bh-plp__price-dash" aria-hidden="true">–</span>
+              <label class="bh-plp__price-field">
+                <span>Max</span>
+                <input type="number" inputmode="decimal" min="0" max="{{ size_ceil }}" step="any" value="{{ hi }}" aria-label="Maximum size in inches" data-bh-price-hi-input>
+                <span>in</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      {%- endcapture -%}
+      {%- assign filter_groups = filter_groups | append: group -%}
+    {%- endif -%}
+    {%- if act_lo != nil -%}
+      {%- assign active_count = active_count | plus: 1 -%}
+      {%- capture pill -%}
+        <a href="{{ filter.url_to_remove }}" class="bh-plp__pill" data-bh-nav>
+          {%- if act_lo == act_hi -%}
+            {{ act_lo | append: '' | remove: '.0' }}″
+          {%- elsif act_lo == size_min -%}
+            Up to {{ act_hi | append: '' | remove: '.0' }}″
+          {%- elsif act_hi == size_max -%}
+            From {{ act_lo | append: '' | remove: '.0' }}″
+          {%- else -%}
+            {{ act_lo | append: '' | remove: '.0' }}″ – {{ act_hi | append: '' | remove: '.0' }}″
+          {%- endif -%}
+          {{ icon_x }}
+        </a>
+      {%- endcapture -%}
+      {%- assign pills = pills | append: pill -%}
+    {%- endif -%}
+  {%- elsif filter.values.size > 1 or filter.active_values.size > 0 -%}
+    {%- comment -%} A filter with a single option changes nothing, so it only shows once there are two {%- endcomment -%}
     {%- capture group -%}
       <div class="bh-plp__group">
         <span class="bh-plp__group-title">{{ filter.label }}</span>
-        {%- comment -%} Product metafield filters (Species, Location) start with an "All" option, ticked until a value is picked {%- endcomment -%}
-        {%- if filter.param_name contains 'filter.p.m.' -%}
+        {%- comment -%} Availability and product metafield filters (Species, Location) start with an "All" option, ticked until a value is picked {%- endcomment -%}
+        {%- if filter.param_name contains 'filter.p.m.' or filter.param_name == 'filter.v.availability' -%}
           <a href="{{ filter.url_to_remove }}" class="bh-plp__opt{% if filter.active_values.size == 0 %} is-on{% endif %}" data-bh-nav rel="nofollow">
             <span class="bh-plp__box">{{ icon_tick }}</span>
             <span class="bh-plp__opt-label">All</span>
@@ -166,6 +290,63 @@
     {%- assign filter_groups = filter_groups | append: group -%}
   {%- endif -%}
 {%- endfor -%}
+
+{%- comment -%}
+  Sale: "On sale" opens the automatic Sale collection (products with a compare-at price), narrowed to this
+  page's category or subcategory; on the Sale page, "All" goes back to that category.
+{%- endcomment -%}
+{%- if is_search != true and section.settings.sale_handle != blank -%}
+  {%- liquid
+    assign sale_base = routes.collections_url | append: '/' | append: section.settings.sale_handle
+    if collection.handle == section.settings.sale_handle
+      assign on_sale = true
+      assign all_url = routes.all_products_collection_url
+      if sale_back_value != blank
+        assign back_handle = sale_back_value | split: '> ' | last | replace: '&', 'and' | handleize
+        assign all_url = routes.collections_url | append: '/' | append: back_handle
+      endif
+      assign sale_url = collection.url
+    else
+      assign on_sale = false
+      assign all_url = collection.url
+      assign sale_url = sale_base
+      for item in results
+        if item.metafields.custom.category.value == collection.title
+          assign esc = collection.title | url_param_escape
+          assign sale_url = sale_base | append: '?filter.p.m.custom.category=' | append: esc
+          break
+        endif
+        for v in item.metafields.custom.subcategories.value
+          assign v_sub = v | split: ' > ' | last
+          if v_sub == collection.title
+            assign esc = v | url_param_escape
+            assign sale_url = sale_base | append: '?filter.p.m.custom.subcategories=' | append: esc
+            break
+          endif
+        endfor
+        if sale_url != sale_base
+          break
+        endif
+      endfor
+    endif
+  -%}
+  {%- capture group -%}
+    <div class="bh-plp__group">
+      <span class="bh-plp__group-title">Sale</span>
+      <a href="{{ all_url }}" class="bh-plp__opt{% unless on_sale %} is-on{% endunless %}" rel="nofollow">
+        <span class="bh-plp__box">{{ icon_tick }}</span>
+        <span class="bh-plp__opt-label">All</span>
+        <span class="bh-plp__opt-count"></span>
+      </a>
+      <a href="{{ sale_url }}" class="bh-plp__opt{% if on_sale %} is-on{% endif %}" rel="nofollow">
+        <span class="bh-plp__box">{{ icon_tick }}</span>
+        <span class="bh-plp__opt-label">On sale</span>
+        <span class="bh-plp__opt-count"></span>
+      </a>
+    </div>
+  {%- endcapture -%}
+  {%- assign filter_groups = filter_groups | append: group -%}
+{%- endif -%}
 
 {%- liquid
   assign has_active = false

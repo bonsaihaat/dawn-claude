@@ -96,8 +96,13 @@
         assign lo = hi
       endif
       assign hi_half = price_ceil | divided_by: 2
+      # Hidden when there is nothing to compare: one product or fewer, and no price picked
+      assign price_set = false
+      if filter.min_value.value != nil or filter.max_value.value != nil
+        assign price_set = true
+      endif
     -%}
-    {%- if price_ceil > 0 -%}
+    {%- if price_ceil > 0 and results_count > 1 or price_set -%}
       {%- capture group -%}
         <div class="bh-plp__group">
           <span class="bh-plp__group-title">{{ filter.label }}</span>
@@ -192,7 +197,8 @@
       endif
       assign hi_half = size_ceil | divided_by: 2.0
     -%}
-    {%- if size_ceil > 0 -%}
+    {%- comment -%} Hidden when every product here is the same size, unless a size is picked {%- endcomment -%}
+    {%- if size_ceil > 0 and filter.values.size > 1 or act_lo != nil -%}
       {%- capture group -%}
         <div class="bh-plp__group">
           <span class="bh-plp__group-title">{{ filter.label }}</span>
@@ -247,7 +253,8 @@
       {%- endcapture -%}
       {%- assign pills = pills | append: pill -%}
     {%- endif -%}
-  {%- elsif filter.values.size > 0 -%}
+  {%- elsif filter.values.size > 1 or filter.active_values.size > 0 -%}
+    {%- comment -%} A filter with a single option changes nothing, so it only shows once there are two {%- endcomment -%}
     {%- capture group -%}
       <div class="bh-plp__group">
         <span class="bh-plp__group-title">{{ filter.label }}</span>

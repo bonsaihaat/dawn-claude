@@ -68,6 +68,15 @@
   {%- if filter.param_name == 'filter.p.m.custom.location' and is_search != true and no_location contains collection.handle -%}
     {%- continue -%}
   {%- endif -%}
+  {%- comment -%} Category and Subcategories filters only narrow the Sale page; other pages are already one category {%- endcomment -%}
+  {%- if filter.param_name == 'filter.p.m.custom.category' or filter.param_name == 'filter.p.m.custom.subcategories' -%}
+    {%- for value in filter.active_values -%}
+      {%- assign sale_back_value = value.value -%}
+    {%- endfor -%}
+    {%- if is_search or collection.handle != section.settings.sale_handle -%}
+      {%- continue -%}
+    {%- endif -%}
+  {%- endif -%}
   {%- if filter.type == 'price_range' -%}
     {%- liquid
       # Slider runs from ₹0 to the highest price here, rounded up to the next ₹500 (amounts in rupees)
@@ -274,6 +283,63 @@
     {%- assign filter_groups = filter_groups | append: group -%}
   {%- endif -%}
 {%- endfor -%}
+
+{%- comment -%}
+  Sale: "On sale" opens the automatic Sale collection (products with a compare-at price), narrowed to this
+  page's category or subcategory; on the Sale page, "All" goes back to that category.
+{%- endcomment -%}
+{%- if is_search != true and section.settings.sale_handle != blank -%}
+  {%- liquid
+    assign sale_base = routes.collections_url | append: '/' | append: section.settings.sale_handle
+    if collection.handle == section.settings.sale_handle
+      assign on_sale = true
+      assign all_url = routes.all_products_collection_url
+      if sale_back_value != blank
+        assign back_handle = sale_back_value | split: '> ' | last | replace: '&', 'and' | handleize
+        assign all_url = routes.collections_url | append: '/' | append: back_handle
+      endif
+      assign sale_url = collection.url
+    else
+      assign on_sale = false
+      assign all_url = collection.url
+      assign sale_url = sale_base
+      for item in results
+        if item.metafields.custom.category.value == collection.title
+          assign esc = collection.title | url_param_escape
+          assign sale_url = sale_base | append: '?filter.p.m.custom.category=' | append: esc
+          break
+        endif
+        for v in item.metafields.custom.subcategories.value
+          assign v_sub = v | split: ' > ' | last
+          if v_sub == collection.title
+            assign esc = v | url_param_escape
+            assign sale_url = sale_base | append: '?filter.p.m.custom.subcategories=' | append: esc
+            break
+          endif
+        endfor
+        if sale_url != sale_base
+          break
+        endif
+      endfor
+    endif
+  -%}
+  {%- capture group -%}
+    <div class="bh-plp__group">
+      <span class="bh-plp__group-title">Sale</span>
+      <a href="{{ all_url }}" class="bh-plp__opt{% unless on_sale %} is-on{% endunless %}" rel="nofollow">
+        <span class="bh-plp__box">{{ icon_tick }}</span>
+        <span class="bh-plp__opt-label">All</span>
+        <span class="bh-plp__opt-count"></span>
+      </a>
+      <a href="{{ sale_url }}" class="bh-plp__opt{% if on_sale %} is-on{% endif %}" rel="nofollow">
+        <span class="bh-plp__box">{{ icon_tick }}</span>
+        <span class="bh-plp__opt-label">On sale</span>
+        <span class="bh-plp__opt-count"></span>
+      </a>
+    </div>
+  {%- endcapture -%}
+  {%- assign filter_groups = filter_groups | append: group -%}
+{%- endif -%}
 
 {%- liquid
   assign has_active = false

@@ -26,7 +26,13 @@
 
   assign rating = product.metafields.reviews.rating.value
   assign rating_count = product.metafields.reviews.rating_count.value | default: 0
+  # Plants ship the exact tree photographed; pots and tools get their own wording
+  assign photo_badge = section.settings.photo_badge
   assign trust_items = section.settings.trust_items | split: ','
+  if product.metafields.custom.category.value != 'Bonsai Plants'
+    assign photo_badge = section.settings.photo_badge_other
+    assign trust_items = section.settings.trust_items_other | split: ','
+  endif
 -%}
 
 {%- capture icon_check -%}
@@ -74,8 +80,8 @@
               }}
             </div>
           {%- endfor -%}
-          {%- if section.settings.photo_badge != blank -%}
-            <span class="bh-pdp__photo-badge">{{ icon_check }} {{ section.settings.photo_badge }}</span>
+          {%- if photo_badge != blank -%}
+            <span class="bh-pdp__photo-badge">{{ icon_check }} {{ photo_badge }}</span>
           {%- endif -%}
         </div>
         {%- if product.media.size > 1 -%}
@@ -249,11 +255,13 @@
   "settings": [
     { "type": "text", "id": "fallback_crumb", "label": "Breadcrumb fallback label", "default": "Bonsai Plants" },
     { "type": "text", "id": "photo_badge", "label": "Photo badge", "default": "Real photo · this tree ships" },
+    { "type": "text", "id": "photo_badge_other", "label": "Photo badge (pots and tools)", "default": "Real product photo", "info": "Used when the product's Category is not Bonsai Plants." },
     { "type": "text", "id": "tax_note", "label": "Price note", "default": "Inclusive of all taxes" },
     { "type": "header", "content": "WhatsApp" },
     { "type": "text", "id": "whatsapp_label", "label": "Button label", "default": "Ask about this product on WhatsApp" },
     { "type": "header", "content": "Delivery check", "info": "Delivery windows and the states with delivery charges are in Theme settings → Delivery." },
     { "type": "text", "id": "trust_items", "label": "Trust items", "default": "Packed with care,Safe arrival guarantee,Exact tree in the photo", "info": "Comma-separated." },
+    { "type": "text", "id": "trust_items_other", "label": "Trust items (pots and tools)", "default": "Packed with care,Safe arrival guarantee,Quality checked", "info": "Comma-separated. Used when the product's Category is not Bonsai Plants." },
     { "type": "header", "content": "Related products" },
     { "type": "text", "id": "related_heading", "label": "Heading", "default": "You may also like" }
   ]

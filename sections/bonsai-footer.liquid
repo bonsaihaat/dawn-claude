@@ -15,8 +15,10 @@
         <div class="bh-footer__brand">
           {%- if section.settings.footer_logo != blank -%}
             {{ section.settings.footer_logo | image_url: width: 400 | image_tag: alt: shop.name, loading: 'lazy' }}
-          {%- else -%}
+          {%- elsif section.settings.builtin_footer_logo == 'original' -%}
             <img src="{{ 'bonsai-logo-light.png' | asset_url }}" alt="{{ shop.name | escape }}" width="2400" height="802" loading="lazy">
+          {%- else -%}
+            <img src="{{ 'bonsai-logo-stacked-light.png' | asset_url }}" alt="{{ shop.name | escape }}" width="2400" height="876" loading="lazy">
           {%- endif -%}
           <p class="bh-footer__blurb">{{ section.settings.footer_blurb }}</p>
           {%- liquid
@@ -131,7 +133,8 @@
   "name": "Bonsai Haat footer",
   "tag": "section",
   "settings": [
-    { "type": "image_picker", "id": "footer_logo", "label": "Footer logo", "info": "Light version for the dark footer." },
+    { "type": "image_picker", "id": "footer_logo", "label": "Footer logo", "info": "Light version for the dark footer. Leave empty to use the built-in logo chosen below." },
+    { "type": "select", "id": "builtin_footer_logo", "label": "Built-in footer logo", "options": [{ "value": "stacked", "label": "New stacked logo" }, { "value": "original", "label": "Original logo" }], "default": "stacked" },
     { "type": "textarea", "id": "footer_blurb", "label": "Blurb", "default": "India's first dedicated bonsai platform — hand-trained trees, delivered healthy." },
     { "type": "text", "id": "footer_col1_title", "label": "Column 1 title", "default": "Shop" },
     { "type": "link_list", "id": "footer_col1_menu", "label": "Column 1 menu" },

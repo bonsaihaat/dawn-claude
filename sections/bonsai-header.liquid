@@ -29,8 +29,10 @@
 {%- capture logo_markup -%}
   {%- if section.settings.logo != blank -%}
     {{ section.settings.logo | image_url: width: 400 | image_tag: alt: shop.name }}
-  {%- else -%}
+  {%- elsif section.settings.builtin_logo == 'original' -%}
     <img src="{{ 'bonsai-logo.png' | asset_url }}" alt="{{ shop.name | escape }}" width="2400" height="802">
+  {%- else -%}
+    <img src="{{ 'bonsai-logo-stacked.svg' | asset_url }}" alt="{{ shop.name | escape }}" width="419" height="153">
   {%- endif -%}
 {%- endcapture -%}
 
@@ -284,7 +286,8 @@
   "tag": "section",
   "max_blocks": 20,
   "settings": [
-    { "type": "image_picker", "id": "logo", "label": "Logo" },
+    { "type": "image_picker", "id": "logo", "label": "Logo", "info": "Leave empty to use the built-in logo chosen below." },
+    { "type": "select", "id": "builtin_logo", "label": "Built-in logo", "options": [{ "value": "stacked", "label": "New stacked logo" }, { "value": "original", "label": "Original logo" }], "default": "stacked" },
     { "type": "link_list", "id": "menu", "label": "Menu", "info": "Leave empty to use the design's default navigation." },
     { "type": "url", "id": "account_url", "label": "Account link", "info": "Leave empty to use Shopify's default account link." },
     { "type": "url", "id": "track_url", "label": "Track order link", "info": "Leave empty to use the Track123 tracking page (/apps/track-order)." },

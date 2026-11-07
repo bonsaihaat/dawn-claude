@@ -1,6 +1,7 @@
 {%- comment -%}
-  Accepts: image, mobile_image (optional, shown below 820px), headline, caption, url (optional),
+  Accepts: image, mobile_image (optional, shown below 820px), headline (optional), caption, url (optional),
   first (true for the first slide), attributes (optional)
+  Without a headline the slide shows just the photo (and caption), with no top shade.
   Images may be image objects or media images (from a metaobject file field).
 {%- endcomment -%}
 {%- liquid
@@ -20,8 +21,9 @@
     assign slide_loading = 'lazy'
   endif
   assign words = headline | split: ' '
+  assign slide_label = headline | default: caption | default: shop.name
 -%}
-<div class="bh-slide{% if first %} is-active{% endif %}" style="--words: {{ words.size }}" data-bh-slide {{ attributes }}>
+<div class="bh-slide{% if first %} is-active{% endif %}{% if headline == blank %} bh-slide--no-title{% endif %}" style="--words: {{ words.size }}" data-bh-slide {{ attributes }}>
   {%- if slide_image != blank -%}
     {%- if slide_mobile != blank -%}
       <picture>
@@ -39,24 +41,26 @@
         widths: '600, 900, 1200, 1600, 2000, 2400',
         sizes: '(min-width: 1180px) 1140px, calc(100vw - 40px)',
         loading: slide_loading,
-        alt: headline
+        alt: slide_label
     }}
     {%- if slide_mobile != blank -%}
       </picture>
     {%- endif -%}
   {%- endif -%}
   <div class="bh-slide__shade"></div>
-  <div class="bh-slide__top">
-    <h1 class="bh-slide__title">
-      {%- render 'bonsai-words', text: headline -%}
-    </h1>
-  </div>
+  {%- if headline != blank -%}
+    <div class="bh-slide__top">
+      <h1 class="bh-slide__title">
+        {%- render 'bonsai-words', text: headline -%}
+      </h1>
+    </div>
+  {%- endif -%}
   {%- if caption != blank -%}
     <div class="bh-slide__bottom">
       <span class="bh-slide__chip">{{ caption }}</span>
     </div>
   {%- endif -%}
   {%- if url != blank -%}
-    <a href="{{ url }}" class="bh-slide__link" aria-label="{{ headline | escape }}"></a>
+    <a href="{{ url }}" class="bh-slide__link" aria-label="{{ slide_label | escape }}"></a>
   {%- endif -%}
 </div>

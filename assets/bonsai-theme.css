@@ -204,6 +204,8 @@ body.bh-body { background: #faf7f1; }
 .bh-word { display: inline-block; overflow: hidden; vertical-align: top; padding: 0.06em 0 0.14em; margin: -0.06em 0 -0.14em; }
 .bh-word__in { display: inline-block; }
 .bh-slide__shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(27, 31, 23, 0.4) 0%, rgba(27, 31, 23, 0) 34%, rgba(27, 31, 23, 0) 60%, rgba(27, 31, 23, 0.55) 100%); pointer-events: none; }
+/* No headline: keep only the bottom darkening (caption and dots) so the photo shows untouched */
+.bh-slide--no-title .bh-slide__shade { background: linear-gradient(180deg, rgba(27, 31, 23, 0) 60%, rgba(27, 31, 23, 0.55) 100%); }
 .bh-slide__top { position: absolute; left: 0; right: 0; top: 0; padding: clamp(20px, 4vw, 40px); display: flex; flex-direction: column; gap: 12px; pointer-events: none; }
 .bh-slide__title { margin: 0; font-weight: 700; font-size: clamp(28px, 4.6vw, 52px); line-height: 1.08; color: #ffffff; max-width: 13ch; }
 .bh-slide__bottom { position: absolute; left: clamp(16px, 3vw, 32px); bottom: clamp(16px, 3vw, 32px); right: clamp(16px, 3vw, 32px); }

@@ -20,7 +20,7 @@
       assign slide_entries = shop.metaobjects.hero_slide.values
       assign slide_keys = ''
       for entry in slide_entries
-        if entry.show_on_homepage.value == false or entry.image.value == blank or entry.headline.value == blank
+        if entry.show_on_homepage.value == false or entry.image.value == blank
           continue
         endif
         assign sort_position = entry.position.value | default: 9999 | at_least: 0 | at_most: 9999 | plus: 10000

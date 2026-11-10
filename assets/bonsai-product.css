@@ -108,16 +108,20 @@
 .bh-pdp__addon-add.is-added { background: #2E4716; border-color: #2E4716; color: #ffffff; }
 .bh-pdp__addon-add[aria-busy="true"] { color: transparent; }
 .bh-pdp__addon-add[aria-busy="true"]::after { content: ''; position: absolute; left: 50%; top: 50%; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; border: 2px solid #5F8F2B; border-right-color: transparent; box-sizing: border-box; animation: bh-pdp-spin 0.7s linear infinite; }
-/* Desktop: the packs sit side by side as compact cards under a plain heading (stacked box below 1024px, where the column is too narrow) */
+/* The box is printed twice: under Add to cart (mobile) and as a full-width band under the product (desktop); show one */
+.bh-pdp__addon-slot--wide { display: none; }
+@media (min-width: 820px) {
+  .bh-pdp__addon-slot--info { display: none; }
+  .bh-pdp__addon-slot--wide { display: block; margin-top: 28px; }
+  /* Band: heading on the left, the packs side by side on the right */
+  .bh-pdp__addon-slot--wide .bh-pdp__addon { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 12px 16px; padding: 18px 20px; border-radius: 20px; }
+  .bh-pdp__addon-slot--wide .bh-pdp__addon-title { grid-column: 1 / -1; font-size: 16px; }
+  .bh-pdp__addon-slot--wide .bh-pdp__addon-item { border: 1px solid #efe9dc; border-radius: 14px; padding: 10px 12px; }
+  .bh-pdp__addon-slot--wide .bh-pdp__addon-item + .bh-pdp__addon-item { border-top: 1px solid #efe9dc; padding-top: 10px; }
+}
 @media (min-width: 1024px) {
-  .bh-pdp__addon { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; border: none; background: none; padding: 0; border-radius: 0; }
-  .bh-pdp__addon-title { grid-column: 1 / -1; }
-  .bh-pdp__addon-item { background: #ffffff; border: 1px solid #e3dccb; border-radius: 16px; padding: 10px; gap: 10px; transition: border-color 0.2s ease; }
-  .bh-pdp__addon-item:hover { border-color: #b9cf94; }
-  .bh-pdp__addon-item + .bh-pdp__addon-item { border-top: 1px solid #e3dccb; padding-top: 10px; }
-  .bh-pdp__addon-item + .bh-pdp__addon-item:hover { border-color: #b9cf94; }
-  .bh .bh-pdp__addon-img { width: 48px; height: 48px; border-radius: 10px; }
-  .bh-pdp__addon-add { min-width: 0; height: 34px; padding: 0 14px; font-size: 13px; }
+  .bh-pdp__addon-slot--wide .bh-pdp__addon { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr); padding: 18px 24px; }
+  .bh-pdp__addon-slot--wide .bh-pdp__addon-title { grid-column: auto; font-size: 17px; line-height: 1.3; padding-right: 8px; }
 }
 
 .bh .bh-pdp__ask { display: flex; align-items: center; justify-content: center; gap: 8px; border: 1.5px solid #1B1F17; border-radius: 999px; padding: 13px; font-size: 14px; font-weight: 600; color: #1B1F17; text-decoration: none; }

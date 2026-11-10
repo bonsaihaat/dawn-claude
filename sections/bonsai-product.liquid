@@ -57,6 +57,19 @@
       <span class="bh-pdp__crumb-current">{{ product.title }}</span>
     </nav>
 
+    {%- comment -%} Plant care add-on: plants only. Shown as a full-width band under the photo and details on desktop, and under Add to cart on mobile (CSS picks one). {%- endcomment -%}
+    {%- capture addon_html -%}
+      {%- if product.metafields.custom.category.value == 'Bonsai Plants' -%}
+        {%- render 'bonsai-pdp-addon',
+          heading: section.settings.addon_heading,
+          product_1: section.settings.addon_product_1,
+          product_2: section.settings.addon_product_2,
+          label_1: section.settings.addon_label_1,
+          label_2: section.settings.addon_label_2
+        -%}
+      {%- endif -%}
+    {%- endcapture -%}
+
     <div class="bh-pdp__layout">
 
       <div class="bh-pdp__gallery">
@@ -162,14 +175,8 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" stroke="#1B1F17" stroke-width="1.7" stroke-linejoin="round"/></svg>
           </button>
         </div>
-        {%- if product.metafields.custom.category.value == 'Bonsai Plants' -%}
-          {%- render 'bonsai-pdp-addon',
-            heading: section.settings.addon_heading,
-            product_1: section.settings.addon_product_1,
-            product_2: section.settings.addon_product_2,
-            label_1: section.settings.addon_label_1,
-            label_2: section.settings.addon_label_2
-          -%}
+        {%- if addon_html != blank -%}
+          <div class="bh-pdp__addon-slot bh-pdp__addon-slot--info">{{ addon_html }}</div>
         {%- endif -%}
         <a href="{{ wa_url }}" target="_blank" rel="noopener" class="bh-pdp__ask">
           <img src="{{ 'whatsapp-logo.png' | asset_url }}" width="22" height="22" alt="" loading="lazy" aria-hidden="true">
@@ -193,6 +200,10 @@
         </div>
       </div>
     </div>
+
+    {%- if addon_html != blank -%}
+      <div class="bh-pdp__addon-slot bh-pdp__addon-slot--wide">{{ addon_html }}</div>
+    {%- endif -%}
 
     {%- liquid
       assign related_source = crumb_collection
@@ -266,7 +277,7 @@
     { "type": "text", "id": "photo_badge", "label": "Photo badge", "default": "Real photo · this tree ships" },
     { "type": "text", "id": "photo_badge_other", "label": "Photo badge (pots and tools)", "default": "Real product photo", "info": "Used when the product's Category is not Bonsai Plants." },
     { "type": "text", "id": "tax_note", "label": "Price note", "default": "Inclusive of all taxes" },
-    { "type": "header", "content": "Plant care add-on", "info": "Shown below Add to cart on plants only (Category = Bonsai Plants). Sold-out add-ons are hidden." },
+    { "type": "header", "content": "Plant care add-on", "info": "Shown on plants only (Category = Bonsai Plants): as a full-width band under the product on desktop, under Add to cart on mobile. Sold-out add-ons are hidden." },
     { "type": "text", "id": "addon_heading", "label": "Heading", "default": "Complete Your Plant Care With Slow Release Fertilizer" },
     { "type": "product", "id": "addon_product_1", "label": "Add-on product 1" },
     { "type": "text", "id": "addon_label_1", "label": "Add-on 1 short name", "default": "Small pack", "info": "Shown instead of the full product title. Leave empty to use the title." },

@@ -128,6 +128,45 @@
         });
     }
     addBtn.addEventListener('click', addToCart);
+
+    // Plant care add-on: each Add button puts its product straight into the cart
+    root.querySelectorAll('[data-bh-addon-add]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (btn.getAttribute('aria-busy') === 'true') return;
+        var shopRoot = (window.Shopify && Shopify.routes ? Shopify.routes.root : '/');
+        btn.setAttribute('aria-busy', 'true');
+        fetch(shopRoot + 'cart/add.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({ items: [{ id: Number(btn.getAttribute('data-bh-addon-add')), quantity: 1 }] }),
+        })
+          .then(function (r) {
+            return r.json().then(function (body) {
+              if (!r.ok) throw new Error(body.description || body.message || 'Could not add');
+            });
+          })
+          .then(function () {
+            btn.removeAttribute('aria-busy');
+            btn.textContent = 'Added';
+            btn.classList.add('is-added');
+            return Promise.all([
+              fetch(shopRoot + 'cart.js').then(function (r) { return r.json(); }),
+              new Promise(function (resolve) { setTimeout(resolve, calm ? 0 : 550); }),
+            ]);
+          })
+          .then(function (results) {
+            document.querySelectorAll('.bh-badge').forEach(function (b) { b.textContent = results[0].item_count; });
+            document.dispatchEvent(new CustomEvent('bh:cart:added'));
+            setTimeout(function () { btn.textContent = 'Add'; btn.classList.remove('is-added'); }, 2500);
+          })
+          .catch(function (err) {
+            btn.removeAttribute('aria-busy');
+            btn.textContent = 'Try again';
+            btn.title = err.message;
+            setTimeout(function () { btn.textContent = 'Add'; btn.removeAttribute('title'); }, 2500);
+          });
+      });
+    });
     if (proxyBtn) proxyBtn.addEventListener('click', addToCart);
 
     // Wishlist (per-browser, snippets/bonsai-wishlist-store.liquid)

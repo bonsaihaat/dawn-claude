@@ -1,0 +1,52 @@
+{%- comment -%}
+  "Complete your plant care" add-on box on the product page, shown only on plants
+  (Category = Bonsai Plants). Lists up to two add-on products picked in the section
+  settings, each with its own Add button that puts it straight into the cart.
+  A product that is sold out or missing is skipped; with none left the box hides.
+  Accepts: heading, product_1, product_2, label_1, label_2 (short names; product title when blank)
+{%- endcomment -%}
+{%- liquid
+  assign shown = 0
+  for i in (1..2)
+    if i == 1
+      assign p = product_1
+    else
+      assign p = product_2
+    endif
+    if p != blank and p.available
+      assign shown = shown | plus: 1
+    endif
+  endfor
+-%}
+{%- if shown > 0 -%}
+  <div class="bh-pdp__addon" data-bh-addon>
+    <span class="bh-pdp__addon-title">{{ heading }}</span>
+    {%- for i in (1..2) -%}
+      {%- if i == 1 -%}
+        {%- assign p = product_1 -%}{%- assign label = label_1 -%}
+      {%- else -%}
+        {%- assign p = product_2 -%}{%- assign label = label_2 -%}
+      {%- endif -%}
+      {%- if label == blank -%}{%- assign label = p.title -%}{%- endif -%}
+      {%- if p == blank or p.available == false -%}{%- continue -%}{%- endif -%}
+      {%- assign v = p.selected_or_first_available_variant -%}
+      <div class="bh-pdp__addon-item">
+        <a href="{{ p.url }}" class="bh-pdp__addon-img">
+          {%- if p.featured_media -%}
+            {{ p.featured_media | image_url: width: 120 | image_tag: width: 56, height: 56, loading: 'lazy', alt: p.featured_media.alt | default: p.title }}
+          {%- endif -%}
+        </a>
+        <a href="{{ p.url }}" class="bh-pdp__addon-text">
+          <span class="bh-pdp__addon-name">{{ label }}</span>
+          <span class="bh-pdp__addon-price">
+            {%- render 'bonsai-money', amount: v.price -%}
+            {%- if v.compare_at_price > v.price -%}
+              <s class="bh-price__compare">{%- render 'bonsai-money', amount: v.compare_at_price -%}</s>
+            {%- endif -%}
+          </span>
+        </a>
+        <button type="button" class="bh-pdp__addon-add" data-bh-addon-add="{{ v.id }}" aria-label="Add {{ p.title | escape }} to cart">Add</button>
+      </div>
+    {%- endfor -%}
+  </div>
+{%- endif -%}

@@ -3,7 +3,9 @@
   "sections": {
     "main": {
       "type": "bonsai-contact",
-      "settings": {}
+      "settings": {
+        "email": "support@bonsaihaat.in"
+      }
     }
   },
   "order": [

@@ -7,7 +7,6 @@ body.bh-body { background: #faf7f1; }
 @keyframes bh-dot-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @keyframes bh-word-up { from { transform: translateY(110%); } to { transform: none; } }
 @keyframes bh-unfold { from { clip-path: inset(4% 4% round 44px); } to { clip-path: inset(0 round 26px); } }
-@keyframes bh-settle { from { scale: 1.14; } to { scale: 1; } }
 
 /* Page-to-page transitions (names are set by snippets/bonsai-view-transitions.liquid): a product card's
    photo grows into the product page's main photo; everything else crossfades */
@@ -220,18 +219,14 @@ body.bh-body { background: #faf7f1; }
 .bh-hero__dot.is-active::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: #5F8F2B; transform-origin: left; }
 
 @media (prefers-reduced-motion: no-preference) {
-  /* Slow push-in on the active slide; the leaving slide resets only after its 0.6s fade */
-  .bh-slide__img { transition: transform 0s linear 0.6s; }
-  .bh-slide.is-zoomed .bh-slide__img { transform: scale(1.08); transition: transform 6s cubic-bezier(0.25, 0.6, 0.3, 1); }
   /* Headline words, then the chip, rise in each time a slide becomes active */
   .bh-slide.is-active .bh-word__in { animation: bh-word-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(0.15s + var(--w, 0) * 60ms); }
   .bh-slide.is-active .bh-slide__chip { animation: bh-rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(0.35s + var(--words, 0) * 60ms); }
   /* Active dot fills over the autoplay interval (5s, matches bonsai-theme.js) */
   .bh-hero__dot.is-active::after { animation: bh-dot-fill 5s linear both; }
 }
-/* First paint: the hero card opens out from a slightly inset, rounder frame while its image settles back */
+/* First paint: the hero card opens out from a slightly inset, rounder frame (photos are never zoomed, so logos in them aren't cropped) */
 .bh-anim .bh-hero { animation: bh-unfold 1.2s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.bh-anim .bh-hero .bh-slide__img { animation: bh-settle 1.8s cubic-bezier(0.16, 1, 0.3, 1) both; }
 
 /* Promo cards */
 .bh-promos { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 16px; }

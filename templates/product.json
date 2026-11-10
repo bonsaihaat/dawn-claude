@@ -3,8 +3,13 @@
   "sections": {
     "main": {
       "type": "bonsai-product",
-      "settings": {}
+      "settings": {
+        "addon_product_1": "slow-release-fertilizer-for-bonsai-all-in-one-balanced-nutrition-small-pack",
+        "addon_product_2": "slow-release-fertilizer-for-bonsai-all-in-one-balanced-nutrition"
+      }
     }
   },
-  "order": ["main"]
+  "order": [
+    "main"
+  ]
 }
